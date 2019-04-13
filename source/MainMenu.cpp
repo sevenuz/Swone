@@ -1,8 +1,8 @@
-#include <Mainmenu.h>
+#include <MainMenu.h>
 
 MainMenu::MainMenu(Controller& c):m_ps(100), m_controller(c) {
 
-    m_controller.pushLogMsg("MainMenu created" + Settings::toH(TEXT_MARGIN_TOP));
+    m_controller.pushLogMsg("MainMenu created");
 
     m_ps.setColor(sf::Color::White);
     m_ps.setDrawingType(sf::Quads);

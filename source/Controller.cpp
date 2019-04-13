@@ -8,7 +8,7 @@ Controller::Controller(sf::RenderWindow& w): m_window(w) {
 }
 
 Controller::~Controller() {
-    //dtor
+    pushLogMsg("Controller destroyed");
 }
 
 void Controller::iniSettings() {
