@@ -1,0 +1,17 @@
+width=10
+height=10
+border=#
+name=Rimp
+
+map:start
+   __
+
+#        #
+#  ww    #
+#     __ #
+#  __    #
+#________#
+    ##
+map:end
+
+weapon=small

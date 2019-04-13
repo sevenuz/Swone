@@ -1,0 +1,18 @@
+project('swone', 'cpp', default_options : ['cpp_std=c++11'])
+
+GL = dependency('GL')
+
+sfmlGraphics = dependency('sfml-graphics')
+sfmlSystem = dependency('sfml-system')
+sfmlWindow = dependency('sfml-window')
+
+incdir = include_directories('include')
+
+iSource = include_directories('./include')
+iInclude = include_directories('./source')
+iImgui = include_directories('./bib/imgui')
+iTinydir = include_directories('./bib/tinydir')
+
+src = ['source/main.cpp', 'bib/imgui/imgui-SFML.cpp', 'bib/imgui/imgui.cpp', 'bib/imgui/imgui_draw.cpp', 'source/Controller.cpp', 'source/GamePanel.cpp', 'source/Mainmenu.cpp', 'source/Settings.cpp', 'source/game/GameController.cpp', 'source/game/GameWindow.cpp', 'source/game/Map.cpp', 'source/game/MapReader.cpp', 'source/game/Player.cpp', 'source/graphics/ParticleSystem.cpp', 'source/graphics/Animation.cpp', 'source/graphics/AnimatedSprite.cpp']
+
+executable('swone', src, cpp_args : ['-std=c++11'], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow])
