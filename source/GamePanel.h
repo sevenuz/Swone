@@ -35,7 +35,7 @@ enum { PLAY, FIRST = PLAY, LAST = PLAY};
 
 class GamePanel: public sf::Drawable,public Handleable {
 private:
-    ParticleSystem m_ps;
+    //ParticleSystem m_ps;
     Controller & m_controller;
     GameController m_gameController;
     GameWindow m_gameWindow;
@@ -48,6 +48,7 @@ private:
 
     MapReader m_mapReader;
 
+    bool m_mapsFound = false;
     int m_selectedAction = 0;
     int m_selectedMap = 0;
     std::vector<Map *> m_maps;

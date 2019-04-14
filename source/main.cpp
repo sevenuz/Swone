@@ -2,7 +2,7 @@
 #include "imgui-SFML.h"
 
 #include <SFML/Graphics.hpp>
-#include <Mainmenu.h>
+#include <MainMenu.h>
 #include <GamePanel.h>
 #include <graphics/ParticleSystem.h>
 #include <string>
@@ -151,9 +151,9 @@ void startMainLoop() {
 int main() {
 	try{
 		std::cout << "hallo in main" << std::endl;
-	    iniImGui();
-	    iniSettings();
-	    startMainLoop();
+		iniImGui();
+		iniSettings();
+		startMainLoop();
 	} catch (...) {
 		std::cout << "error" << std::endl;
 	}

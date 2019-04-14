@@ -1,14 +1,15 @@
 #include <GamePanel.h>
 
-GamePanel::GamePanel(Controller& c) :
-		m_ps(200), m_controller(c), m_gameController(c), m_gameWindow(m_gameController), m_mapReader(c) {
+GamePanel::GamePanel(Controller& c) : m_controller(c), m_gameController(c), m_gameWindow(m_gameController), m_mapReader(c) {
+//m_ps(100)
+	m_controller.pushLogMsg("GamePanel created");
 
-//	m_controller.pushLogMsg("GamePanel created");
-
+/*
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
 	m_ps.setLifetime(sf::seconds(3));
 	//m_ps.setOrigin(Settings::toW(0.1f), Settings::toH(0.1f), 580, 300, Origin::ON_BORDER);
+*/
 
 	m_play.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
 	m_play.setString("Play");
@@ -33,7 +34,7 @@ GamePanel::GamePanel(Controller& c) :
 	m_switchRight.setColor(sf::Color::Yellow);
 	m_switchRight.setCharacterSize(Settings::toF(50));
 
-	readMapsFromDir();
+	//readMapsFromDir();
 }
 
 GamePanel::~GamePanel() {
@@ -47,6 +48,8 @@ void GamePanel::readMapsFromDir() {
 	if(!dir.has_next) {
 		m_controller.pushLogMsg("no files or no dir available.", "error");
 		throw std::invalid_argument("no files or no dir available");
+	} else {
+		m_mapsFound = true;
 	}
 
 	while (dir.has_next)
@@ -76,6 +79,11 @@ void GamePanel::readMapsFromDir() {
 }
 
 void GamePanel::setMapSelection(int i){
+	if(! m_mapsFound){
+		m_controller.pushLogMsg("no maps found.", "error");
+		return;
+	}
+
 	if(i >= (int) m_maps.size()) {
 		i = 0;
 	}
@@ -85,9 +93,10 @@ void GamePanel::setMapSelection(int i){
 
 	m_selectedMap = i;
 
-	m_ps.setOrigin(Settings::toW(0.1f), Settings::toH(0.1f), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageHeight(), Origin::ON_BORDER);
+	//m_ps.setOrigin(Settings::toW(0.1f), Settings::toH(0.1f), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageHeight(), Origin::ON_BORDER);
 
 	m_mapName.setString(m_maps[m_selectedMap]->getName());
+	m_controller.pushLogMsg(m_maps[m_selectedMap]->getName());
 
 	m_gameController.setMap(m_maps[m_selectedMap]);
 }
@@ -119,11 +128,9 @@ void GamePanel::event(sf::Event& event) {
 				}
 				if (event.key.code == sf::Keyboard::Left) {
 					setMapSelection(m_selectedMap - 1);
-					m_controller.pushLogMsg(m_maps[m_selectedMap]->getName());
 				}
 				if (event.key.code == sf::Keyboard::Right) {
 					setMapSelection(m_selectedMap + 1);
-					m_controller.pushLogMsg(m_maps[m_selectedMap]->getName());
 				}
 				if(event.key.code == sf::Keyboard::Down) {
 					setActionSelection(m_selectedMap + 1);
@@ -156,8 +163,7 @@ void GamePanel::event(sf::Event& event) {
 }
 
 void GamePanel::update(sf::Time ellapsed) {
-	m_ps.update(ellapsed);
-
+	//m_ps.update(ellapsed);
 	switch(m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
 		//m_maps[m_selectedMap]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
@@ -173,27 +179,32 @@ void GamePanel::update(sf::Time ellapsed) {
 void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 	states.transform *= getTransform();
 	states.texture = NULL;
-
 	sf::View view(sf::FloatRect(0,0,m_controller.settings.WIDTH,m_controller.settings.HEIGHT));
 	view.setViewport(sf::FloatRect(0.1, 0.1, 0.4, 0.4));
 
 	switch(m_controller.getActiveGameWindow()) {
-		case ActiveGameWindow::MAPSELECTION:
-			target.draw(m_ps, states);
-			m_controller.getWindow().setView(view);
+	case ActiveGameWindow::MAPSELECTION:
+		//target.draw(m_ps, states);
+		m_controller.getWindow().setView(view);
+
+		if(m_mapsFound){
 			target.draw(m_maps[m_selectedMap]->getSprite(), states);
-			m_controller.getWindow().setView(m_controller.getWindow().getDefaultView());
-			target.draw(m_play, states);
-			target.draw(m_mapName, states);
-			target.draw(m_switchLeft, states);
-			target.draw(m_switchRight, states);
-			break;
-		case ActiveGameWindow::GAME:
-			//target.draw(* m_maps[m_selectedMap], states);//calls draw method of map
-			target.draw(m_gameWindow, states);
-			break;
-		default:
-			m_controller.setActiveGameWindow(ActiveGameWindow::MAPSELECTION);
-			break;
 		}
+		
+		m_controller.getWindow().setView(m_controller.getWindow().getDefaultView());
+		target.draw(m_play, states);
+		target.draw(m_mapName, states);
+		target.draw(m_switchLeft, states);
+		target.draw(m_switchRight, states);
+		break;
+	case ActiveGameWindow::GAME:
+		if(m_mapsFound){
+			target.draw(* m_maps[m_selectedMap], states);//calls draw method of map
+		}
+		target.draw(m_gameWindow, states);
+		break;
+	default:
+		m_controller.setActiveGameWindow(ActiveGameWindow::MAPSELECTION);
+		break;
+	}
 };

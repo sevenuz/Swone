@@ -1,13 +1,13 @@
 #include <MainMenu.h>
 
-MainMenu::MainMenu(Controller& c):m_ps(100), m_controller(c) {
+MainMenu::MainMenu(Controller& c): m_controller(c) {
 
     m_controller.pushLogMsg("MainMenu created");
-
+/*
     m_ps.setColor(sf::Color::White);
     m_ps.setDrawingType(sf::Quads);
     m_ps.setLifetime(sf::seconds(3));
-
+*/
     m_selectedMenupoint = Menupoint::LOKAL;
 
     m_header.setString("Swone");
@@ -47,7 +47,7 @@ void MainMenu::changeFont(sf::Font & font) {
 void MainMenu::selectedStyle(sf::Text& t) {
     t.setCharacterSize(Settings::toF(TEXT_SELECTED_SIZE));
     t.setColor(sf::Color::Yellow);
-    m_ps.setOrigin(t.getGlobalBounds().left,t.getGlobalBounds().top,t.getGlobalBounds().width,t.getGlobalBounds().height,Origin::ON_BORDER);
+    //m_ps.setOrigin(t.getGlobalBounds().left,t.getGlobalBounds().top,t.getGlobalBounds().width,t.getGlobalBounds().height,Origin::ON_BORDER);
 }
 
 void MainMenu::deselectedStyle(sf::Text& t) {
@@ -157,14 +157,14 @@ void MainMenu::event(sf::Event& event) {
 }
 
 void MainMenu::update(sf::Time ellapsed) {
-    m_ps.update(ellapsed);
+    //m_ps.update(ellapsed);
 }
 
 void MainMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;
 
-	target.draw(m_ps, states);
+	//target.draw(m_ps, states);
 	target.draw(m_header, states);
 	target.draw(m_lokal, states);
 	target.draw(m_online, states);
