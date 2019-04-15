@@ -31,3 +31,21 @@ void GameController::setMap(Map * map){
 void GameController::pushPlayer(Player * player){
 	m_player.push_back(player);
 }
+
+void GameController::updateMap(sf::Time ellapsed){
+	getMap()->update(ellapsed);
+}
+void GameController::eventMap(sf::Event& e){
+	getMap()->event(e);
+}
+
+void GameController::updatePlayers(sf::Time ellapsed){
+	for(unsigned int i = 0; i < getPlayers().size(); i++){
+		getPlayers()[i]->update(ellapsed);
+	}
+}
+void GameController::eventPlayers(sf::Event& e){
+	for(unsigned int i = 0; i < getPlayers().size(); i++){
+		getPlayers()[i]->event(e);
+	}
+}

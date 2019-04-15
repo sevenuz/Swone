@@ -14,6 +14,13 @@ public:
 
     Map * getMap();
     std::vector<Player *> getPlayers();
+
+    void updateMap(sf::Time ellapsed);
+    void eventMap(sf::Event& e);
+
+    void updatePlayers(sf::Time ellapsed);
+    void eventPlayers(sf::Event& e);
+
     void setMap(Map * m);
     void pushPlayer(Player *);
 protected:

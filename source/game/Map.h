@@ -68,6 +68,8 @@ private:
     unsigned int m_width = 0;
     unsigned int m_height = 0;
 
+    unsigned int m_mapDataSize = 0;
+
     unsigned int m_imgWidth = 0;
     unsigned int m_imgHeight = 0;
 

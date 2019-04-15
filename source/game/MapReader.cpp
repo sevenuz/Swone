@@ -40,7 +40,6 @@ void MapReader::readMap()
     }
     m_controller.pushLogMsg("end reading map.");
     m_map->createMapImage();
-    m_controller.pushLogMsg("created map image.");
 };
 
 void MapReader::parseLine(std::string line)
@@ -125,10 +124,17 @@ void MapReader::startParseMap()
     m_controller.pushLogMsg("start map parsing");
 }
 
-void MapReader::endParseMap()
-{
-    m_mapParse = false;
-    m_controller.pushLogMsg("end of map parsing");
+void MapReader::endParseMap() {
+	//if linecount is not defined for the full height it becomes whitespace
+	for(unsigned int j = m_lineCounter; j < m_map->getHeight(); j++) {
+		for(unsigned int i = 0; i < m_map->getWidth(); i++) {
+		        parseMapChar(*" ", m_lineCounter, i);
+		}
+		m_controller.pushLogMsg(std::to_string(m_lineCounter));
+		m_lineCounter++;
+	}
+   	m_mapParse = false;
+    	m_controller.pushLogMsg("end of map parsing");
 }
 
 void MapReader::parseMapChar(char c, unsigned int h, unsigned int w)

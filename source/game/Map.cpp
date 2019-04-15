@@ -86,7 +86,8 @@ void Map::scaleToFit(unsigned int w, unsigned int h){
 
 void Map::iniMapData() {
 	if (m_width > 0 && m_height > 0) {
-		m_mapData = new unsigned int[m_height * m_width];
+		m_mapDataSize = m_height * m_width;
+		m_mapData = new unsigned int[m_mapDataSize];
 	} else {
 		throw std::invalid_argument("width or height are not set");
 	}
@@ -101,7 +102,7 @@ void Map::createMapImage() {
 	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Black);
 	int l = 0; //lines
 	int c = -1; //columns
-	for (unsigned int i = 0; i < m_width * m_height; i++) {
+	for (unsigned int i = 0; i < m_mapDataSize; i++) {
 		if (i < m_width * (l + 1)) {
 			c++;
 		} else {
@@ -113,7 +114,7 @@ void Map::createMapImage() {
 						Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
 	}
 	if (!m_texture.loadFromImage(m_mapImage)) {
-		//error
+		throw std::invalid_argument("error: convert img to texture.");
 	} else {
 		m_sprite.setTexture(m_texture);
 		m_sprite.setPosition(sf::Vector2f(0, 0));

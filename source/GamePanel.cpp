@@ -34,11 +34,11 @@ GamePanel::GamePanel(Controller& c) : m_controller(c), m_gameController(c), m_ga
 	m_switchRight.setColor(sf::Color::Yellow);
 	m_switchRight.setCharacterSize(Settings::toF(50));
 
-	//readMapsFromDir();
+	readMapsFromDir();
 }
 
 GamePanel::~GamePanel() {
-//	m_controller.pushLogMsg("GamePanel destroyed");
+	m_controller.pushLogMsg("GamePanel destroyed");
 }
 
 void GamePanel::readMapsFromDir() {
@@ -111,8 +111,12 @@ void GamePanel::setActionSelection(int i){
 }
 
 void GamePanel::startGame(){
-	m_controller.pushLogMsg("start game");
-	m_controller.setActiveGameWindow(ActiveGameWindow::GAME);
+	if(m_mapsFound){
+		m_controller.pushLogMsg("start game");
+		m_controller.setActiveGameWindow(ActiveGameWindow::GAME);	
+	} else {
+		m_controller.pushLogMsg("No Map. Can't start the game.", "error");
+	}
 }
 
 void GamePanel::event(sf::Event& event) {
@@ -198,9 +202,6 @@ void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 		target.draw(m_switchRight, states);
 		break;
 	case ActiveGameWindow::GAME:
-		if(m_mapsFound){
-			target.draw(* m_maps[m_selectedMap], states);//calls draw method of map
-		}
 		target.draw(m_gameWindow, states);
 		break;
 	default:
