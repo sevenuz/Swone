@@ -10,6 +10,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
+#include <sstream>
 #include <vector>
 #include <random>
 #include <cmath>

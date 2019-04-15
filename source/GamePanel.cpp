@@ -1,15 +1,13 @@
 #include <GamePanel.h>
 
-GamePanel::GamePanel(Controller& c) : m_controller(c), m_gameController(c), m_gameWindow(m_gameController), m_mapReader(c) {
-//m_ps(100)
+GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameController(c), m_gameWindow(m_gameController), m_mapReader(c) {
+
 	m_controller.pushLogMsg("GamePanel created");
 
-/*
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
 	m_ps.setLifetime(sf::seconds(3));
 	//m_ps.setOrigin(Settings::toW(0.1f), Settings::toH(0.1f), 580, 300, Origin::ON_BORDER);
-*/
 
 	m_play.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
 	m_play.setString("Play");
@@ -93,7 +91,7 @@ void GamePanel::setMapSelection(int i){
 
 	m_selectedMap = i;
 
-	//m_ps.setOrigin(Settings::toW(0.1f), Settings::toH(0.1f), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageHeight(), Origin::ON_BORDER);
+	m_ps.setOrigin(Settings::toW(0.1f), Settings::toH(0.1f), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageHeight(), Origin::ON_BORDER);
 
 	m_mapName.setString(m_maps[m_selectedMap]->getName());
 	m_controller.pushLogMsg(m_maps[m_selectedMap]->getName());
@@ -167,7 +165,7 @@ void GamePanel::event(sf::Event& event) {
 }
 
 void GamePanel::update(sf::Time ellapsed) {
-	//m_ps.update(ellapsed);
+	m_ps.update(ellapsed);
 	switch(m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
 		//m_maps[m_selectedMap]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
@@ -188,7 +186,7 @@ void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 
 	switch(m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
-		//target.draw(m_ps, states);
+		target.draw(m_ps, states);
 		m_controller.getWindow().setView(view);
 
 		if(m_mapsFound){

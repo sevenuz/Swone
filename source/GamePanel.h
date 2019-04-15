@@ -35,7 +35,7 @@ enum { PLAY, FIRST = PLAY, LAST = PLAY};
 
 class GamePanel: public sf::Drawable,public Handleable {
 private:
-    //ParticleSystem m_ps;
+    ParticleSystem m_ps;
     Controller & m_controller;
     GameController m_gameController;
     GameWindow m_gameWindow;

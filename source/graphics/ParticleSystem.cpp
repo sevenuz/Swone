@@ -1,5 +1,4 @@
 #include <graphics/ParticleSystem.h>
-#include <sstream>
 
 //ParticleSystem::ParticleSystem() {}
 
@@ -21,8 +20,8 @@ ParticleSystem::ParticleSystem(unsigned int n) {
 }
 
 ParticleSystem::~ParticleSystem() {
-    delete &m_particles;
-    //deleting m_verticles crashs
+	m_vertices.clear();
+	m_particles.clear();
 }
 
 void ParticleSystem::resetParticle(Particle* particle) {
@@ -138,10 +137,12 @@ void ParticleSystem::reset() {
 }
 
 void ParticleSystem::resetVertices() {
+    m_vertices.clear();
     m_vertices = sf::VertexArray(m_drawingType,m_particleNumber*m_drawingFactor);
 }
 
 void ParticleSystem::resetParticles() {
+    m_particles.clear();
     m_particles = std::vector<Particle>(m_particleNumber);
 }
 

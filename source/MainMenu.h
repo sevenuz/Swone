@@ -35,7 +35,7 @@ private:
     sf::Text m_settings;
     sf::Text m_exit;
 
-    //ParticleSystem m_ps;
+    ParticleSystem m_ps;
     Controller & m_controller;
 
     unsigned char m_selectedMenupoint;
