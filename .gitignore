@@ -4,3 +4,4 @@ swone.layout
 bib/
 builddir/
 /build/
+*.swp

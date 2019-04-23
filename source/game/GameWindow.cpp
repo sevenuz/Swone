@@ -15,13 +15,12 @@ void GameWindow::update(sf::Time ellapsed) {
 
 void GameWindow::event(sf::Event& event) {
 	if(event.type == sf::Event::KeyPressed) {
-					if (event.key.code == sf::Keyboard::Escape) {
-							m_gc.getController().setActiveGameWindow(ActiveGameWindow::MAPSELECTION);
-					} else {
-						m_gc.eventMap(event);
-						m_gc.eventPlayers(event);
-					}
+		if (event.key.code == sf::Keyboard::Escape) {
+			m_gc.getController().setActiveGameWindow(ActiveGameWindow::MAPSELECTION);
+		}
 	}
+	m_gc.eventMap(event);
+	m_gc.eventPlayers(event);
 }
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const{
