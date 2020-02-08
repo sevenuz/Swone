@@ -75,13 +75,15 @@ void Map::scaleToFit(){
 void Map::scaleToFit(unsigned int w, unsigned int h){
 	float scaleW = (float)(w) / (float)(m_imgWidth);
 	float scaleH = (float)(h) / (float)(m_imgHeight);
+	float scale;
 	if (scaleW > scaleH) {
-		m_scale = scaleH;
-		m_sprite.setScale(sf::Vector2f(scaleH,scaleH));
+		scale = scaleH;
 	} else {
-		m_scale = scaleW;
-		m_sprite.setScale(sf::Vector2f(scaleW,scaleW));
+		scale = scaleW;
 	}
+	m_scale = scale;
+	m_controller.setScale(sf::Vector2f(scale, scale));
+	//m_sprite.setScale(scale);
 }
 
 void Map::iniMapData() {

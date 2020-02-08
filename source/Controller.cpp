@@ -45,6 +45,14 @@ unsigned int Controller::getActiveGameWindow() {
     return m_activeGameWindow;
 }
 
+sf::Vector2f Controller::getScale() {
+    return m_scale;
+}
+
+void Controller::setScale(sf::Vector2f scale) {
+    m_scale = scale;
+}
+
 
 sf::RenderWindow& Controller::getWindow() {
     return m_window;
@@ -71,9 +79,24 @@ void Controller::pushLogMsg(std::string msg, std::string type) {
     m_log_msgList.push_back(msg);
     m_log_msgTypeList.push_back(type);
 };
+void Controller::pushLogMsg(float f, std::string type) {
+    std::string msg = std::to_string(f);
+	std::cout << msg << std::endl;
+    m_log_msgList.push_back(msg);
+    m_log_msgTypeList.push_back(type);
+};
 void Controller::replaceLastLogMsg(std::string msg, std::string type) {
     if(m_log_msgList.size() > 0 && m_log_msgTypeList.size() > 0) {
         //m_log_msgList.insert(m_log_msgList.size() - 1,msg);
         //m_log_msgTypeList.insert(m_log_msgTypeList.size() - 1,msg);
     }
 };
+
+void Controller::setView(sf::View view) {
+    getWindow().setView(view);
+}
+
+void Controller::setDefaultView() {
+    getWindow().setView(getWindow().getDefaultView());
+}
+

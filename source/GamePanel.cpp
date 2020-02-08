@@ -7,16 +7,16 @@ GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameControlle
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
 	m_ps.setLifetime(sf::seconds(3));
-	//m_ps.setOrigin(Settings::toW(0.1f), Settings::toH(0.1f), 580, 300, Origin::ON_BORDER);
+	m_ps.setOrigin(Settings::toW(0.4f), Settings::toH(61), 150, 3, Origin::ON_BORDER);
 
 	m_play.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
 	m_play.setString("Play");
-	m_play.setPosition(Settings::toW(0.1f), Settings::toH(0.5f));
+	m_play.setPosition(Settings::toW(0.415f), Settings::toH(0.8f));
 	m_play.setColor(sf::Color::Yellow);
 	m_play.setCharacterSize(Settings::toF(50));
 
 	m_mapName.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
-	m_mapName.setPosition(Settings::toW(360), Settings::toH(31));
+	m_mapName.setPosition(Settings::toW(0.4f), Settings::toH(31));
 	m_mapName.setColor(sf::Color::White);
 	m_mapName.setCharacterSize(Settings::toF(30));
 
@@ -90,8 +90,6 @@ void GamePanel::setMapSelection(int i){
 	}
 
 	m_selectedMap = i;
-
-	m_ps.setOrigin(Settings::toW(0.1f), Settings::toH(0.1f), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getScale() * 0.4 * m_maps[m_selectedMap]->getImageHeight(), Origin::ON_BORDER);
 
 	m_mapName.setString(m_maps[m_selectedMap]->getName());
 	m_controller.pushLogMsg(m_maps[m_selectedMap]->getName());
@@ -181,19 +179,19 @@ void GamePanel::update(sf::Time ellapsed) {
 void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 	states.transform *= getTransform();
 	states.texture = NULL;
-	sf::View view(sf::FloatRect(0,0,m_controller.settings.WIDTH,m_controller.settings.HEIGHT));
-	view.setViewport(sf::FloatRect(0.1, 0.1, 0.4, 0.4));
+	sf::View view(sf::FloatRect(0,0,m_maps[m_selectedMap]->getImageWidth(),m_maps[m_selectedMap]->getImageHeight()));
+	view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
 
 	switch(m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
 		target.draw(m_ps, states);
-		m_controller.getWindow().setView(view);
+		m_controller.setView(view);
 
 		if(m_mapsFound){
 			target.draw(m_maps[m_selectedMap]->getSprite(), states);
 		}
 		
-		m_controller.getWindow().setView(m_controller.getWindow().getDefaultView());
+		m_controller.setDefaultView();
 		target.draw(m_play, states);
 		target.draw(m_mapName, states);
 		target.draw(m_switchLeft, states);

@@ -15,10 +15,13 @@
 
 #include <graphics/Animation.h>
 #include <graphics/AnimatedSprite.h>
-#define JUMP_FORCE 150
-#define MOVE_FORCE 100
+
+#include "Map.h"
+
+#define JUMP_FORCE 3
+#define MOVE_FORCE 1
 #define SPEED_FACTOR 1
-#define WEIGHT 300
+#define WEIGHT 3
 
 namespace PlayerAnimation {
 	enum { LEFT, RIGHT, JUMP };
@@ -30,14 +33,22 @@ public:
 	Player(float x, float y);
 	virtual ~Player();
 
+	sf::Vector2f getLeftBoundry();
+	sf::Vector2f getRightBoundry();
 	AnimatedSprite * getAnimatedSprite();
+  bool isMoving();
 	void jump();
 	void move(float fx);
 
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
-	void calculateJump(sf::Time ellapsed);
-	void calculateMove(sf::Time ellapsed);
+  void refreshJump(sf::Time ellapsed);
+
+  sf::Vector2f calculateVec(sf::Time ellapsed, sf::Vector2f newPos) const;
+	sf::Vector2f calculatePos(sf::Time ellapsed) const;
+
+  void setPos(sf::Vector2f pos);
+  void setVec(sf::Vector2f pos);
 private:
 	
 	void setAnimation(unsigned int ani);
@@ -49,13 +60,11 @@ private:
 	float m_jf = JUMP_FORCE; // height of jump
 	float m_mf = MOVE_FORCE; // width of movement
 	float m_m = WEIGHT; // weight (for gravityforce)
-	float m_x = 0; // x position
-	float m_y = 0; // y position
-	float m_fx = 10; // vector x direction
-	float m_fy = 0; // vector y direction
+	sf::Vector2f m_pos = sf::Vector2f(3,0); // position in map
+	sf::Vector2f m_vec = sf::Vector2f(0,0); // direction vector
 
-	bool m_isJump = false;
-	bool m_animationFlag = false; // true if ani plays
+	sf::Vector2f m_left_boundry;
+	sf::Vector2f m_right_boundry;
 
 	sf::Texture m_texture;
 	Animation m_ani_left;
@@ -63,7 +72,6 @@ private:
 	Animation m_ani_jump;
 	Animation * m_ani;
 	AnimatedSprite m_sprite;
-
 };
 
 #endif /* SOURCE_GAME_PLAYER_H_ */

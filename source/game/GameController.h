@@ -13,6 +13,7 @@ public:
     Controller& getController();
 
     Map * getMap();
+    sf::View getView();
     std::vector<Player *> getPlayers();
 
     void updateMap(sf::Time ellapsed);
@@ -27,6 +28,11 @@ protected:
 private:
     Controller & m_controller;
     Map * m_map = NULL;
+    sf::View m_view;
     std::vector<Player *> m_player;
+
+    unsigned int round(float f) {
+      return static_cast<unsigned int> (f + 0.5);
+    }
 };
 #endif

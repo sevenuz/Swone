@@ -37,6 +37,9 @@ public:
     void setActiveGameWindow(unsigned int i);
     unsigned int getActiveGameWindow();
 
+    sf::Vector2f getScale();
+    void setScale(sf::Vector2f scale);
+
     sf::RenderWindow& getWindow();
 
     //Log
@@ -45,11 +48,15 @@ public:
     void toggleLogWindow();
     bool isLogClosed();
     void pushLogMsg(std::string msg, std::string type = "log");
+    void pushLogMsg(float msg, std::string type = "log");
     void replaceLastLogMsg(std::string msg, std::string type = "log");
     void clearLog();
     std::string& getLastLogMsg();
     std::vector<std::string>* getMsgList();
     std::vector<std::string>* getMsgTypeList();
+
+    void setView(sf::View view);
+    void setDefaultView();
 protected:
 
 private:
@@ -60,6 +67,7 @@ private:
     unsigned int m_activeWindow = ActiveWindow::FIRST;
     unsigned int m_activeGameWindow = ActiveGameWindow::FIRST;
 
+    sf::Vector2f m_scale = sf::Vector2f(1,1);
 
     //Log
     char m_log_input;

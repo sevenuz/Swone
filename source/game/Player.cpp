@@ -8,24 +8,23 @@
 #include "Player.h"
 
 Player::Player(float x, float y) {
-	m_x = x;
-	m_y = y;
+	m_pos = sf::Vector2f(x, y);
 
 	if (!m_texture.loadFromFile("../res/sprites/player.png")){
 		std::cout << "Failed to load player spritesheet!" << std::endl;
 	}
 
-	    m_ani_jump.setSpriteSheet(m_texture);
-	    m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
-	    m_ani_jump.addFrame(sf::IntRect(64, 0, 32, 32));
-	    m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
-	    m_ani_jump.addFrame(sf::IntRect( 0, 0, 32, 32));
+	m_ani_jump.setSpriteSheet(m_texture);
+	m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
+	m_ani_jump.addFrame(sf::IntRect(64, 0, 32, 32));
+	m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
+	m_ani_jump.addFrame(sf::IntRect( 0, 0, 32, 32));
 
-	    m_ani_left.setSpriteSheet(m_texture);
-	    m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
-	    m_ani_left.addFrame(sf::IntRect(64, 32, 32, 32));
-	    m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
-	    m_ani_left.addFrame(sf::IntRect( 0, 32, 32, 32));
+	m_ani_left.setSpriteSheet(m_texture);
+	m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
+	m_ani_left.addFrame(sf::IntRect(64, 32, 32, 32));
+	m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
+	m_ani_left.addFrame(sf::IntRect( 0, 32, 32, 32));
 
 	m_ani_right.setSpriteSheet(m_texture);
 	m_ani_right.addFrame(sf::IntRect(32, 64, 32, 32));
@@ -41,6 +40,14 @@ Player::Player(float x, float y) {
 
 Player::~Player() {
 	// TODO Auto-generated destructor stub
+}
+
+sf::Vector2f Player::getLeftBoundry(){
+	return m_left_boundry;
+}
+
+sf::Vector2f Player::getRightBoundry(){
+	return m_right_boundry;
 }
 
 void Player::setAnimation(unsigned int ani){
@@ -64,58 +71,67 @@ AnimatedSprite * Player::getAnimatedSprite(){
 void Player::jump(){
 	if(m_jumps > 0){
 		m_jumps--;
-		m_isJump = true;
-		m_fy = -m_jf;
+		m_vec.y = -1 * m_jf; // Startkraft nach oben
 	}
 }
 
 void Player::move(float fx){
-	m_fx = fx;
+	m_vec.x = fx;
+}
+
+bool Player::isMoving() {
+    return m_vec.x != 0 || m_vec.y != 0;
 }
 
 void Player::event(sf::Event& event) {
 	if(event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Left) {
-			m_animationFlag = true;
 			setAnimation(PlayerAnimation::LEFT);
 			move(-m_mf);
 		} else if (event.key.code == sf::Keyboard::Right) {
-			m_animationFlag = true;
 			setAnimation(PlayerAnimation::RIGHT);
 			move(m_mf);
 		} else if (event.key.code == sf::Keyboard::Up) {
-			m_animationFlag = true;
 			setAnimation(PlayerAnimation::JUMP);
 			jump();
-		} else {
 		}
 	} else if(event.type == sf::Event::KeyReleased) {
 		if (event.key.code == sf::Keyboard::Left) {
 			move(0);
-			m_animationFlag = false;
 		} else if (event.key.code == sf::Keyboard::Right) {
 			move(0);
-			m_animationFlag = false;
-		} else if (event.key.code == sf::Keyboard::Up) {
-			m_animationFlag = false;
-		} else {
 		}
 	}
 }
 
+sf::Vector2f Player::calculatePos(sf::Time ellapsed) const {
+    const float s = ellapsed.asSeconds();
+    return sf::Vector2f(m_pos.x + (m_vec.x * s), m_pos.y + (m_vec.y * s));
+}
+
+sf::Vector2f Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) const {
+    const float s = ellapsed.asSeconds();
+    const float deltaY = newPos.y - m_pos.y;
+    // x linear, y beschleunigt
+    // F=m*(2s/t**2)
+    sf::Vector2f v = sf::Vector2f(m_vec.x, m_vec.y + (m_m * ((2*deltaY)/(s*s))));
+    // TODO speedfactor
+    v.x *= SPEED_FACTOR;
+    v.y *= SPEED_FACTOR;
+    return v;
+}
+
 void Player::update(sf::Time ellapsed){
-	if(m_animationFlag || m_isJump){
+	if(isMoving()){
 		m_sprite.play(*m_ani);
 		m_sprite.update(ellapsed);
 	} else {
 		m_sprite.stop();
 	}
-	calculateMove(ellapsed);
-	calculateJump(ellapsed);
-	m_sprite.setPosition(m_x, m_y);
+	refreshJump(ellapsed);
 }
 
-void Player::calculateJump(sf::Time ellapsed){
+void Player::refreshJump(sf::Time ellapsed){
 	m_jumpCooldown += ellapsed;
 	if(m_jumpCooldown >= m_jumpCooldownTime){
 		if(m_jumps < m_jumpsPossible){
@@ -123,18 +139,16 @@ void Player::calculateJump(sf::Time ellapsed){
 		}
 		m_jumpCooldown = sf::seconds(0);
 	}
-	if(m_y > 200){
-		m_y = 200;
-		m_fy = 0;
-		m_isJump = false;
-		return;
-	}
-	if(m_isJump){
-		m_y = m_y + m_fy * ellapsed.asSeconds() * SPEED_FACTOR; 
-		m_fy = m_fy + (ellapsed.asSeconds() * m_m);	
-	}
 }
 
-void Player::calculateMove(sf::Time ellapsed){
-	m_x = m_x + m_fx * ellapsed.asSeconds() * SPEED_FACTOR;
+void Player::setPos(sf::Vector2f pos) {
+    m_pos = pos;
+    pos.x *= Map::TILE_WIDTH;
+    pos.y *= Map::TILE_HEIGHT;
+    m_sprite.setPosition(pos);
 }
+
+void Player::setVec(sf::Vector2f vec) {
+    m_vec = vec;
+}
+

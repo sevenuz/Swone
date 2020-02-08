@@ -24,8 +24,12 @@ void GameWindow::event(sf::Event& event) {
 }
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const{
+	m_gc.getController().setView(m_gc.getView());
 	target.draw(* m_gc.getMap(), states);
 	for(unsigned int i = 0; i < m_gc.getPlayers().size(); i++){
 		target.draw(* m_gc.getPlayers()[i]->getAnimatedSprite(), states);
+	//		    m_gc.getPlayers()[i].getLeftBoundry(),
+	//		    m_gc.getPlayers()[i].getRightBoundry(),
+	//	sf::RectangleShape line(sf::Vector2f(150, 5));
 	}
 }
