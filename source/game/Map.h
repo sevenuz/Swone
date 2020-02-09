@@ -17,7 +17,7 @@
 
 namespace MapTiles
 {
-enum { SHARP, UNDERSCORE, W, SPACE, DEFAULT = SPACE};
+enum { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE};
 }
 
 class Map: public sf::Drawable,public Handleable

@@ -42,12 +42,8 @@ Player::~Player() {
 	// TODO Auto-generated destructor stub
 }
 
-sf::Vector2f Player::getLeftBoundry(){
-	return m_left_boundry;
-}
-
-sf::Vector2f Player::getRightBoundry(){
-	return m_right_boundry;
+sf::FloatRect Player::getHitbox(){
+	return m_hitbox;
 }
 
 void Player::setAnimation(unsigned int ani){
@@ -76,6 +72,8 @@ void Player::jump(){
 }
 
 void Player::move(float fx){
+    if(m_vec.x != fx)
+
 	m_vec.x = fx;
 }
 
@@ -87,6 +85,7 @@ void Player::event(sf::Event& event) {
 	if(event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Left) {
 			setAnimation(PlayerAnimation::LEFT);
+			std::cout << "left" << std::endl;
 			move(-m_mf);
 		} else if (event.key.code == sf::Keyboard::Right) {
 			setAnimation(PlayerAnimation::RIGHT);
@@ -97,6 +96,7 @@ void Player::event(sf::Event& event) {
 		}
 	} else if(event.type == sf::Event::KeyReleased) {
 		if (event.key.code == sf::Keyboard::Left) {
+		    std::cout << "stop left" << std::endl;
 			move(0);
 		} else if (event.key.code == sf::Keyboard::Right) {
 			move(0);
@@ -111,14 +111,16 @@ sf::Vector2f Player::calculatePos(sf::Time ellapsed) const {
 
 sf::Vector2f Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) const {
     const float s = ellapsed.asSeconds();
-    const float deltaY = newPos.y - m_pos.y;
     // x linear, y beschleunigt
-    // F=m*(2s/t**2)
-    sf::Vector2f v = sf::Vector2f(m_vec.x, m_vec.y + (m_m * ((2*deltaY)/(s*s))));
-    // TODO speedfactor
-    v.x *= SPEED_FACTOR;
-    v.y *= SPEED_FACTOR;
-    return v;
+    // F*t=m*g*t
+    const float g = GRAVITY * SPEED_FACTOR;
+    float fx = m_vec.x * SPEED_FACTOR;
+    float fy = m_vec.y  + (m_m * g * s);
+    // TODO
+    if(fy > g)
+        fy = g;
+
+    return sf::Vector2f(fx, fy);
 }
 
 void Player::update(sf::Time ellapsed){
@@ -142,6 +144,8 @@ void Player::refreshJump(sf::Time ellapsed){
 }
 
 void Player::setPos(sf::Vector2f pos) {
+    if(pos.x < 0 || m_pos.y < 0)
+        return;
     m_pos = pos;
     pos.x *= Map::TILE_WIDTH;
     pos.y *= Map::TILE_HEIGHT;
@@ -149,6 +153,42 @@ void Player::setPos(sf::Vector2f pos) {
 }
 
 void Player::setVec(sf::Vector2f vec) {
-    m_vec = vec;
+    m_vec.x = vec.x;
+    m_vec.y = vec.y;
+}
+
+sf::Vector2f Player::getVec() {
+    return m_vec;
+}
+sf::Vector2f Player::getPos() {
+    return m_pos;
+}
+sf::Vector2f Player::getSpritePos() {
+    return m_sprite.getPosition();
+}
+
+//Pixel in Map
+sf::FloatRect Player::getSpriteBounds() {
+    return m_sprite.getGlobalBounds();
+}
+sf::Vector2f* Player::getHitboxLeftBotton() {
+    return new sf::Vector2f((m_pos.x + m_hitbox.left), (m_pos.y + m_hitbox.top) + m_hitbox.height);
+}
+sf::Vector2f* Player::getHitboxRightBotton() {
+    return new sf::Vector2f((m_pos.x + m_hitbox.left) + m_hitbox.width, (m_pos.y + m_hitbox.top) + m_hitbox.height);
+}
+sf::Vector2f* Player::getHitboxLeftBotton(sf::Vector2f pos) {
+    return new sf::Vector2f((pos.x + m_hitbox.left), (pos.y + m_hitbox.top) + m_hitbox.height);
+}
+sf::Vector2f* Player::getHitboxRightBotton(sf::Vector2f pos) {
+    return new sf::Vector2f((pos.x + m_hitbox.left) + m_hitbox.width, (pos.y + m_hitbox.top) + m_hitbox.height);
+}
+//Pixel in Map
+sf::FloatRect* Player::getHitboxBounds() {
+    float x = (m_pos.x + m_hitbox.left) * Map::TILE_WIDTH;
+    float y = (m_pos.y + m_hitbox.top) * Map::TILE_HEIGHT;
+    float w = m_hitbox.width * Map::TILE_WIDTH;
+    float h = m_hitbox.height * Map::TILE_HEIGHT;
+    return  new sf::FloatRect(x, y, w, h);
 }
 

@@ -83,7 +83,6 @@ void Map::scaleToFit(unsigned int w, unsigned int h){
 	}
 	m_scale = scale;
 	m_controller.setScale(sf::Vector2f(scale, scale));
-	//m_sprite.setScale(scale);
 }
 
 void Map::iniMapData() {

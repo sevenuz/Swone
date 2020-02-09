@@ -81,9 +81,7 @@ void Controller::pushLogMsg(std::string msg, std::string type) {
 };
 void Controller::pushLogMsg(float f, std::string type) {
     std::string msg = std::to_string(f);
-	std::cout << msg << std::endl;
-    m_log_msgList.push_back(msg);
-    m_log_msgTypeList.push_back(type);
+	pushLogMsg(msg, type);
 };
 void Controller::replaceLastLogMsg(std::string msg, std::string type) {
     if(m_log_msgList.size() > 0 && m_log_msgTypeList.size() > 0) {

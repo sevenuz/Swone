@@ -9,6 +9,7 @@
 #define SOURCE_GAME_PLAYER_H_
 
 #include <iostream>
+#include <cmath>
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
@@ -18,10 +19,11 @@
 
 #include "Map.h"
 
-#define JUMP_FORCE 3
-#define MOVE_FORCE 1
-#define SPEED_FACTOR 1
-#define WEIGHT 3
+#define GRAVITY 9.81
+#define JUMP_FORCE 30
+#define MOVE_FORCE 10
+#define SPEED_FACTOR 0.5
+#define WEIGHT 30
 
 namespace PlayerAnimation {
 	enum { LEFT, RIGHT, JUMP };
@@ -33,8 +35,6 @@ public:
 	Player(float x, float y);
 	virtual ~Player();
 
-	sf::Vector2f getLeftBoundry();
-	sf::Vector2f getRightBoundry();
 	AnimatedSprite * getAnimatedSprite();
   bool isMoving();
 	void jump();
@@ -46,6 +46,19 @@ public:
 
   sf::Vector2f calculateVec(sf::Time ellapsed, sf::Vector2f newPos) const;
 	sf::Vector2f calculatePos(sf::Time ellapsed) const;
+
+  sf::Vector2f getVec();
+	sf::Vector2f getPos();
+
+  sf::Vector2f getSpritePos();
+  sf::FloatRect getSpriteBounds();
+
+	sf::FloatRect getHitbox();
+  sf::Vector2f* getHitboxLeftBotton();
+  sf::Vector2f* getHitboxRightBotton();
+  sf::Vector2f* getHitboxLeftBotton(sf::Vector2f pos);
+  sf::Vector2f* getHitboxRightBotton(sf::Vector2f pos);
+  sf::FloatRect* getHitboxBounds();
 
   void setPos(sf::Vector2f pos);
   void setVec(sf::Vector2f pos);
@@ -60,11 +73,11 @@ private:
 	float m_jf = JUMP_FORCE; // height of jump
 	float m_mf = MOVE_FORCE; // width of movement
 	float m_m = WEIGHT; // weight (for gravityforce)
-	sf::Vector2f m_pos = sf::Vector2f(3,0); // position in map
+	sf::Vector2f m_pos = sf::Vector2f(0,0); // position in map
 	sf::Vector2f m_vec = sf::Vector2f(0,0); // direction vector
 
-	sf::Vector2f m_left_boundry;
-	sf::Vector2f m_right_boundry;
+  // TODO
+	sf::FloatRect m_hitbox = sf::FloatRect(0.1875,0.0,0.1094,0.5);
 
 	sf::Texture m_texture;
 	Animation m_ani_left;
