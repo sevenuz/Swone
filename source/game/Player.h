@@ -44,8 +44,9 @@ public:
 	void event(sf::Event& e);
   void refreshJump(sf::Time ellapsed);
 
-  sf::Vector2f calculateVec(sf::Time ellapsed, sf::Vector2f newPos) const;
-	sf::Vector2f calculatePos(sf::Time ellapsed) const;
+  sf::Vector2f& calculateVec(sf::Time ellapsed, sf::Vector2f newPos);
+	sf::Vector2f& calculatePos(sf::Time ellapsed);
+  void apply();
 
   sf::Vector2f getVec();
 	sf::Vector2f getPos();
@@ -54,11 +55,11 @@ public:
   sf::FloatRect getSpriteBounds();
 
 	sf::FloatRect getHitbox();
-  sf::Vector2f* getHitboxLeftBotton();
-  sf::Vector2f* getHitboxRightBotton();
-  sf::Vector2f* getHitboxLeftBotton(sf::Vector2f pos);
-  sf::Vector2f* getHitboxRightBotton(sf::Vector2f pos);
-  sf::FloatRect* getHitboxBounds();
+  sf::Vector2f& getHitboxLeftBotton();
+  sf::Vector2f& getHitboxRightBotton();
+  sf::Vector2f& getHitboxLeftBotton(sf::Vector2f pos);
+  sf::Vector2f& getHitboxRightBotton(sf::Vector2f pos);
+  sf::FloatRect& getHitboxBounds();
 
   void setPos(sf::Vector2f pos);
   void setVec(sf::Vector2f pos);
@@ -75,7 +76,8 @@ private:
 	float m_m = WEIGHT; // weight (for gravityforce)
 	sf::Vector2f m_pos = sf::Vector2f(0,0); // position in map
 	sf::Vector2f m_vec = sf::Vector2f(0,0); // direction vector
-
+  sf::Vector2f m_nextPos = sf::Vector2f(0,0); // position in map after next calculation
+	sf::Vector2f m_nextVec = sf::Vector2f(0,0); // direction vector after next calculation
   // TODO
 	sf::FloatRect m_hitbox = sf::FloatRect(0.1875,0.0,0.1094,0.5);
 

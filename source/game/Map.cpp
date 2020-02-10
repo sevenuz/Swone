@@ -9,6 +9,14 @@ Map::~Map() {
 	delete[] m_mapData;
 }
 
+float Map::toMapPixelX(float x){
+    return x * Map::TILE_WIDTH;
+}
+
+float Map::toMapPixelY(float y){
+    return y * Map::TILE_HEIGHT;
+}
+
 sf::Sprite & Map::getSprite(){
 	return m_sprite;
 }
@@ -61,6 +69,8 @@ float Map::getScale(){
 }
 
 unsigned int Map::getMapDataValue(unsigned int h, unsigned int w) {
+    if(h >= m_height || w >= m_height)
+        return MapTiles::DEFAULT;
 	return m_mapData[h * m_width + w];
 }
 

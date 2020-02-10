@@ -26,6 +26,9 @@ public:
     static const unsigned int TILE_WIDTH = 64;
     static const unsigned int TILE_HEIGHT = 64;
 
+    static float toMapPixelX(float x);
+    static float toMapPixelY(float y);
+
     Map(Controller & c);
     virtual ~Map();
 

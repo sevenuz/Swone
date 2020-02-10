@@ -30,13 +30,13 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 	    Player * p = m_gc.getPlayers()[i];
 		target.draw(* p->getAnimatedSprite(), states);
 
-	    sf::FloatRect* h = p->getHitboxBounds();
+	    sf::FloatRect h = p->getHitboxBounds();
         sf::RectangleShape rectangle;
-        rectangle.setSize(sf::Vector2f(h->width, h->height));
+        rectangle.setSize(sf::Vector2f(h.width, h.height));
         rectangle.setOutlineColor(sf::Color::Red);
         rectangle.setOutlineThickness(1);
         rectangle.setFillColor(sf::Color::Transparent);
-        rectangle.setPosition(h->left, h->top);
+        rectangle.setPosition(h.left, h.top);
         target.draw(rectangle);
 	}
 }

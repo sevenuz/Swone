@@ -22,17 +22,20 @@ public:
     void updatePlayers(sf::Time ellapsed);
     void eventPlayers(sf::Event& e);
 
+    void setViewCenter(sf::Vector2f pos);
+
     void setMap(Map * m);
     void pushPlayer(Player *);
 protected:
 private:
     Controller & m_controller;
     Map * m_map = NULL;
+    sf::Vector2f m_viewDelta = sf::Vector2f(0,0);
     sf::View m_view;
     std::vector<Player *> m_player;
 
     unsigned int round(float f) {
-      return static_cast<unsigned int> (f + 0.5);
+      return static_cast<unsigned int> (f);
     }
 };
 #endif

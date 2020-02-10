@@ -28,6 +28,13 @@ std::vector<Player *> GameController::getPlayers(){
 	return m_player;
 }
 
+void GameController::setViewCenter(sf::Vector2f pos) {
+	m_view.setCenter(
+	    Map::toMapPixelX(pos.x) + m_viewDelta.x,
+	    Map::toMapPixelY(pos.y) + m_viewDelta.y
+	);
+}
+
 void GameController::setMap(Map * map){
 	m_map = map;
 	m_view = m_controller.getWindow().getView();
@@ -53,24 +60,22 @@ void GameController::eventMap(sf::Event& e){
       }
     if(e.type == sf::Event::MouseMoved) // Zomm in or out if the mouse wheel moves
       {
-        sf::Vector2f delta = worldPos - m_view.getCenter();
-        m_view.move(delta.x*0.01, delta.y*0.01f);
+        sf::Vector2f delta = worldPos - getPlayers()[0]->getPos();
+        m_viewDelta.x = delta.x*0.1f;
+        m_viewDelta.y = delta.y*0.1f;
       }
     if (e.type == sf::Event::KeyPressed) {
 		if (e.key.code == sf::Keyboard::D) {
 		    Player * p = getPlayers()[0];
-	        sf::Vector2f * pos = p->getHitboxRightBotton();
+	        sf::Vector2f& pos = p->getHitboxRightBotton();
 	        sf::Vector2f pos2 = p->getPos();
-	        sf::Vector2f pos3 = p->getVec();
-	        unsigned int tile = m_map->getMapDataValue(round(pos->y), round(pos->x));
+	        unsigned int tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
 	        m_controller.pushLogMsg("-------");
 	        m_controller.pushLogMsg(tile);
-	        m_controller.pushLogMsg(pos->x);
-	        m_controller.pushLogMsg(pos->y);
+	        m_controller.pushLogMsg(pos.x);
+	        m_controller.pushLogMsg(pos.y);
 		    m_controller.pushLogMsg(pos2.x);
 	        m_controller.pushLogMsg(pos2.y);
-	        m_controller.pushLogMsg(pos3.x);
-	        m_controller.pushLogMsg(pos3.y);
 	    }
 	}
 }
@@ -78,14 +83,14 @@ void GameController::eventMap(sf::Event& e){
 void GameController::updatePlayers(sf::Time ellapsed){
 	for(unsigned int i = 0; i < getPlayers().size(); i++){
 	    Player * p = getPlayers()[i];
-	    sf::Vector2f pos = p->calculatePos(ellapsed);
+	    sf::Vector2f& pos = p->calculatePos(ellapsed);
 	    unsigned int tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
-	    sf::Vector2f vec = p->calculateVec(ellapsed, pos);
-	    if(pos.y >= m_map->getHeight() - 1){
-	        pos.y = m_map->getHeight() - 1;
+	    sf::Vector2f& vec = p->calculateVec(ellapsed, pos);
+	    if(pos.y > m_map->getHeight()){
+	        pos.y = m_map->getHeight();
 	    }
-	    p->setPos(pos);
-	    p->setVec(vec);
+        setViewCenter(pos);
+	    p->apply();
 		p->update(ellapsed);
 	}
 }
