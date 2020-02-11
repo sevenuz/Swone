@@ -20,8 +20,8 @@
 #include "Map.h"
 
 #define GRAVITY 9.81
-#define JUMP_FORCE 30
-#define MOVE_FORCE 10
+#define JUMP_FORCE 60
+#define MOVE_FORCE 7
 #define SPEED_FACTOR 0.5
 #define WEIGHT 30
 
@@ -37,16 +37,24 @@ public:
 
 	AnimatedSprite * getAnimatedSprite();
   bool isMoving();
+  bool isFalling();
+  bool isJumping();
+  void toggleFalling(bool falling); // changes jumping and falling
+  void stopFalling();
+  void startFalling();
 	void jump();
 	void move(float fx);
 
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
   void refreshJump(sf::Time ellapsed);
+  void resetJump();
 
   sf::Vector2f& calculateVec(sf::Time ellapsed, sf::Vector2f newPos);
 	sf::Vector2f& calculatePos(sf::Time ellapsed);
   void apply();
+  void applyX();
+  void applyY();
 
   sf::Vector2f getVec();
 	sf::Vector2f getPos();
@@ -87,6 +95,10 @@ private:
 	Animation m_ani_jump;
 	Animation * m_ani;
 	AnimatedSprite m_sprite;
+
+  bool m_isJumping = false; // movement to top
+  bool m_isFalling = false; // movement to bottom
+  bool m_isMoving = false;  // movement on x
 };
 
 #endif /* SOURCE_GAME_PLAYER_H_ */

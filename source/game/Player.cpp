@@ -64,21 +64,42 @@ AnimatedSprite * Player::getAnimatedSprite(){
 	return &m_sprite;
 }
 
+bool Player::isMoving() {
+    return m_isMoving;
+}
+
+bool Player::isJumping() {
+    return m_isJumping;
+}
+
+bool Player::isFalling() {
+    return m_isFalling;
+}
+
+void Player::toggleFalling(bool falling) {
+    m_isFalling = falling;
+    m_isJumping = !falling && m_vec.y < 0;
+}
+
+void Player::stopFalling() {
+    toggleFalling(false);
+}
+
+void Player::startFalling() {
+    toggleFalling(true);
+}
+
 void Player::jump(){
 	if(m_jumps > 0){
 		m_jumps--;
 		m_vec.y = -1 * m_jf; // Startkraft nach oben
+		toggleFalling(false);
 	}
 }
 
 void Player::move(float fx){
-    if(m_vec.x != fx)
-
 	m_vec.x = fx;
-}
-
-bool Player::isMoving() {
-    return m_vec.x != 0 || m_pos.y != GRAVITY;
+	m_isMoving = fx != 0;
 }
 
 void Player::event(sf::Event& event) {
@@ -128,6 +149,15 @@ void Player::apply() {
     setVec(m_nextVec);
 }
 
+void Player::applyX() {
+    m_nextPos.y = m_pos.y;
+    apply();
+}
+
+void Player::applyY() {
+    m_nextPos.x = m_pos.x;
+    apply();
+}
 void Player::update(sf::Time ellapsed){
 	if(isMoving()){
 		m_sprite.play(*m_ani);
@@ -148,9 +178,12 @@ void Player::refreshJump(sf::Time ellapsed){
 	}
 }
 
+void Player::resetJump(){
+	m_jumpCooldown = sf::seconds(0);
+	m_jumps = m_jumpsPossible;
+}
+
 void Player::setPos(sf::Vector2f pos) {
-    if(pos.x < 0 || m_pos.y < 0)
-        return;
     m_pos = pos;
     m_sprite.setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
 }

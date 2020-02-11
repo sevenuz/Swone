@@ -2,7 +2,7 @@
 
 
 GameController::GameController(Controller & c): m_controller(c){
-	Player * p = new Player(0, 8.2);
+	Player * p = new Player(0, 0);
 	pushPlayer(p);
 }
 
@@ -68,14 +68,11 @@ void GameController::eventMap(sf::Event& e){
 		if (e.key.code == sf::Keyboard::D) {
 		    Player * p = getPlayers()[0];
 	        sf::Vector2f& pos = p->getHitboxRightBotton();
-	        sf::Vector2f pos2 = p->getPos();
 	        unsigned int tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
 	        m_controller.pushLogMsg("-------");
 	        m_controller.pushLogMsg(tile);
 	        m_controller.pushLogMsg(pos.x);
 	        m_controller.pushLogMsg(pos.y);
-		    m_controller.pushLogMsg(pos2.x);
-	        m_controller.pushLogMsg(pos2.y);
 	    }
 	}
 }
@@ -84,13 +81,26 @@ void GameController::updatePlayers(sf::Time ellapsed){
 	for(unsigned int i = 0; i < getPlayers().size(); i++){
 	    Player * p = getPlayers()[i];
 	    sf::Vector2f& pos = p->calculatePos(ellapsed);
-	    unsigned int tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
+	    sf::Vector2f& hbr = p->getHitboxRightBotton(pos);
+	    sf::Vector2f& hbl = p->getHitboxLeftBotton(pos);
+	    unsigned int tile_r = m_map->getMapDataValue(round(hbr.y), round(hbr.x));
+	    unsigned int tile_l = m_map->getMapDataValue(round(hbl.y), round(hbl.x));
 	    sf::Vector2f& vec = p->calculateVec(ellapsed, pos);
+
 	    if(pos.y > m_map->getHeight()){
-	        pos.y = m_map->getHeight();
+	        //TODO
+	        //pos.y = m_map->getHeight();
 	    }
-        setViewCenter(pos);
-	    p->apply();
+
+        if(tile_r != MapTiles::SPACE || tile_l != MapTiles::SPACE) {
+            p->stopFalling();
+            p->resetJump();
+            p->applyX();
+        } else {
+            p->startFalling();
+            p->apply();
+        }
+        setViewCenter(p->getPos());
 		p->update(ellapsed);
 	}
 }
