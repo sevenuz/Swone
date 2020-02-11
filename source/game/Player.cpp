@@ -42,10 +42,6 @@ Player::~Player() {
 	// TODO Auto-generated destructor stub
 }
 
-sf::FloatRect Player::getHitbox(){
-	return m_hitbox;
-}
-
 void Player::setAnimation(unsigned int ani){
 	switch(ani) {
 	case PlayerAnimation::LEFT:
@@ -193,38 +189,27 @@ void Player::setVec(sf::Vector2f vec) {
     m_vec.y = vec.y;
 }
 
-sf::Vector2f Player::getVec() {
-    return m_vec;
-}
-sf::Vector2f Player::getPos() {
-    return m_pos;
-}
 sf::Vector2f Player::getSpritePos() {
     return m_sprite.getPosition();
 }
 
-//Pixel in Map
-sf::FloatRect Player::getSpriteBounds() {
-    return m_sprite.getGlobalBounds();
+void Player::onTiles(unsigned int leftTop, unsigned int rightTop, unsigned int leftBottom, unsigned int rightBottom) {
+    if(leftBottom != MapTiles::SPACE || rightBottom != MapTiles::SPACE) {
+        stopFalling();
+        resetJump();
+        applyX();
+    } else {
+        startFalling();
+        apply();
+    }
 }
-sf::Vector2f& Player::getHitboxLeftBotton() {
-    return * new sf::Vector2f((m_pos.x + m_hitbox.left), (m_pos.y + m_hitbox.top) + m_hitbox.height);
-}
-sf::Vector2f& Player::getHitboxRightBotton() {
-    return * new sf::Vector2f((m_pos.x + m_hitbox.left) + m_hitbox.width, (m_pos.y + m_hitbox.top) + m_hitbox.height);
-}
-sf::Vector2f& Player::getHitboxLeftBotton(sf::Vector2f pos) {
-    return * new sf::Vector2f((pos.x + m_hitbox.left), (pos.y + m_hitbox.top) + m_hitbox.height);
-}
-sf::Vector2f& Player::getHitboxRightBotton(sf::Vector2f pos) {
-    return * new sf::Vector2f((pos.x + m_hitbox.left) + m_hitbox.width, (pos.y + m_hitbox.top) + m_hitbox.height);
-}
-//Pixel in Map
-sf::FloatRect& Player::getHitboxBounds() {
-    float x = (m_pos.x + m_hitbox.left) * Map::TILE_WIDTH;
-    float y = (m_pos.y + m_hitbox.top) * Map::TILE_HEIGHT;
-    float w = m_hitbox.width * Map::TILE_WIDTH;
-    float h = m_hitbox.height * Map::TILE_HEIGHT;
-    return  * new sf::FloatRect(x, y, w, h);
+
+void Player::onOutOfMap() {
+    std::cout << "oh noo!" << std::endl;
+    apply();
+};
+
+void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const{
+	target.draw(m_sprite, states);
 }
 

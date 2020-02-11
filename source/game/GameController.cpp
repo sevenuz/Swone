@@ -67,7 +67,7 @@ void GameController::eventMap(sf::Event& e){
     if (e.type == sf::Event::KeyPressed) {
 		if (e.key.code == sf::Keyboard::D) {
 		    Player * p = getPlayers()[0];
-	        sf::Vector2f& pos = p->getHitboxRightBotton();
+	        sf::Vector2f pos = p->getHitboxRightBottom(p->getPos());
 	        unsigned int tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
 	        m_controller.pushLogMsg("-------");
 	        m_controller.pushLogMsg(tile);
@@ -81,25 +81,22 @@ void GameController::updatePlayers(sf::Time ellapsed){
 	for(unsigned int i = 0; i < getPlayers().size(); i++){
 	    Player * p = getPlayers()[i];
 	    sf::Vector2f& pos = p->calculatePos(ellapsed);
-	    sf::Vector2f& hbr = p->getHitboxRightBotton(pos);
-	    sf::Vector2f& hbl = p->getHitboxLeftBotton(pos);
-	    unsigned int tile_r = m_map->getMapDataValue(round(hbr.y), round(hbr.x));
-	    unsigned int tile_l = m_map->getMapDataValue(round(hbl.y), round(hbl.x));
 	    sf::Vector2f& vec = p->calculateVec(ellapsed, pos);
 
-	    if(pos.y > m_map->getHeight()){
-	        //TODO
-	        //pos.y = m_map->getHeight();
+	    if(pos.x > m_map->getWidth() || pos.x < 0 || pos.y > m_map->getHeight() || pos.y < 0){
+	        p->onOutOfMap();
+	    } else {
+	        sf::Vector2f hbrb = p->getHitboxRightBottom(pos);
+	        sf::Vector2f hblb = p->getHitboxLeftBottom(pos);
+	        sf::Vector2f hbrt = p->getHitboxRightBottom(pos);
+	        sf::Vector2f hblt = p->getHitboxLeftBottom(pos);
+	        unsigned int tile_rb = m_map->getMapDataValue(round(hbrb.y), round(hbrb.x));
+	        unsigned int tile_lb = m_map->getMapDataValue(round(hblb.y), round(hblb.x));
+	        unsigned int tile_rt = m_map->getMapDataValue(round(hbrt.y), round(hbrt.x));
+	        unsigned int tile_lt = m_map->getMapDataValue(round(hblt.y), round(hblt.x));
+	        p->onTiles(tile_lt, tile_rt, tile_lb, tile_rb);
 	    }
 
-        if(tile_r != MapTiles::SPACE || tile_l != MapTiles::SPACE) {
-            p->stopFalling();
-            p->resetJump();
-            p->applyX();
-        } else {
-            p->startFalling();
-            p->apply();
-        }
         setViewCenter(p->getPos());
 		p->update(ellapsed);
 	}
