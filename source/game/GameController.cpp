@@ -7,7 +7,7 @@ GameController::GameController(Controller & c): m_controller(c){
 }
 
 GameController::~GameController(){
-	for(unsigned int i = 0; i < m_player.size(); i++){
+	for(size_t i = 0; i < m_player.size(); i++){
 			delete m_player[i];
 	}
 }
@@ -68,7 +68,7 @@ void GameController::eventMap(sf::Event& e){
 		if (e.key.code == sf::Keyboard::D) {
 		    Player * p = getPlayers()[0];
 	        sf::Vector2f pos = p->getHitboxRightBottom(p->getPos());
-	        unsigned int tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
+	        MapTile tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
 	        m_controller.pushLogMsg("-------");
 	        m_controller.pushLogMsg(tile);
 	        m_controller.pushLogMsg(pos.x);
@@ -78,7 +78,7 @@ void GameController::eventMap(sf::Event& e){
 }
 
 void GameController::updatePlayers(sf::Time ellapsed){
-	for(unsigned int i = 0; i < getPlayers().size(); i++){
+	for(size_t i = 0; i < getPlayers().size(); i++){
 	    Player * p = getPlayers()[i];
 	    sf::Vector2f& pos = p->calculatePos(ellapsed);
 	    sf::Vector2f& vec = p->calculateVec(ellapsed, pos);
@@ -90,10 +90,10 @@ void GameController::updatePlayers(sf::Time ellapsed){
 	        sf::Vector2f hblb = p->getHitboxLeftBottom(pos);
 	        sf::Vector2f hbrt = p->getHitboxRightBottom(pos);
 	        sf::Vector2f hblt = p->getHitboxLeftBottom(pos);
-	        unsigned int tile_rb = m_map->getMapDataValue(round(hbrb.y), round(hbrb.x));
-	        unsigned int tile_lb = m_map->getMapDataValue(round(hblb.y), round(hblb.x));
-	        unsigned int tile_rt = m_map->getMapDataValue(round(hbrt.y), round(hbrt.x));
-	        unsigned int tile_lt = m_map->getMapDataValue(round(hblt.y), round(hblt.x));
+	        MapTile tile_rb = m_map->getMapDataValue(round(hbrb.y), round(hbrb.x));
+	        MapTile tile_lb = m_map->getMapDataValue(round(hblb.y), round(hblb.x));
+	        MapTile tile_rt = m_map->getMapDataValue(round(hbrt.y), round(hbrt.x));
+	        MapTile tile_lt = m_map->getMapDataValue(round(hblt.y), round(hblt.x));
 	        p->onTiles(tile_lt, tile_rt, tile_lb, tile_rb);
 	    }
 
@@ -102,7 +102,7 @@ void GameController::updatePlayers(sf::Time ellapsed){
 	}
 }
 void GameController::eventPlayers(sf::Event& e){
-	for(unsigned int i = 0; i < getPlayers().size(); i++){
+	for(size_t i = 0; i < getPlayers().size(); i++){
 		getPlayers()[i]->event(e);
 	}
 }

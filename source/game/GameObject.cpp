@@ -11,7 +11,7 @@ sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
     return m_nextVec;
 }
 
- void GameObject::onTiles(unsigned int leftTop, unsigned int rightTop, unsigned int leftBottom, unsigned int rightBottom) {
+ void GameObject::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
     m_pos = m_nextPos;
     m_vec = m_nextVec;
  }

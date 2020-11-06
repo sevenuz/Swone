@@ -193,8 +193,8 @@ sf::Vector2f Player::getSpritePos() {
     return m_sprite.getPosition();
 }
 
-void Player::onTiles(unsigned int leftTop, unsigned int rightTop, unsigned int leftBottom, unsigned int rightBottom) {
-    if(leftBottom != MapTiles::SPACE || rightBottom != MapTiles::SPACE) {
+void Player::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
+    if(leftBottom != MapTile::SPACE || rightBottom != MapTile::SPACE) {
         stopFalling();
         resetJump();
         applyX();

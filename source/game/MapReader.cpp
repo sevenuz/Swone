@@ -74,7 +74,7 @@ void MapReader::parseValue(std::string key, std::string value)
     }
     else if(key == "border")
     {
-        m_map->setBorder(value);
+        m_map->setBorder(MapReader::charToMapTile(value[0]));
     }
     else if(key == "name")
     {
@@ -99,7 +99,7 @@ void MapReader::parseMap(std::string line)
             endParseMap();
             return;
         }
-        for(unsigned int i = 0; i < m_map->getWidth(); i++)
+        for(size_t i = 0; i < m_map->getWidth(); i++)
         {
             if(i < line.length())
             {
@@ -126,8 +126,8 @@ void MapReader::startParseMap()
 
 void MapReader::endParseMap() {
 	//if linecount is not defined for the full height it becomes whitespace
-	for(unsigned int j = m_lineCounter; j < m_map->getHeight(); j++) {
-		for(unsigned int i = 0; i < m_map->getWidth(); i++) {
+	for(size_t j = m_lineCounter; j < m_map->getHeight(); j++) {
+		for(size_t i = 0; i < m_map->getWidth(); i++) {
 		        parseMapChar(*" ", m_lineCounter, i);
 		}
 		m_controller.pushLogMsg(std::to_string(m_lineCounter));
@@ -137,23 +137,25 @@ void MapReader::endParseMap() {
     	m_controller.pushLogMsg("end of map parsing");
 }
 
-void MapReader::parseMapChar(char c, unsigned int h, unsigned int w)
+MapTile MapReader::charToMapTile(char c)
 {
     switch(c)
     {
-    case *"#":
-        m_map->setMapDataValue(h, w, MapTiles::SHARP);
-        break;
-    case *"_":
-        m_map->setMapDataValue(h, w, MapTiles::UNDERSCORE);
-        break;
-    case *" ":
-        m_map->setMapDataValue(h, w, MapTiles::SPACE);
-        break;
-    case *"w":
-        m_map->setMapDataValue(h, w, MapTiles::W);
-        break;
+    case '#':
+        return MapTile::SHARP;
+    case '_':
+        return MapTile::UNDERSCORE;
+    case ' ':
+        return MapTile::SPACE;
+    case 'w':
+        return MapTile::W;
     default:
-        m_map->setMapDataValue(h, w, MapTiles::DEFAULT);
+        return MapTile::DEFAULT;
     }
 }
+
+void MapReader::parseMapChar(char c, size_t h, size_t w)
+{
+    m_map->setMapDataValue(h, w, MapReader::charToMapTile(c));
+}
+

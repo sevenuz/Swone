@@ -18,6 +18,8 @@ public:
     void setPath(std::string path);
     void setMap(Map * mapObj);
     void readMap();
+
+    static MapTile charToMapTile(char);
 protected:
 private:
     Map * m_map = NULL;
@@ -26,14 +28,14 @@ private:
     std::string m_path = "";
 
     bool m_mapParse = false;
-    unsigned int m_lineCounter = 0;
+    size_t m_lineCounter = 0;
 
     void parseLine(std::string line);
     void parseValue(std::string key, std::string value);
     void parseMap(std::string line);
     void startParseMap();
     void endParseMap();
-    void parseMapChar(char c, unsigned int h, unsigned int w);
+    void parseMapChar(char c, size_t h, size_t w);
 };
 
 #endif // MAPREADER_H

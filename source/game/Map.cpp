@@ -28,39 +28,39 @@ std::string Map::getName() {
 	return m_name;
 }
 
-void Map::setWidth(unsigned int w) {
+void Map::setWidth(size_t w) {
 	m_width = w;
 }
 
-void Map::setHeight(unsigned int h) {
+void Map::setHeight(size_t h) {
 	m_height = h;
 }
 
-void Map::setBorder(std::string b) {
+void Map::setBorder(MapTile b) {
 	m_border = b;
 }
 
-unsigned int Map::getWidth() {
+size_t Map::getWidth() {
 	return m_width;
 }
 
-unsigned int Map::getHeight() {
+size_t Map::getHeight() {
 	return m_height;
 }
 
-unsigned int Map::getImageWidth() {
+size_t Map::getImageWidth() {
 	return m_imgWidth;
 }
 
-unsigned int Map::getImageHeight() {
+size_t Map::getImageHeight() {
 	return m_imgHeight;
 }
 
-std::string Map::getBorder() {
+MapTile Map::getBorder() {
 	return m_border;
 }
 
-unsigned int & Map::getMapData() {
+MapTile& Map::getMapData() {
 	return *m_mapData;
 }
 
@@ -68,13 +68,13 @@ float Map::getScale(){
 	return m_scale;
 }
 
-unsigned int Map::getMapDataValue(unsigned int h, unsigned int w) {
+MapTile Map::getMapDataValue(size_t h, size_t w) {
     if(h >= m_height || w >= m_height)
-        return MapTiles::DEFAULT;
+        return MapTile::DEFAULT;
 	return m_mapData[h * m_width + w];
 }
 
-void Map::setMapDataValue(unsigned int h, unsigned int w, unsigned int v) {
+void Map::setMapDataValue(size_t h, size_t w, MapTile v) {
 	m_mapData[h * m_width + w] = v;
 }
 
@@ -82,23 +82,18 @@ void Map::scaleToFit(){
 	scaleToFit(m_controller.settings.WIDTH, m_controller.settings.HEIGHT);
 }
 
-void Map::scaleToFit(unsigned int w, unsigned int h){
+void Map::scaleToFit(size_t w, size_t h){
 	float scaleW = (float)(w) / (float)(m_imgWidth);
 	float scaleH = (float)(h) / (float)(m_imgHeight);
-	float scale;
-	if (scaleW > scaleH) {
-		scale = scaleH;
-	} else {
-		scale = scaleW;
-	}
-	m_scale = scale;
-	m_controller.setScale(sf::Vector2f(scale, scale));
+
+	m_scale = (scaleW > scaleH) ? scaleH : scaleW;
+	m_controller.setScale(sf::Vector2f(m_scale, m_scale));
 }
 
 void Map::iniMapData() {
 	if (m_width > 0 && m_height > 0) {
 		m_mapDataSize = m_height * m_width;
-		m_mapData = new unsigned int[m_mapDataSize];
+		m_mapData = new MapTile[m_mapDataSize];
 	} else {
 		throw std::invalid_argument("width or height are not set");
 	}
@@ -113,7 +108,7 @@ void Map::createMapImage() {
 	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Black);
 	int l = 0; //lines
 	int c = -1; //columns
-	for (unsigned int i = 0; i < m_mapDataSize; i++) {
+	for (size_t i = 0; i < m_mapDataSize; i++) {
 		if (i < m_width * (l + 1)) {
 			c++;
 		} else {

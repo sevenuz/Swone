@@ -21,7 +21,7 @@ public:
 
     static const bool STANDART_VERTICAL_SYNC_ENABLED = true;
 
-    char * mapDir = "../res/map/";
+    char mapDir[12] = "../res/map/";
 
     sf::Font font;
 

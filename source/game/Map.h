@@ -15,16 +15,13 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
-namespace MapTiles
-{
-enum { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE};
-}
+enum MapTile : char{ SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE};
 
 class Map: public sf::Drawable,public Handleable
 {
 public:
-    static const unsigned int TILE_WIDTH = 64;
-    static const unsigned int TILE_HEIGHT = 64;
+    static const size_t TILE_WIDTH = 64;
+    static const size_t TILE_HEIGHT = 64;
 
     static float toMapPixelX(float x);
     static float toMapPixelY(float y);
@@ -41,22 +38,22 @@ public:
     sf::Sprite & getSprite();
 
     void scaleToFit();
-    void scaleToFit(unsigned int w, unsigned int h);
+    void scaleToFit(size_t w, size_t h);
 
-    void setWidth(unsigned int);
-    void setHeight(unsigned int);
-    void setBorder(std::string);
-    unsigned int getWidth();
-    unsigned int getHeight();
-    unsigned int getImageWidth();
-    unsigned int getImageHeight();
+    void setWidth(size_t);
+    void setHeight(size_t);
+    void setBorder(MapTile);
+    size_t getWidth();
+    size_t getHeight();
+    size_t getImageWidth();
+    size_t getImageHeight();
 
     float getScale();
 
-    std::string getBorder();
-    unsigned int & getMapData();
-    unsigned int getMapDataValue(unsigned int h, unsigned int w);
-    void setMapDataValue(unsigned int h, unsigned int w, unsigned int v);
+    MapTile getBorder();
+    MapTile & getMapData();
+    MapTile getMapDataValue(size_t h, size_t w);
+    void setMapDataValue(size_t h, size_t w, MapTile v);
     void iniMapData();
 
     void createMapImage();
@@ -68,19 +65,18 @@ private:
 
     std::string m_name= "";
 
-    unsigned int m_width = 0;
-    unsigned int m_height = 0;
+    size_t m_width = 0;
+    size_t m_height = 0;
 
-    unsigned int m_mapDataSize = 0;
+    size_t m_mapDataSize = 0;
 
-    unsigned int m_imgWidth = 0;
-    unsigned int m_imgHeight = 0;
+    size_t m_imgWidth = 0;
+    size_t m_imgHeight = 0;
 
     float m_scale = 1;
 
-    std::string m_border = "space";
-
-    unsigned int * m_mapData;//pointer (2d-array) to Map Infos
+    MapTile * m_mapData;//pointer (2d-array) to Map Infos
+    MapTile m_border;
 
     sf::Image m_mapTiles;//Img with all tiles
     sf::Image m_mapImage;//Img with map tiles

@@ -15,7 +15,7 @@ public:
 
   virtual sf::Vector2f& calculateVec(sf::Time ellapsed, sf::Vector2f newPos);
   virtual sf::Vector2f& calculatePos(sf::Time ellapsed);
-  virtual void onTiles(unsigned int leftTop, unsigned int rightTop, unsigned int leftBottom, unsigned int rightBottom);
+  virtual void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom);
   virtual void onOutOfMap() {};
 
   virtual sf::Vector2f& getVec();

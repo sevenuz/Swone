@@ -39,7 +39,7 @@ public:
 
   sf::Vector2f& calculateVec(sf::Time ellapsed, sf::Vector2f newPos) override;
   sf::Vector2f& calculatePos(sf::Time ellapsed) override;
-  void onTiles(unsigned int leftTop, unsigned int rightTop, unsigned int leftBottom, unsigned int rightBottom) override;
+  void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) override;
   void onOutOfMap() override;
 
 	AnimatedSprite * getAnimatedSprite();

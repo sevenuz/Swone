@@ -34,8 +34,8 @@ private:
     sf::View m_view;
     std::vector<Player *> m_player;
 
-    unsigned int round(float f) {
-      return static_cast<unsigned int> (f);
+    size_t round(float f) {
+      return static_cast<size_t> (f);
     }
 };
 #endif
