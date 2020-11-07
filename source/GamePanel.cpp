@@ -97,7 +97,7 @@ void GamePanel::setMapSelection(int i){
 	m_gameController.setMap(m_maps[m_selectedMap]);
 }
 
-void GamePanel::setActionSelection(int i){
+void GamePanel::setActionSelection(char i){
 	if(i > GamePanelMenuPoint::LAST) {
 		i = GamePanelMenuPoint::FIRST;
 	} else if(i < GamePanelMenuPoint::FIRST) {
@@ -133,10 +133,10 @@ void GamePanel::event(sf::Event& event) {
 					setMapSelection(m_selectedMap + 1);
 				}
 				if(event.key.code == sf::Keyboard::Down) {
-					setActionSelection(m_selectedMap + 1);
+					setActionSelection(m_selectedAction++);
 				}
 				if(event.key.code == sf::Keyboard::Up) {
-					setActionSelection(m_selectedMap - 1);
+					setActionSelection(m_selectedAction--);
 				}
 				if(event.key.code == sf::Keyboard::P) {
 					//Spawn Player

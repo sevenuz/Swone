@@ -29,12 +29,11 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <game/MapReader.h>
 
-namespace GamePanelMenuPoint {
-enum { PLAY, FIRST = PLAY, LAST = PLAY};
-}
 
 class GamePanel: public sf::Drawable,public Handleable {
 private:
+    enum GamePanelMenuPoint : char { PLAY, FIRST = PLAY, LAST = PLAY};
+
     ParticleSystem m_ps;
     Controller & m_controller;
     GameController m_gameController;
@@ -49,13 +48,14 @@ private:
     MapReader m_mapReader;
 
     bool m_mapsFound = false;
-    int m_selectedAction = 0;
+    // GamePanelMenuPoint type, but char to perform de/increment
+    char m_selectedAction = FIRST;
     int m_selectedMap = 0;
     std::vector<Map *> m_maps;
 
     void readMapsFromDir();
     void setMapSelection(int);
-    void setActionSelection(int);
+    void setActionSelection(char);
 
     void startGame();
 

@@ -15,13 +15,9 @@
 #include <Settings.h>
 #include <SFML/Graphics/Drawable.hpp>
 
-
-namespace Menupoint {
-enum { LOKAL, ONLINE, SETTINGS, EXIT, FIRST = LOKAL, LAST = EXIT};
-}
-
 class MainMenu: public sf::Drawable,public Handleable {
 private:
+    enum Menupoint : char { LOKAL, ONLINE, SETTINGS, EXIT, FIRST = LOKAL, LAST = EXIT};
 
     int TEXT_MARGIN_LEFT = 30;
     int TEXT_MARGIN_TOP = 50;
@@ -38,7 +34,8 @@ private:
     ParticleSystem m_ps;
     Controller & m_controller;
 
-    unsigned char m_selectedMenupoint;
+    // Menupoint type, but char to perform de/increment
+    char m_selectedMenupoint;
 
 
     void changeFont(sf::Font &);
@@ -55,7 +52,7 @@ private:
 
 public:
 
-    void setSelectedMenupoint(unsigned int smp);
+    void setSelectedMenupoint(Menupoint smp);
     void update(sf::Time ellapsed);
     void setFont(sf::Font & font);
     void event(sf::Event& e);

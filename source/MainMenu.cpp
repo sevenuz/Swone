@@ -79,7 +79,7 @@ void MainMenu::changeSelectedMenupoint() {
     }
 }
 
-void MainMenu::setSelectedMenupoint(unsigned int smp) {
+void MainMenu::setSelectedMenupoint(Menupoint smp) {
     m_selectedMenupoint = smp;
     changeSelectedMenupoint();
 }
@@ -107,14 +107,14 @@ void MainMenu::event(sf::Event& event) {
             if(m_selectedMenupoint == Menupoint::LAST)
                 m_selectedMenupoint = Menupoint::FIRST;
             else
-                m_selectedMenupoint += 1;
+                m_selectedMenupoint++;
             changeSelectedMenupoint();
         }
         if(event.key.code == sf::Keyboard::Up) {
             if(m_selectedMenupoint == Menupoint::FIRST)
                 m_selectedMenupoint = Menupoint::LAST;
             else
-                m_selectedMenupoint -= 1;
+                m_selectedMenupoint--;
             changeSelectedMenupoint();
         }
         if(event.key.code == sf::Keyboard::Return) {//Enter
