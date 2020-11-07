@@ -12,24 +12,24 @@ GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameControlle
 	m_play.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
 	m_play.setString("Play");
 	m_play.setPosition(Settings::toW(0.415f), Settings::toH(0.8f));
-	m_play.setColor(sf::Color::Yellow);
+	m_play.setFillColor(sf::Color::Yellow);
 	m_play.setCharacterSize(Settings::toF(50));
 
 	m_mapName.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
 	m_mapName.setPosition(Settings::toW(0.4f), Settings::toH(31));
-	m_mapName.setColor(sf::Color::White);
+	m_mapName.setFillColor(sf::Color::White);
 	m_mapName.setCharacterSize(Settings::toF(30));
 
 	m_switchLeft.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
 	m_switchLeft.setString("<");
 	m_switchLeft.setPosition(Settings::toW(30), Settings::toH(150));
-	m_switchLeft.setColor(sf::Color::Yellow);
+	m_switchLeft.setFillColor(sf::Color::Yellow);
 	m_switchLeft.setCharacterSize(Settings::toF(50));
 
 	m_switchRight.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
 	m_switchRight.setString(">");
 	m_switchRight.setPosition(Settings::toW(590), Settings::toH(150));
-	m_switchRight.setColor(sf::Color::Yellow);
+	m_switchRight.setFillColor(sf::Color::Yellow);
 	m_switchRight.setCharacterSize(Settings::toF(50));
 
 	readMapsFromDir();

@@ -13,7 +13,7 @@ MainMenu::MainMenu(Controller& c): m_ps(100), m_controller(c) {
     m_header.setString("Swone");
     m_header.setCharacterSize(Settings::toF(TEXT_HEADER_SIZE));
     m_header.setStyle(sf::Text::Bold | sf::Text::Underlined);
-    m_header.setColor(sf::Color::Red);
+    m_header.setFillColor(sf::Color::Red);
     m_header.setPosition(Settings::toW(TEXT_MARGIN_LEFT),Settings::toH(TEXT_MARGIN_TOP));
 
     m_lokal.setString("Lokal");
@@ -46,13 +46,13 @@ void MainMenu::changeFont(sf::Font & font) {
 
 void MainMenu::selectedStyle(sf::Text& t) {
     t.setCharacterSize(Settings::toF(TEXT_SELECTED_SIZE));
-    t.setColor(sf::Color::Yellow);
+    t.setFillColor(sf::Color::Yellow);
     m_ps.setOrigin(t.getGlobalBounds().left,t.getGlobalBounds().top,t.getGlobalBounds().width,t.getGlobalBounds().height,Origin::ON_BORDER);
 }
 
 void MainMenu::deselectedStyle(sf::Text& t) {
     t.setCharacterSize(Settings::toF(TEXT_MENUPOINT_SIZE));
-    t.setColor(sf::Color::White);
+    t.setFillColor(sf::Color::White);
 }
 
 void MainMenu::changeSelectedMenupoint() {

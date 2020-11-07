@@ -71,7 +71,7 @@ float Map::getScale(){
 MapTile Map::getMapDataValue(size_t h, size_t w) {
     if(h >= m_height || w >= m_height)
         return MapTile::DEFAULT;
-	return m_mapData[h * m_width + w];
+    return m_mapData[h * m_width + w];
 }
 
 void Map::setMapDataValue(size_t h, size_t w, MapTile v) {
