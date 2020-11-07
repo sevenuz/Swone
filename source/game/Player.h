@@ -25,9 +25,7 @@
 #define MOVE_FORCE 7
 #define WEIGHT 30
 
-namespace PlayerAnimation {
-	enum { LEFT, RIGHT, JUMP };
-}
+enum PlayerAnimation : char { LEFT, RIGHT, JUMP };
 
 class Player: public GameObject {
 public:
@@ -66,7 +64,7 @@ public:
   void setVec(sf::Vector2f pos);
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	void setAnimation(unsigned int ani);
+	void setAnimation(PlayerAnimation ani);
 
 	sf::Time m_jumpCooldownTime = sf::seconds(2); // required time to get jump
 	sf::Time m_jumpCooldown = sf::seconds(0); // used time of jump cooldown

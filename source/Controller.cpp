@@ -23,25 +23,25 @@ bool Controller::isLogClosed(){
 };
 
 
-void Controller::setActiveWindow(unsigned int i) {
-    if(i>ActiveWindow::LAST) {
-        m_activeWindow = ActiveWindow::FIRST;
+void Controller::setActiveWindow(ActiveWindow i) {
+    if(i>ActiveWindow::AW_LAST) {
+        m_activeWindow = ActiveWindow::AW_FIRST;
     } else {
         m_activeWindow = i;
     }
 }
-unsigned int Controller::getActiveWindow() {
+ActiveWindow Controller::getActiveWindow() {
     return m_activeWindow;
 }
 
-void Controller::setActiveGameWindow(unsigned int i) {
-    if(i>ActiveGameWindow::LAST) {
-    	m_activeGameWindow = ActiveGameWindow::FIRST;
+void Controller::setActiveGameWindow(ActiveGameWindow i) {
+    if(i>ActiveGameWindow::AGW_LAST) {
+    	m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
     } else {
     	m_activeGameWindow = i;
     }
 }
-unsigned int Controller::getActiveGameWindow() {
+ActiveGameWindow Controller::getActiveGameWindow() {
     return m_activeGameWindow;
 }
 

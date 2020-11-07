@@ -7,13 +7,11 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
-namespace ActiveWindow {
-	enum { MAINMENU, SETTINGS, GAME, FIRST = MAINMENU, LAST = GAME};
-}
+// Prefix in front of First and Last is necessary to avoid name clash of the both enums
+enum ActiveWindow : char { MAINMENU, SETTINGS, GAME, AW_FIRST = MAINMENU, AW_LAST = GAME};
 
-namespace ActiveGameWindow {
-	enum { MAPSELECTION, GAME, FIRST = MAPSELECTION, LAST = GAME};
-}
+enum ActiveGameWindow : char { MAPSELECTION, INGAME, AGW_FIRST = MAPSELECTION, AGW_LAST = INGAME};
+
 /*
 //connection listener declare:
 enum close_reason {
@@ -31,11 +29,11 @@ public:
 
     Settings settings;
 
-    void setActiveWindow(unsigned int i);
-    unsigned int getActiveWindow();
+    void setActiveWindow(ActiveWindow i);
+    ActiveWindow getActiveWindow();
 
-    void setActiveGameWindow(unsigned int i);
-    unsigned int getActiveGameWindow();
+    void setActiveGameWindow(ActiveGameWindow i);
+    ActiveGameWindow getActiveGameWindow();
 
     sf::Vector2f getScale();
     void setScale(sf::Vector2f scale);
@@ -64,8 +62,8 @@ private:
     sf::RenderWindow& m_window;
 
     void iniSettings();
-    unsigned int m_activeWindow = ActiveWindow::FIRST;
-    unsigned int m_activeGameWindow = ActiveGameWindow::FIRST;
+    ActiveWindow m_activeWindow = ActiveWindow::AW_FIRST;
+    ActiveGameWindow m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
 
     sf::Vector2f m_scale = sf::Vector2f(1,1);
 

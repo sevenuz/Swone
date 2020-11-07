@@ -42,7 +42,7 @@ Player::~Player() {
 	// TODO Auto-generated destructor stub
 }
 
-void Player::setAnimation(unsigned int ani){
+void Player::setAnimation(PlayerAnimation ani){
 	switch(ani) {
 	case PlayerAnimation::LEFT:
 		m_ani = &m_ani_left;

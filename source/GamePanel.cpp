@@ -109,7 +109,7 @@ void GamePanel::setActionSelection(int i){
 void GamePanel::startGame(){
 	if(m_mapsFound){
 		m_controller.pushLogMsg("start game");
-		m_controller.setActiveGameWindow(ActiveGameWindow::GAME);	
+		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
 	} else {
 		m_controller.pushLogMsg("No Map. Can't start the game.", "error");
 	}
@@ -154,7 +154,7 @@ void GamePanel::event(sf::Event& event) {
 				}
 			}
 			break;
-		case ActiveGameWindow::GAME:
+		case ActiveGameWindow::INGAME:
 			m_gameWindow.event(event);
 			break;
 		default:
@@ -168,7 +168,7 @@ void GamePanel::update(sf::Time ellapsed) {
 	case ActiveGameWindow::MAPSELECTION:
 		//m_maps[m_selectedMap]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
 		break;
-	case ActiveGameWindow::GAME:
+	case ActiveGameWindow::INGAME:
 		m_gameWindow.update(ellapsed);
 		break;
 	default:
@@ -197,7 +197,7 @@ void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const{
 		target.draw(m_switchLeft, states);
 		target.draw(m_switchRight, states);
 		break;
-	case ActiveGameWindow::GAME:
+	case ActiveGameWindow::INGAME:
 		target.draw(m_gameWindow, states);
 		break;
 	default:

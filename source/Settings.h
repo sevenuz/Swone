@@ -11,13 +11,13 @@ public:
     virtual ~Settings();
 
     //An den standart werten werden die elemente ausgerichtet
-    static const unsigned int STANDART_WIDTH = 640;
-    static const unsigned int STANDART_HEIGHT = 360;
+    static const size_t STANDART_WIDTH = 640;
+    static const size_t STANDART_HEIGHT = 360;
 
     //das ist die eigentliche auflösung
-    static const unsigned int WIDTH = 640;
-    static const unsigned int HEIGHT = 360;
-    static const unsigned int STANDART_BITS_PER_PIXEL = 32;
+    static const size_t WIDTH = 640;
+    static const size_t HEIGHT = 360;
+    static const size_t STANDART_BITS_PER_PIXEL = 32;
 
     static const bool STANDART_VERTICAL_SYNC_ENABLED = true;
 
