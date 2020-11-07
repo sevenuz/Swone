@@ -6,8 +6,8 @@
 #include <string>
 #include <stdexcept>
 
-#include <game/Map.h>
-#include <Controller.h>
+#include "game/Map.h"
+#include "Controller.h"
 
 class MapReader
 {

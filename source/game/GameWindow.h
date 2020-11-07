@@ -2,10 +2,10 @@
 #define SWONE_GAME_GAMEWINDOW_H
 
 #include <SFML/Graphics/Drawable.hpp>
-#include <Handleable.h>
-#include <game/GameController.h>
+#include "Handleable.h"
+#include "game/GameController.h"
 
-class GameWindow: public sf::Drawable, public Handleable {
+class GameWindow: public Handleable {
 
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;

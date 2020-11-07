@@ -3,21 +3,19 @@
 
 #include <string>
 #include <stdexcept>
-#include <Controller.h>
-#include <Handleable.h>
-
-#include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Vector2.hpp>
-
 #include <SFML/Graphics/Rect.hpp>
+
+#include "Controller.h"
+#include "Handleable.h"
 
 enum MapTile : char{ SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE};
 
-class Map: public sf::Drawable,public Handleable
+class Map: public Handleable
 {
 public:
     static const size_t TILE_WIDTH = 64;

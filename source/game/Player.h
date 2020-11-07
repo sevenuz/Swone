@@ -14,9 +14,8 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
 
-#include <graphics/Animation.h>
-#include <graphics/AnimatedSprite.h>
-
+#include "graphics/Animation.h"
+#include "graphics/AnimatedSprite.h"
 #include "Map.h"
 #include "GameObject.h"
 

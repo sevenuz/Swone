@@ -1,6 +1,7 @@
 #ifndef SWONE_MAINMENU_H
 #define SWONE_MAINMENU_H
 
+#include <string>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -8,14 +9,13 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/Color.hpp>
-#include <graphics/ParticleSystem.h>
-#include <Handleable.h>
-#include <string>
-#include <Controller.h>
-#include <Settings.h>
-#include <SFML/Graphics/Drawable.hpp>
 
-class MainMenu: public sf::Drawable,public Handleable {
+#include "graphics/ParticleSystem.h"
+#include "Handleable.h"
+#include "Controller.h"
+#include "Settings.h"
+
+class MainMenu: public Handleable {
 private:
     enum Menupoint : char { LOKAL, ONLINE, SETTINGS, EXIT, FIRST = LOKAL, LAST = EXIT};
 

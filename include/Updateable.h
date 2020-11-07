@@ -6,5 +6,9 @@
 class Updateable {
 public:
     virtual void update(sf::Time elapsed) = 0;
+    virtual ~Updateable() = 0;
 };
+
+inline Updateable::~Updateable(){}
+
 #endif

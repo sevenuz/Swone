@@ -14,23 +14,21 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/Color.hpp>
 
-#include <graphics/ParticleSystem.h>
-#include <game/GameController.h>
-#include <game/GameWindow.h>
-#include <Handleable.h>
-#include <Settings.h>
-
 #include <vector>
 #include <string>
 #include <sstream>
 #include <tinydir.h>
 
-#include <Controller.h>
-#include <SFML/Graphics/Drawable.hpp>
-#include <game/MapReader.h>
+#include "graphics/ParticleSystem.h"
+#include "game/GameController.h"
+#include "game/GameWindow.h"
+#include "Handleable.h"
+#include "Settings.h"
+#include "Controller.h"
+#include "game/MapReader.h"
 
 
-class GamePanel: public sf::Drawable,public Handleable {
+class GamePanel: public Handleable {
 private:
     enum GamePanelMenuPoint : char { PLAY, FIRST = PLAY, LAST = PLAY};
 

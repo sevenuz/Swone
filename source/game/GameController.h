@@ -2,9 +2,10 @@
 #define SWONE_GAME_GAMECONTROLLER_H
 
 #include <vector>
-#include <game/Map.h>
-#include <game/Player.h>
-#include <Controller.h>
+
+#include "game/Map.h"
+#include "game/Player.h"
+#include "Controller.h"
 
 class GameController {
 public:

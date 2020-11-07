@@ -4,14 +4,16 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
 
+#include "Handleable.h"
 #include "Map.h"
 
 #define SPEED_FACTOR 0.5
 
-class GameObject: public sf::Drawable {
+class GameObject: public Handleable {
 public:
-	virtual void update(sf::Time ellapsed) {};
-  virtual void event(sf::Event& e) {};
+  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
+  virtual void event(sf::Event& e) = 0;
+	virtual void update(sf::Time ellapsed) = 0;
 
   virtual sf::Vector2f& calculateVec(sf::Time ellapsed, sf::Vector2f newPos);
   virtual sf::Vector2f& calculatePos(sf::Time ellapsed);
@@ -28,8 +30,6 @@ public:
   virtual sf::Vector2f getHitboxRightBottom(const sf::Vector2f& pos);
   virtual sf::FloatRect getHitboxBounds();
 protected:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
-
   sf::Vector2f m_pos = sf::Vector2f(0,0); // position in map
 	sf::Vector2f m_vec = sf::Vector2f(0,0); // direction vector
   sf::Vector2f m_nextPos = sf::Vector2f(0,0); // position in map after next calculation

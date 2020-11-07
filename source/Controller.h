@@ -2,10 +2,11 @@
 #define SWONE_CONTROLLER_H
 
 #include <iostream>
-#include <Settings.h>
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
+
+#include "Settings.h"
 
 // Prefix in front of First and Last is necessary to avoid name clash of the both enums
 enum ActiveWindow : char { MAINMENU, SETTINGS, GAME, AW_FIRST = MAINMENU, AW_LAST = GAME};
