@@ -78,6 +78,8 @@ void Player::toggleFalling(bool falling) {
 }
 
 void Player::stopFalling() {
+    m_vec.y  = 0;
+    m_nextVec.y = 0;
     toggleFalling(false);
 }
 
@@ -131,10 +133,11 @@ sf::Vector2f& Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
     const float g = GRAVITY;
     float fx = m_vec.x;
     // x linear, y beschleunigt
-    float fy = m_vec.y  + (m_m * g * s);
-    // TODO
-    if(fy > g)
-        fy = g;
+
+    // TODO Luftwiderstand
+    float luftwid = 0;
+    float fy = m_vec.y  + ((g-luftwid) * s);
+    //std::cout << m_vec.y << std::endl;
     m_nextVec.x = fx;
     m_nextVec.y = fy;
     return m_nextVec;
@@ -205,7 +208,7 @@ void Player::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapT
 }
 
 void Player::onOutOfMap() {
-    std::cout << "oh noo!" << std::endl;
+    //std::cout << "oh noo!" << std::endl;
     apply();
 };
 

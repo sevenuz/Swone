@@ -19,8 +19,8 @@
 #include "Map.h"
 #include "GameObject.h"
 
-#define GRAVITY 9.81
-#define JUMP_FORCE 60
+#define GRAVITY 25
+#define JUMP_FORCE 15
 #define MOVE_FORCE 7
 #define WEIGHT 30
 
