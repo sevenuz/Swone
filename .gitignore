@@ -5,3 +5,5 @@ builddir/
 /build/
 *.swp
 .project
+bib/sfml/
+.vs/
