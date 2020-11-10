@@ -1,0 +1,172 @@
+<?xml version="1.0" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="release|x64">
+			<Configuration>release</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<ProjectGuid>{1FD73685-9F53-42DF-9345-2684FEA9AB98}</ProjectGuid>
+		<Keyword>x64Proj</Keyword>
+		<RootNamespace>swone</RootNamespace>
+		<Platform>x64</Platform>
+		<ProjectName>swone</ProjectName>
+		<WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+	<PropertyGroup Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<CharacterSet>MultiByte</CharacterSet>
+		<PlatformToolset>v142</PlatformToolset>
+		<WholeProgramOptimization>false</WholeProgramOptimization>
+		<BasicRuntimeChecks>Default</BasicRuntimeChecks>
+		<UseDebugLibraries>false</UseDebugLibraries>
+	</PropertyGroup>
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+			<ExceptionHandling>Sync</ExceptionHandling>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<FunctionLevelLinking>true</FunctionLevelLinking>
+			<WarningLevel>Level2</WarningLevel>
+			<InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+			<FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+		</ClCompile>
+		<ResourceCompile>
+			<PreprocessorDefinitions/>
+		</ResourceCompile>
+		<Link>
+			<AdditionalOptions>/OPT:REF %(AdditionalOptions)</AdditionalOptions>
+			<AdditionalDependencies>opengl32.lib;C:/Users/thoma/source/repos/Swone/bib/sfml/lib/Release/sfml-graphics.lib;C:/Users/thoma/source/repos/Swone/bib/sfml/lib/Release/sfml-system.lib;C:/Users/thoma/source/repos/Swone/bib/sfml/lib/Release/sfml-window.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<OutputFile>$(OutDir)swone.exe</OutputFile>
+			<SubSystem>Console</SubSystem>
+			<TargetMachine>MachineX64</TargetMachine>
+			<SuppressStartupBanner>true</SuppressStartupBanner>
+			<SetChecksum>true</SetChecksum>
+		</Link>
+	</ItemDefinitionGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+	<PropertyGroup>
+		<_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+		<OutDir>.\</OutDir>
+		<IntDir>swone@exe\</IntDir>
+		<TargetName>swone</TargetName>
+		<TargetExt>.exe</TargetExt>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\meson.build"/>
+	</ItemGroup>
+	<ItemGroup>
+		<CLCompile Include="..\source/main.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_main.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\bib/imgui/imgui-SFML.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)bib_imgui_imgui-SFML.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\bib/imgui/imgui.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)bib_imgui_imgui.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\bib/imgui/imgui_draw.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)bib_imgui_imgui_draw.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/Controller.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_Controller.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/GamePanel.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_GamePanel.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/MainMenu.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_MainMenu.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/Settings.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_Settings.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/game/GameController.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_game_GameController.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/game/GameObject.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_game_GameObject.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/game/GameWindow.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_game_GameWindow.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/game/Map.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_game_Map.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/game/MapReader.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_game_MapReader.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/game/Player.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_game_Player.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/graphics/ParticleSystem.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_graphics_ParticleSystem.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/graphics/Animation.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_graphics_Animation.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/graphics/AnimatedSprite.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_graphics_AnimatedSprite.cpp.obj</ObjectFileName>
+		</CLCompile>
+	</ItemGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+	<ItemGroup>
+		<ProjectReference Include="C:\Users\thoma\source\repos\Swone\build\REGEN.vcxproj">
+			<Project>{C86FC8B0-937C-4832-A07D-19AC1283381F}</Project>
+			<LinkLibraryDependencies>false</LinkLibraryDependencies>
+		</ProjectReference>
+	</ItemGroup>
+</Project>

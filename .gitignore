@@ -1,9 +1,10 @@
 bin/
 obj/
 swone.layout
-builddir/
-/build/
+/build/**
 *.swp
 .project
 bib/sfml/
 .vs/
+!/build/swone@exe.vcxproj
+!/build/swone.sln
