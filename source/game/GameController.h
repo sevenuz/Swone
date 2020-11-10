@@ -20,12 +20,14 @@ public:
     void updateMap(sf::Time ellapsed);
     void eventMap(sf::Event& e);
 
+    // TODO should be GameObject functions
     void updatePlayers(sf::Time ellapsed);
     void eventPlayers(sf::Event& e);
 
     void setViewCenter(sf::Vector2f pos);
 
     void setMap(Map * m);
+    // TODO should be GameObject fn
     void pushPlayer(Player *);
 protected:
 private:
@@ -33,6 +35,8 @@ private:
     Map * m_map = NULL;
     sf::Vector2f m_viewDelta = sf::Vector2f(0,0);
     sf::View m_view;
+    // TODO should be GameObject vector
+    // multi dimensional -> back/forground
     std::vector<Player *> m_player;
 
     size_t round(float f) {

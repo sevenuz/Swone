@@ -36,6 +36,7 @@ GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameControlle
 }
 
 GamePanel::~GamePanel() {
+	// TODO delete Map vector
 	m_controller.pushLogMsg("GamePanel destroyed");
 }
 

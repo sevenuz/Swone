@@ -1,0 +1,41 @@
+# Project Structure
+
+## include/
+Contains pure virtuell classes,
+defining the different interface functions of objects in the game:
+
+- virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
+- virtual void event(sf::Event& e) = 0;
+- virtual void update(sf::Time elapsed) = 0;
+
+## source/
+Contains the rest o.0
+
+### class dependencies and members
+The following graph shows the hierarchy of the classes located in source/.
+> The right side is the member of the left...
+
+main.cpp--+-Controller m_controller-----Settings settings  // Controller which is passed through, holds the general state
+          |
+          +-MainMenu m_menu-----------+-ParticleSystem m_ps
+          |                           |
+          |                           +-Controller & m_controller
+          |
+          +-GamePanel m_gamePanel-----+-ParticleSystem m_ps
+                                      |
+                                      +-Controller & m_controller
+                                      |
+                                      +-GameController m_gameController---+-Controller & m_controller  // GameController implements GAME LOGIC
+                                      |                                   |
+                                      |                                   +-Map * m_map  // map of the game, set from the GamePanel::m_maps
+                                      |                                   |
+                                      |                                   +-std::vector<GameObject *> m_gameObjects  // TODO objects and players in map
+                                      |
+                                      +-GameWindow m_gameWindow-------------GameController & m_gc  // Glue between GamePanel and GameController: TODO unnecessary?
+                                      |
+                                      +-MapReader m_mapReader-------------+-Map * m_map
+                                      |                                   |
+                                      |                                   +-Controller & m_controller
+                                      |  git
+                                      +-std::vector<Map *> m_maps-----------Controller & m_controller // All read maps from res/map/ dir
+                                      

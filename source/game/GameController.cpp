@@ -2,6 +2,7 @@
 
 
 GameController::GameController(Controller & c): m_controller(c){
+	// TODO move player adding
 	Player * p = new Player(0, 0);
 	pushPlayer(p);
 }
