@@ -137,9 +137,14 @@ sf::Vector2f& Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
     // TODO Luftwiderstand
     float luftwid = 0;
     float fy = m_vec.y  + ((g-luftwid) * s);
-    //std::cout << m_vec.y << std::endl;
-    m_nextVec.x = fx;
-    m_nextVec.y = fy;
+    std::cout << m_vec.y << std::endl;
+
+    // speed lock on tile width/height,
+    // to prevent glitching on low frame rates
+    // TODO is maximum useful or still posible to glitch?
+    // or: implement line from oldPos to newPos with collision detection
+    m_nextVec.x = fx < Map::TILE_WIDTH ? fx : Map::TILE_WIDTH;
+    m_nextVec.y = fy < Map::TILE_HEIGHT? fy : Map::TILE_HEIGHT;
     return m_nextVec;
 }
 
