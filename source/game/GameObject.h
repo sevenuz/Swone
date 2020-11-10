@@ -15,9 +15,15 @@ public:
   virtual void event(sf::Event& e) = 0;
 	virtual void update(sf::Time ellapsed) = 0;
 
+  // TODO standard implementation of this functions
+  // calculate the next position of the object and save the result in m_nextPos
   virtual sf::Vector2f& calculateVec(sf::Time ellapsed, sf::Vector2f newPos);
+  // calculate the next speed vct of the object and save the result in m_nextVec
   virtual sf::Vector2f& calculatePos(sf::Time ellapsed);
+  // is called with the tiles which are hitting the corners
+  // of the hitbox of the m_nextPos vector
   virtual void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom);
+  // if the object is complete out of map, this function is called
   virtual void onOutOfMap() {};
 
   virtual sf::Vector2f& getVec();

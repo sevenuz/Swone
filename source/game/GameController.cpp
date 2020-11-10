@@ -55,11 +55,12 @@ void GameController::eventMap(sf::Event& e){
 	sf::Vector2f worldPos = w.mapPixelToCoords(pixelPos);
 
 	getMap()->event(e);
+	// TODO get numbers from settings
 	if(e.type == sf::Event::MouseWheelMoved) // Zomm in or out if the mouse wheel moves
       {
         m_view.zoom(1.f+e.mouseWheel.delta*0.1f);
       }
-    if(e.type == sf::Event::MouseMoved) // Zomm in or out if the mouse wheel moves
+    if(e.type == sf::Event::MouseMoved) // Move view
       {
         sf::Vector2f delta = worldPos - getPlayers()[0]->getPos();
         m_viewDelta.x = delta.x*0.1f;
