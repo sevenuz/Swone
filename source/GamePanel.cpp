@@ -66,7 +66,7 @@ void GamePanel::readMapsFromDir() {
 			m_mapReader.setPath(m_controller.settings.mapDir + ss.str());
 
 			m_mapReader.setMap(map);
-			m_mapReader.readMap();
+			m_mapReader.read();
 
 			m_maps.push_back(map);
 		}

@@ -5,8 +5,8 @@
  *      Author: julius
  */
 
-#ifndef SOURCE_GAME_PLAYER_H_
-#define SOURCE_GAME_PLAYER_H_
+#ifndef SWONE_GAME_PLAYER_H_
+#define SWONE_GAME_PLAYER_H_
 
 #include <iostream>
 #include <cmath>

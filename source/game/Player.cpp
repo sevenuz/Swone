@@ -137,7 +137,7 @@ sf::Vector2f& Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
     // TODO Luftwiderstand
     float luftwid = 0;
     float fy = m_vec.y  + ((g-luftwid) * s);
-    std::cout << m_vec.y << std::endl;
+    //std::cout << m_vec.y << std::endl;
 
     // speed lock on tile width/height,
     // to prevent glitching on low frame rates

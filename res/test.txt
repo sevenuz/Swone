@@ -1,0 +1,20 @@
+width=100
+height=50
+
+frame1
+1=/skin1.png
+2=/skin2.png
+3=/skin3.png
+
+frame2
+1=/skin4.png
+2=/skin5.png
+3=/skin6.png
+
+global
+weapon=big
+
+map
+// Gravity of the map
+gravity=8.96
+

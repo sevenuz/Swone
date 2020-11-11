@@ -36,6 +36,6 @@ main.cpp--+-Controller m_controller-----Settings settings  // Controller which i
                                       +-MapReader m_mapReader-------------+-Map * m_map
                                       |                                   |
                                       |                                   +-Controller & m_controller
-                                      |  git
+                                      |
                                       +-std::vector<Map *> m_maps-----------Controller & m_controller // All read maps from res/map/ dir
                                       
