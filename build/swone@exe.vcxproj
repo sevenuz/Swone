@@ -131,11 +131,17 @@
 			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 			<ObjectFileName>$(IntDir)source_game_Map.cpp.obj</ObjectFileName>
 		</CLCompile>
-		<CLCompile Include="..\source/game/MapReader.cpp">
+		<CLCompile Include="..\source/util/reader/Reader.cpp">
 			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
 			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-			<ObjectFileName>$(IntDir)source_game_MapReader.cpp.obj</ObjectFileName>
+			<ObjectFileName>$(IntDir)source_util_reader_Reader.cpp.obj</ObjectFileName>
+		</CLCompile>
+		<CLCompile Include="..\source/util/reader/MapReader.cpp">
+			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;..\./bib/sfml/include;bib\sfml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<ObjectFileName>$(IntDir)source_util_reader_MapReader.cpp.obj</ObjectFileName>
 		</CLCompile>
 		<CLCompile Include="..\source/game/Player.cpp">
 			<AdditionalOptions>&quot;/EHsc&quot; &quot;/std:c++14&quot; &quot;/permissive-&quot; %(AdditionalOptions) &quot;-std=c++11&quot;</AdditionalOptions>

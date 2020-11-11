@@ -8,7 +8,7 @@
 #include "Map.h"
 
 #define SPEED_FACTOR 0.5
-#define DEFAULT_DRAG 25
+#define DEFAULT_DRAG 100
 
 class GameObject : public Handleable {
 public:

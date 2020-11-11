@@ -130,10 +130,7 @@ sf::Vector2f& Player::calculatePos(sf::Time ellapsed) {
 
 // This function should probably be moved sooner or later
 float calculateDrag(const float& drag, const float& speed) {
-	// Speed gets divided by a constant factor of 10000 before 
-	// continuing with the calculation to make the drag values
-	// more readable
-	return pow(speed/CONST_10000, 2) * drag;
+	return pow(speed, 2) * drag * SCALE_DRAG_CONST;
 }
 
 sf::Vector2f& Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
@@ -145,7 +142,7 @@ sf::Vector2f& Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
 	float speed = m_vec.y / s;
 	float drag = calculateDrag(m_drag, speed);
     float fy = m_vec.y  + (g * s);
-	fy = fy > 0 ? std::max(fy - drag, 0.0f) : std::min(fy + drag, 0.0f);
+	fy = fy > 0 ? std::max(fy - (drag*s), 0.0f) : std::min(fy + (drag*s), 0.0f);
 	//std::cout << m_vec.y << std::endl;
 
 	// speed lock on tile width/height,

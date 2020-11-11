@@ -21,11 +21,12 @@
 #include "GameObject.h"
 
 #define GRAVITY 25
-#define JUMP_FORCE 15
+#define JUMP_FORCE 16
 #define MOVE_FORCE 7
-#define WEIGHT 30
 
-#define CONST_10000 10000
+// This scales the drag, so that with a Gravity of 25 and a 
+// drag property of 100, a terminal velocity of 50 is reached
+#define SCALE_DRAG_CONST 0.0000000276f;
 
 enum PlayerAnimation : char { LEFT, RIGHT, JUMP };
 
