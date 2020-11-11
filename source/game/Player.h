@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
@@ -23,6 +24,8 @@
 #define JUMP_FORCE 15
 #define MOVE_FORCE 7
 #define WEIGHT 30
+
+#define CONST_10000 10000
 
 enum PlayerAnimation : char { LEFT, RIGHT, JUMP };
 
@@ -71,7 +74,6 @@ private:
 	unsigned int m_jumps = 0; // count of current jumps
 	float m_jf = JUMP_FORCE; // height of jump
 	float m_mf = MOVE_FORCE; // width of movement
-	float m_m = WEIGHT; // weight (for gravityforce)
 
 	sf::Texture m_texture;
 	Animation m_ani_left;
