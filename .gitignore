@@ -8,3 +8,4 @@ bib/sfml/
 .vs/
 !/build/swone@exe.vcxproj
 !/build/swone.sln
+winbuild.txt
