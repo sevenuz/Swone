@@ -20,13 +20,8 @@
 #include "Map.h"
 #include "GameObject.h"
 
-#define GRAVITY 25
 #define JUMP_FORCE 16
 #define MOVE_FORCE 7
-
- // This scales the drag, so that with a Gravity of 25 and a 
- // drag property of 100, a terminal velocity of 50 is reached
-#define SCALE_DRAG_CONST 0.0000000276f;
 
 enum PlayerAnimation : char { LEFT, RIGHT, JUMP };
 
@@ -38,7 +33,6 @@ public:
 	void update(sf::Time ellapsed) override;
 	void event(sf::Event& e) override;
 
-	sf::Vector2f& calculateVec(sf::Time ellapsed, sf::Vector2f newPos) override;
 	sf::Vector2f& calculatePos(sf::Time ellapsed) override;
 	void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) override;
 	void onOutOfMap() override;

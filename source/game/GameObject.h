@@ -7,8 +7,13 @@
 #include "Handleable.h"
 #include "Map.h"
 
+#define GRAVITY 25
 #define SPEED_FACTOR 0.5
 #define DEFAULT_DRAG 100
+
+// This scales the drag, so that with a Gravity of 25 and a 
+// drag property of 100, a terminal velocity of 50 is reached
+#define SCALE_DRAG_CONST 0.0000000276f
 
 class GameObject : public Handleable {
 public:
@@ -47,5 +52,6 @@ protected:
 	// higher drag means slower falling
 	float m_drag = DEFAULT_DRAG;
 };
-#endif
 
+float calculateDrag(const float& drag, const float& speed);
+#endif

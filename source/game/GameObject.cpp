@@ -7,10 +7,6 @@ sf::Vector2f& GameObject::calculatePos(sf::Time ellapsed) {
 	return m_nextPos;
 }
 
-sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
-	return m_nextVec;
-}
-
 void GameObject::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
 	m_pos = m_nextPos;
 	m_vec = m_nextVec;
@@ -46,5 +42,32 @@ sf::FloatRect GameObject::getHitboxBounds() {
 	float w = m_hitbox.width * Map::TILE_WIDTH;
 	float h = m_hitbox.height * Map::TILE_HEIGHT;
 	return sf::FloatRect(x, y, w, h);
+}
+
+// This function should probably be moved sooner or later
+float calculateDrag(const float& drag, const float& speed) {
+	return pow(speed, 2) * drag * SCALE_DRAG_CONST;
+}
+
+sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
+	const float s = ellapsed.asSeconds();
+	const float g = GRAVITY;
+	float fx = m_vec.x;
+	// x linear, y beschleunigt
+
+	float speed = m_vec.y / s;
+	float drag = calculateDrag(m_drag, speed);
+	float fy = m_vec.y + (g * s);
+	fy = fy > 0 ? std::max(fy - (drag * s), 0.0f) : std::min(fy + (drag * s), 0.0f);
+	//std::cout << m_vec.y << std::endl;
+
+	// speed lock on tile width/height,
+	// to prevent glitching on low frame rates
+	// TODO is maximum useful or still posible to glitch?
+	// or: implement line from oldPos to newPos with collision detection
+	m_nextVec.x = fx < Map::TILE_WIDTH ? fx : Map::TILE_WIDTH;
+	m_nextVec.y = fy < Map::TILE_HEIGHT ? fy : Map::TILE_HEIGHT;
+
+	return m_nextVec;
 }
 
