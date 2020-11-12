@@ -1,26 +1,38 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2019
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swone@exe", "swone@exe.vcxproj", "{1FD73685-9F53-42DF-9345-2684FEA9AB98}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swone", "swone@exe.vcxproj", "{CF279198-C310-4EED-8BF6-3F6E32708CBE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_TESTS", "RUN_TESTS.vcxproj", "{FF1B0AD5-D90F-46CD-B052-252AC3A3D38E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_TESTS", "RUN_TESTS.vcxproj", "{49A601F5-A382-4D95-9758-AC6836F7D215}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "REGEN", "REGEN.vcxproj", "{C86FC8B0-937C-4832-A07D-19AC1283381F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "REGEN", "REGEN.vcxproj", "{EEE99AC7-6B7A-4D1F-AAF9-2A1C3C929442}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_INSTALL", "RUN_INSTALL.vcxproj", "{4372B328-F9DE-424E-95E6-640DFC65E785}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_INSTALL", "RUN_INSTALL.vcxproj", "{51AE5047-D8DF-4D2F-9B43-A9DB046847B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		release|x64 = release|x64
+		plain|Win32 = plain|Win32
+		plain|x64 = plain|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C86FC8B0-937C-4832-A07D-19AC1283381F}.release|x64.ActiveCfg = release|x64
-		{C86FC8B0-937C-4832-A07D-19AC1283381F}.release|x64.Build.0 = release|x64
-		{1FD73685-9F53-42DF-9345-2684FEA9AB98}.release|x64.ActiveCfg = release|x64
-		{1FD73685-9F53-42DF-9345-2684FEA9AB98}.release|x64.Build.0 = release|x64
-		{FF1B0AD5-D90F-46CD-B052-252AC3A3D38E}.release|x64.ActiveCfg = release|x64
-		{4372B328-F9DE-424E-95E6-640DFC65E785}.release|x64.ActiveCfg = release|x64
+		{CF279198-C310-4EED-8BF6-3F6E32708CBE}.plain|Win32.ActiveCfg = plain|Win32
+		{CF279198-C310-4EED-8BF6-3F6E32708CBE}.plain|Win32.Build.0 = plain|Win32
+		{CF279198-C310-4EED-8BF6-3F6E32708CBE}.plain|x64.ActiveCfg = plain|x64
+		{CF279198-C310-4EED-8BF6-3F6E32708CBE}.plain|x64.Build.0 = plain|x64
+		{49A601F5-A382-4D95-9758-AC6836F7D215}.plain|Win32.ActiveCfg = plain|Win32
+		{49A601F5-A382-4D95-9758-AC6836F7D215}.plain|x64.ActiveCfg = plain|x64
+		{EEE99AC7-6B7A-4D1F-AAF9-2A1C3C929442}.plain|Win32.ActiveCfg = plain|Win32
+		{EEE99AC7-6B7A-4D1F-AAF9-2A1C3C929442}.plain|Win32.Build.0 = plain|Win32
+		{EEE99AC7-6B7A-4D1F-AAF9-2A1C3C929442}.plain|x64.ActiveCfg = plain|x64
+		{EEE99AC7-6B7A-4D1F-AAF9-2A1C3C929442}.plain|x64.Build.0 = plain|x64
+		{51AE5047-D8DF-4D2F-9B43-A9DB046847B7}.plain|Win32.ActiveCfg = plain|Win32
+		{51AE5047-D8DF-4D2F-9B43-A9DB046847B7}.plain|x64.ActiveCfg = plain|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CE63095D-6FAB-4697-8F95-F1F6B37CEDFA}
 	EndGlobalSection
 EndGlobal

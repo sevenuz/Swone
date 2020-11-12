@@ -42,12 +42,13 @@ GamePanel::~GamePanel() {
 
 void GamePanel::readMapsFromDir() {
 	tinydir_dir dir;
-	tinydir_open(& dir, m_controller.settings.mapDir);
+	tinydir_open(&dir, m_controller.settings.mapDir);
 
-	if(!dir.has_next) {
+	if (!dir.has_next) {
 		m_controller.pushLogMsg("no files or no dir available.", "error");
 		throw std::invalid_argument("no files or no dir available");
-	} else {
+	}
+	else {
 		m_mapsFound = true;
 	}
 
@@ -56,10 +57,10 @@ void GamePanel::readMapsFromDir() {
 		tinydir_file file;
 		tinydir_readfile(&dir, &file);
 
-		if (! file.is_dir)
+		if (!file.is_dir)
 		{
 			m_controller.pushLogMsg(file.name);
-			Map * map = new Map(m_controller);
+			Map* map = new Map(m_controller);
 
 			std::stringstream ss;
 			ss << file.name;
@@ -77,16 +78,16 @@ void GamePanel::readMapsFromDir() {
 	setMapSelection(0);
 }
 
-void GamePanel::setMapSelection(int i){
-	if(! m_mapsFound){
+void GamePanel::setMapSelection(int i) {
+	if (!m_mapsFound) {
 		m_controller.pushLogMsg("no maps found.", "error");
 		return;
 	}
 
-	if(i >= (int) m_maps.size()) {
+	if (i >= (int)m_maps.size()) {
 		i = 0;
 	}
-	else if(i < 0) {
+	else if (i < 0) {
 		i = m_maps.size() - 1;
 	}
 
@@ -98,74 +99,79 @@ void GamePanel::setMapSelection(int i){
 	m_gameController.setMap(m_maps[m_selectedMap]);
 }
 
-void GamePanel::setActionSelection(char i){
-	if(i > GamePanelMenuPoint::LAST) {
+void GamePanel::setActionSelection(char i) {
+	if (i > GamePanelMenuPoint::LAST) {
 		i = GamePanelMenuPoint::FIRST;
-	} else if(i < GamePanelMenuPoint::FIRST) {
+	}
+	else if (i < GamePanelMenuPoint::FIRST) {
 		i = GamePanelMenuPoint::LAST;
 	}
 	m_selectedAction = i;
 }
 
-void GamePanel::startGame(){
-	if(m_mapsFound){
+void GamePanel::startGame() {
+	if (m_mapsFound) {
 		m_controller.pushLogMsg("start game");
 		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
-	} else {
+	}
+	else {
 		m_controller.pushLogMsg("No Map. Can't start the game.", "error");
 	}
 }
 
 void GamePanel::event(sf::Event& event) {
-	sf::RenderWindow & w = m_controller.getWindow();
+	sf::RenderWindow& w = m_controller.getWindow();
 	sf::Vector2i pixelPos = sf::Mouse::getPosition(w);
 	sf::Vector2f worldPos = w.mapPixelToCoords(pixelPos);
 
-	switch(m_controller.getActiveGameWindow()) {
-		case ActiveGameWindow::MAPSELECTION:
-			if(event.type == sf::Event::KeyPressed) {
-				if (event.key.code == sf::Keyboard::Escape) {
-						m_controller.setActiveWindow(ActiveWindow::MAINMENU);
-				}
-				if (event.key.code == sf::Keyboard::Left) {
-					setMapSelection(m_selectedMap - 1);
-				}
-				if (event.key.code == sf::Keyboard::Right) {
-					setMapSelection(m_selectedMap + 1);
-				}
-				if(event.key.code == sf::Keyboard::Down) {
-					setActionSelection(m_selectedAction++);
-				}
-				if(event.key.code == sf::Keyboard::Up) {
-					setActionSelection(m_selectedAction--);
-				}
-				if(event.key.code == sf::Keyboard::P) {
-					//Spawn Player
-				}
-				if(event.key.code == sf::Keyboard::Return) {//Enter
-					startGame();
-				}
-			} else if(event.type == sf::Event::MouseButtonReleased) {
-				if(m_play.getGlobalBounds().contains(worldPos.x,worldPos.y)) {
-					startGame();
-				} else if(m_switchLeft.getGlobalBounds().contains(worldPos.x,worldPos.y)) {
-					setMapSelection(m_selectedMap - 1);
-				} else if(m_switchRight.getGlobalBounds().contains(worldPos.x,worldPos.y)) {
-					setMapSelection(m_selectedMap + 1);
-				}
+	switch (m_controller.getActiveGameWindow()) {
+	case ActiveGameWindow::MAPSELECTION:
+		if (event.type == sf::Event::KeyPressed) {
+			if (event.key.code == sf::Keyboard::Escape) {
+				m_controller.setActiveWindow(ActiveWindow::MAINMENU);
 			}
-			break;
-		case ActiveGameWindow::INGAME:
-			m_gameWindow.event(event);
-			break;
-		default:
-			break;
+			if (event.key.code == sf::Keyboard::Left) {
+				setMapSelection(m_selectedMap - 1);
+			}
+			if (event.key.code == sf::Keyboard::Right) {
+				setMapSelection(m_selectedMap + 1);
+			}
+			if (event.key.code == sf::Keyboard::Down) {
+				setActionSelection(m_selectedAction++);
+			}
+			if (event.key.code == sf::Keyboard::Up) {
+				setActionSelection(m_selectedAction--);
+			}
+			if (event.key.code == sf::Keyboard::P) {
+				//Spawn Player
+			}
+			if (event.key.code == sf::Keyboard::Return) {//Enter
+				startGame();
+			}
 		}
+		else if (event.type == sf::Event::MouseButtonReleased) {
+			if (m_play.getGlobalBounds().contains(worldPos.x, worldPos.y)) {
+				startGame();
+			}
+			else if (m_switchLeft.getGlobalBounds().contains(worldPos.x, worldPos.y)) {
+				setMapSelection(m_selectedMap - 1);
+			}
+			else if (m_switchRight.getGlobalBounds().contains(worldPos.x, worldPos.y)) {
+				setMapSelection(m_selectedMap + 1);
+			}
+		}
+		break;
+	case ActiveGameWindow::INGAME:
+		m_gameWindow.event(event);
+		break;
+	default:
+		break;
+	}
 }
 
 void GamePanel::update(sf::Time ellapsed) {
 	m_ps.update(ellapsed);
-	switch(m_controller.getActiveGameWindow()) {
+	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
 		//m_maps[m_selectedMap]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
 		break;
@@ -177,21 +183,21 @@ void GamePanel::update(sf::Time ellapsed) {
 	}
 }
 
-void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const{
+void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;
-	sf::View view(sf::FloatRect(0,0,m_maps[m_selectedMap]->getImageWidth(),m_maps[m_selectedMap]->getImageHeight()));
+	sf::View view(sf::FloatRect(0, 0, m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getImageHeight()));
 	view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
 
-	switch(m_controller.getActiveGameWindow()) {
+	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
 		target.draw(m_ps, states);
 		m_controller.setView(view);
 
-		if(m_mapsFound){
+		if (m_mapsFound) {
 			target.draw(m_maps[m_selectedMap]->getSprite(), states);
 		}
-		
+
 		m_controller.setDefaultView();
 		target.draw(m_play, states);
 		target.draw(m_mapName, states);

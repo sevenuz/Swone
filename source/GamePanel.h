@@ -28,42 +28,42 @@
 #include "util/reader/MapReader.h"
 
 
-class GamePanel: public Handleable {
+class GamePanel : public Handleable {
 private:
-    enum GamePanelMenuPoint : char { PLAY, FIRST = PLAY, LAST = PLAY};
+	enum GamePanelMenuPoint : char { PLAY, FIRST = PLAY, LAST = PLAY };
 
-    ParticleSystem m_ps;
-    Controller & m_controller;
-    GameController m_gameController;
-    GameWindow m_gameWindow;
+	ParticleSystem m_ps;
+	Controller& m_controller;
+	GameController m_gameController;
+	GameWindow m_gameWindow;
 
-    sf::Text m_play;
+	sf::Text m_play;
 
-    sf::Text m_mapName;
-    sf::Text m_switchLeft;
-    sf::Text m_switchRight;
+	sf::Text m_mapName;
+	sf::Text m_switchLeft;
+	sf::Text m_switchRight;
 
-    MapReader m_mapReader;
+	MapReader m_mapReader;
 
-    bool m_mapsFound = false;
-    // GamePanelMenuPoint type, but char to perform de/increment
-    char m_selectedAction = FIRST;
-    int m_selectedMap = 0;
-    std::vector<Map *> m_maps;
+	bool m_mapsFound = false;
+	// GamePanelMenuPoint type, but char to perform de/increment
+	char m_selectedAction = FIRST;
+	int m_selectedMap = 0;
+	std::vector<Map*> m_maps;
 
-    void readMapsFromDir();
-    void setMapSelection(int);
-    void setActionSelection(char);
+	void readMapsFromDir();
+	void setMapSelection(int);
+	void setActionSelection(char);
 
-    void startGame();
+	void startGame();
 
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 public:
-    void update(sf::Time ellapsed);
-    void event(sf::Event& e);
-    GamePanel(Controller& c);
-    ~GamePanel();
+	void update(sf::Time ellapsed);
+	void event(sf::Event& e);
+	GamePanel(Controller& c);
+	~GamePanel();
 };
 
 #endif

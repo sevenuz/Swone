@@ -5,10 +5,10 @@
 
 class Eventable {
 public:
-    virtual void event(sf::Event& e) = 0;
-    virtual ~Eventable() = 0;
+	virtual void event(sf::Event& e) = 0;
+	virtual ~Eventable() = 0;
 };
 
-inline Eventable::~Eventable(){}
+inline Eventable::~Eventable() {}
 
 #endif // SWONE_EVENTABLE_H

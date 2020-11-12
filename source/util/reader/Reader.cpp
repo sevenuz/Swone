@@ -2,8 +2,8 @@
 
 Reader::Reader(std::string path)
 {
-    m_path = path;
-    read();
+	m_path = path;
+	read();
 }
 
 Reader::Reader() {}
@@ -15,34 +15,34 @@ Reader::~Reader()
 
 void Reader::setPath(std::string path)
 {
-    m_path = path;
+	m_path = path;
 };
 
 void Reader::read()
 {
-    if(m_path == "")
-    {
-        throw std::invalid_argument("path not set");
-    }
-    startReading();
-    m_lineCounter = 0;
-    std::ifstream infile(m_path);
-    std::string line;
-    while (std::getline(infile, line))
-    {
-    	// ignore comment lines:
-    	if(line.substr(0,2)=="//")
-    		break;
-        parseLine(m_paragraph, line);
-        m_lineCounter++;
-    }
-    endReading();
+	if (m_path == "")
+	{
+		throw std::invalid_argument("path not set");
+	}
+	startReading();
+	m_lineCounter = 0;
+	std::ifstream infile(m_path);
+	std::string line;
+	while (std::getline(infile, line))
+	{
+		// ignore comment lines:
+		if (line.substr(0, 2) == "//")
+			break;
+		parseLine(m_paragraph, line);
+		m_lineCounter++;
+	}
+	endReading();
 };
 
 template<typename F>
 void Reader::forEach(F fn) {
-	for(auto& p: getParagraphMap()){
-		for(auto& s: p.second){
+	for (auto& p : getParagraphMap()) {
+		for (auto& s : p.second) {
 			fn(p.first, s);
 		}
 	}
@@ -62,12 +62,13 @@ size_t Reader::getLineCounter() {
 
 StringPair Reader::parseValue(std::string line) const {
 	size_t next = std::string::npos;
-    next = line.find_first_of("=", 0);
-    if(next != std::string::npos) {
-        return StringPair(line.substr(0, next), line.substr(next + 1));
-    } else {
-        throw std::invalid_argument("line is not a key=value pair");
-    }
+	next = line.find_first_of("=", 0);
+	if (next != std::string::npos) {
+		return StringPair(line.substr(0, next), line.substr(next + 1));
+	}
+	else {
+		throw std::invalid_argument("line is not a key=value pair");
+	}
 };
 
 void Reader::startReading() {

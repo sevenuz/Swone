@@ -10,7 +10,7 @@
 Player::Player(float x, float y) {
 	m_pos = sf::Vector2f(x, y);
 
-	if (!m_texture.loadFromFile("../res/sprites/player.png")){
+	if (!m_texture.loadFromFile("../res/sprites/player.png")) {
 		std::cout << "Failed to load player spritesheet!" << std::endl;
 	}
 
@@ -18,19 +18,19 @@ Player::Player(float x, float y) {
 	m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
 	m_ani_jump.addFrame(sf::IntRect(64, 0, 32, 32));
 	m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
-	m_ani_jump.addFrame(sf::IntRect( 0, 0, 32, 32));
+	m_ani_jump.addFrame(sf::IntRect(0, 0, 32, 32));
 
 	m_ani_left.setSpriteSheet(m_texture);
 	m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
 	m_ani_left.addFrame(sf::IntRect(64, 32, 32, 32));
 	m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
-	m_ani_left.addFrame(sf::IntRect( 0, 32, 32, 32));
+	m_ani_left.addFrame(sf::IntRect(0, 32, 32, 32));
 
 	m_ani_right.setSpriteSheet(m_texture);
 	m_ani_right.addFrame(sf::IntRect(32, 64, 32, 32));
 	m_ani_right.addFrame(sf::IntRect(64, 64, 32, 32));
 	m_ani_right.addFrame(sf::IntRect(32, 64, 32, 32));
-	m_ani_right.addFrame(sf::IntRect( 0, 64, 32, 32));
+	m_ani_right.addFrame(sf::IntRect(0, 64, 32, 32));
 
 	setAnimation(PlayerAnimation::LEFT);
 
@@ -42,8 +42,8 @@ Player::~Player() {
 	// TODO Auto-generated destructor stub
 }
 
-void Player::setAnimation(PlayerAnimation ani){
-	switch(ani) {
+void Player::setAnimation(PlayerAnimation ani) {
+	switch (ani) {
 	case PlayerAnimation::LEFT:
 		m_ani = &m_ani_left;
 		break;
@@ -56,76 +56,80 @@ void Player::setAnimation(PlayerAnimation ani){
 	}
 }
 
-AnimatedSprite * Player::getAnimatedSprite(){
+AnimatedSprite* Player::getAnimatedSprite() {
 	return &m_sprite;
 }
 
 bool Player::isMoving() {
-    return m_isMoving;
+	return m_isMoving;
 }
 
 bool Player::isJumping() {
-    return m_isJumping;
+	return m_isJumping;
 }
 
 bool Player::isFalling() {
-    return m_isFalling;
+	return m_isFalling;
 }
 
 void Player::toggleFalling(bool falling) {
-    m_isFalling = falling;
-    m_isJumping = !falling && m_vec.y < 0;
+	m_isFalling = falling;
+	m_isJumping = !falling && m_vec.y < 0;
 }
 
 void Player::stopFalling() {
-    m_vec.y  = 0;
-    m_nextVec.y = 0;
-    toggleFalling(false);
+	m_vec.y = 0;
+	m_nextVec.y = 0;
+	toggleFalling(false);
 }
 
 void Player::startFalling() {
-    toggleFalling(true);
+	toggleFalling(true);
 }
 
-void Player::jump(){
-	if(m_jumps > 0){
+void Player::jump() {
+	if (m_jumps > 0) {
 		m_jumps--;
 		m_vec.y = -1 * m_jf; // Startkraft nach oben
 		toggleFalling(false);
 	}
 }
 
-void Player::move(float fx){
+void Player::move(float fx) {
 	m_vec.x = fx;
 	m_isMoving = fx != 0;
 }
 
 void Player::event(sf::Event& event) {
-	if(event.type == sf::Event::KeyPressed) {
+	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Left) {
 			setAnimation(PlayerAnimation::LEFT);
 			move(-m_mf);
-		} else if (event.key.code == sf::Keyboard::Right) {
+		}
+		else if (event.key.code == sf::Keyboard::Right) {
 			setAnimation(PlayerAnimation::RIGHT);
 			move(m_mf);
-		} else if (event.key.code == sf::Keyboard::Up) {
+		}
+		else if (event.key.code == sf::Keyboard::Up) {
 			setAnimation(PlayerAnimation::JUMP);
 			jump();
 		}
-	} else if(event.type == sf::Event::KeyReleased) {
+	}
+	else if (event.type == sf::Event::KeyReleased) {
 		if (event.key.code == sf::Keyboard::Left) {
 			move(0);
-		} else if (event.key.code == sf::Keyboard::Right) {
+		}
+		else if (event.key.code == sf::Keyboard::Right) {
 			move(0);
 		}
 	}
 }
 
 sf::Vector2f& Player::calculatePos(sf::Time ellapsed) {
-    const float s = ellapsed.asSeconds();
-    m_nextPos.x = m_pos.x + (m_vec.x * SPEED_FACTOR * s);
-    m_nextPos.y = m_pos.y + (m_vec.y * SPEED_FACTOR * s);
-    return m_nextPos;
+	const float s = ellapsed.asSeconds();
+	m_nextPos.x = m_pos.x + (m_vec.x * SPEED_FACTOR * s);
+	m_nextPos.y = m_pos.y + (m_vec.y * SPEED_FACTOR * s);
+	return m_nextPos;
 }
 
 // This function should probably be moved sooner or later
@@ -134,15 +138,15 @@ float calculateDrag(const float& drag, const float& speed) {
 }
 
 sf::Vector2f& Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
-    const float s = ellapsed.asSeconds();
-    const float g = GRAVITY;
-    float fx = m_vec.x;
-    // x linear, y beschleunigt
+	const float s = ellapsed.asSeconds();
+	const float g = GRAVITY;
+	float fx = m_vec.x;
+	// x linear, y beschleunigt
 
 	float speed = m_vec.y / s;
 	float drag = calculateDrag(m_drag, speed);
-    float fy = m_vec.y  + (g * s);
-	fy = fy > 0 ? std::max(fy - (drag*s), 0.0f) : std::min(fy + (drag*s), 0.0f);
+	float fy = m_vec.y + (g * s);
+	fy = fy > 0 ? std::max(fy - (drag * s), 0.0f) : std::min(fy + (drag * s), 0.0f);
 	//std::cout << m_vec.y << std::endl;
 
 	// speed lock on tile width/height,
@@ -152,79 +156,81 @@ sf::Vector2f& Player::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
 	m_nextVec.x = fx < Map::TILE_WIDTH ? fx : Map::TILE_WIDTH;
 	m_nextVec.y = fy < Map::TILE_HEIGHT ? fy : Map::TILE_HEIGHT;
 
-    return m_nextVec;
+	return m_nextVec;
 }
 
 void Player::apply() {
-    setPos(m_nextPos);
-    setVec(m_nextVec);
+	setPos(m_nextPos);
+	setVec(m_nextVec);
 }
 
 void Player::applyX() {
-    m_nextPos.y = m_pos.y;
-    apply();
+	m_nextPos.y = m_pos.y;
+	apply();
 }
 
 void Player::applyY() {
-    m_nextPos.x = m_pos.x;
-    apply();
+	m_nextPos.x = m_pos.x;
+	apply();
 }
-void Player::update(sf::Time ellapsed){
-	if(isMoving()){
+void Player::update(sf::Time ellapsed) {
+	if (isMoving()) {
 		m_sprite.play(*m_ani);
 		m_sprite.update(ellapsed);
-	} else {
+	}
+	else {
 		m_sprite.stop();
 	}
 	refreshJump(ellapsed);
 }
 
-void Player::refreshJump(sf::Time ellapsed){
+void Player::refreshJump(sf::Time ellapsed) {
 	m_jumpCooldown += ellapsed;
-	if(m_jumpCooldown >= m_jumpCooldownTime){
-		if(m_jumps < m_jumpsPossible){
+	if (m_jumpCooldown >= m_jumpCooldownTime) {
+		if (m_jumps < m_jumpsPossible) {
 			m_jumps++;
 		}
 		m_jumpCooldown = sf::seconds(0);
 	}
 }
 
-void Player::resetJump(){
+void Player::resetJump() {
 	m_jumpCooldown = sf::seconds(0);
 	m_jumps = m_jumpsPossible;
 }
 
 void Player::setPos(sf::Vector2f pos) {
-    m_pos = pos;
-    m_sprite.setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
+	m_pos = pos;
+	m_sprite.setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
 }
 
 void Player::setVec(sf::Vector2f vec) {
-    m_vec.x = vec.x;
-    m_vec.y = vec.y;
+	m_vec.x = vec.x;
+	m_vec.y = vec.y;
 }
 
 sf::Vector2f Player::getSpritePos() {
-    return m_sprite.getPosition();
+	return m_sprite.getPosition();
 }
 
 void Player::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
-    if(leftBottom != MapTile::SPACE || rightBottom != MapTile::SPACE) {
-        stopFalling();
-        resetJump();
-        applyX();
-    } else {
-        startFalling();
-        apply();
-    }
+	if (leftBottom != MapTile::SPACE || rightBottom != MapTile::SPACE) {
+		stopFalling();
+		resetJump();
+		applyX();
+	}
+	else {
+		startFalling();
+		apply();
+	}
 }
 
 void Player::onOutOfMap() {
-    //std::cout << "oh noo!" << std::endl;
-    apply();
+	//std::cout << "oh noo!" << std::endl;
+	apply();
 };
 
-void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const{
+void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
 }
 

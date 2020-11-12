@@ -5,11 +5,11 @@
 #include "Handleable.h"
 #include "game/GameController.h"
 
-class GameWindow: public Handleable {
+class GameWindow : public Handleable {
 
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	GameController & m_gc;
+	GameController& m_gc;
 
 protected:
 

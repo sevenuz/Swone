@@ -1,6 +1,6 @@
 #include "Map.h"
 
-Map::Map(Controller & c) : m_controller(c) // @suppress("Class members should be properly initialized")
+Map::Map(Controller& c) : m_controller(c) // @suppress("Class members should be properly initialized")
 {
 }
 
@@ -9,15 +9,15 @@ Map::~Map() {
 	delete[] m_mapData;
 }
 
-float Map::toMapPixelX(float x){
-    return x * Map::TILE_WIDTH;
+float Map::toMapPixelX(float x) {
+	return x * Map::TILE_WIDTH;
 }
 
-float Map::toMapPixelY(float y){
-    return y * Map::TILE_HEIGHT;
+float Map::toMapPixelY(float y) {
+	return y * Map::TILE_HEIGHT;
 }
 
-sf::Sprite & Map::getSprite(){
+sf::Sprite& Map::getSprite() {
 	return m_sprite;
 }
 
@@ -64,25 +64,25 @@ MapTile& Map::getMapData() {
 	return *m_mapData;
 }
 
-float Map::getScale(){
+float Map::getScale() {
 	return m_scale;
 }
 
 MapTile Map::getMapDataValue(size_t h, size_t w) {
-    if(h >= m_height || w >= m_height)
-        return MapTile::DEFAULT;
-    return m_mapData[h * m_width + w];
+	if (h >= m_height || w >= m_height)
+		return MapTile::DEFAULT;
+	return m_mapData[h * m_width + w];
 }
 
 void Map::setMapDataValue(size_t h, size_t w, MapTile v) {
 	m_mapData[h * m_width + w] = v;
 }
 
-void Map::scaleToFit(){
+void Map::scaleToFit() {
 	scaleToFit(m_controller.settings.WIDTH, m_controller.settings.HEIGHT);
 }
 
-void Map::scaleToFit(size_t w, size_t h){
+void Map::scaleToFit(size_t w, size_t h) {
 	float scaleW = (float)(w) / (float)(m_imgWidth);
 	float scaleH = (float)(h) / (float)(m_imgHeight);
 
@@ -94,7 +94,8 @@ void Map::iniMapData() {
 	if (m_width > 0 && m_height > 0) {
 		m_mapDataSize = m_height * m_width;
 		m_mapData = new MapTile[m_mapDataSize];
-	} else {
+	}
+	else {
 		throw std::invalid_argument("width or height are not set");
 	}
 }
@@ -111,17 +112,19 @@ void Map::createMapImage() {
 	for (size_t i = 0; i < m_mapDataSize; i++) {
 		if (i < m_width * (l + 1)) {
 			c++;
-		} else {
+		}
+		else {
 			c = 0;
 			l++;
 		}
 		m_mapImage.copy(m_mapTiles, c * Map::TILE_WIDTH, l * Map::TILE_HEIGHT,
-				sf::IntRect(getMapDataValue(l, c) * Map::TILE_WIDTH, 0,
-						Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
+			sf::IntRect(getMapDataValue(l, c) * Map::TILE_WIDTH, 0,
+				Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
 	}
 	if (!m_texture.loadFromImage(m_mapImage)) {
 		throw std::invalid_argument("error: convert img to texture.");
-	} else {
+	}
+	else {
 		m_sprite.setTexture(m_texture);
 		m_sprite.setPosition(sf::Vector2f(0, 0));
 		scaleToFit();
@@ -146,7 +149,7 @@ void Map::update(sf::Time ellapsed) {
 void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;
-	if(m_mapDrawable)
+	if (m_mapDrawable)
 	{
 		target.draw(m_sprite, states);
 	}

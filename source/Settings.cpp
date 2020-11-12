@@ -9,24 +9,24 @@ Settings::Settings()
 
 Settings::~Settings()
 {
-    //dtor
+	//dtor
 }
 
 
-int Settings::toW(int w){
-	return (int)(((float)w/STANDART_WIDTH)*WIDTH);
+int Settings::toW(int w) {
+	return (int)(((float)w / STANDART_WIDTH) * WIDTH);
 }
-int Settings::toH(int h){
-	return (int)(((float)h/STANDART_HEIGHT)*HEIGHT);
+int Settings::toH(int h) {
+	return (int)(((float)h / STANDART_HEIGHT) * HEIGHT);
 }
-int Settings::toW(float w){
-	return (int)(w*WIDTH);
+int Settings::toW(float w) {
+	return (int)(w * WIDTH);
 }
-int Settings::toH(float h){
-	return (int)(h*HEIGHT);
+int Settings::toH(float h) {
+	return (int)(h * HEIGHT);
 }
-int Settings::toF(int f){
-	return (int)(((float)f/STANDART_WIDTH)*WIDTH);
+int Settings::toF(int f) {
+	return (int)(((float)f / STANDART_WIDTH) * WIDTH);
 	/*
 	if (WIDTH > 800) {
 		return f + 30;

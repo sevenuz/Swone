@@ -13,75 +13,75 @@
 #include "Controller.h"
 #include "Handleable.h"
 
-enum MapTile : char{ SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE};
+enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
 
-class Map: public Handleable
+class Map : public Handleable
 {
 public:
-    static const size_t TILE_WIDTH = 64;
-    static const size_t TILE_HEIGHT = 64;
+	static const size_t TILE_WIDTH = 64;
+	static const size_t TILE_HEIGHT = 64;
 
-    static float toMapPixelX(float x);
-    static float toMapPixelY(float y);
+	static float toMapPixelX(float x);
+	static float toMapPixelY(float y);
 
-    Map(Controller & c);
-    virtual ~Map();
+	Map(Controller& c);
+	virtual ~Map();
 
-    void update(sf::Time ellapsed);
-    void event(sf::Event& e);
+	void update(sf::Time ellapsed);
+	void event(sf::Event& e);
 
-    void setName(std::string);
-    std::string getName();
+	void setName(std::string);
+	std::string getName();
 
-    sf::Sprite & getSprite();
+	sf::Sprite& getSprite();
 
-    void scaleToFit();
-    void scaleToFit(size_t w, size_t h);
+	void scaleToFit();
+	void scaleToFit(size_t w, size_t h);
 
-    void setWidth(size_t);
-    void setHeight(size_t);
-    void setBorder(MapTile);
-    size_t getWidth();
-    size_t getHeight();
-    size_t getImageWidth();
-    size_t getImageHeight();
+	void setWidth(size_t);
+	void setHeight(size_t);
+	void setBorder(MapTile);
+	size_t getWidth();
+	size_t getHeight();
+	size_t getImageWidth();
+	size_t getImageHeight();
 
-    float getScale();
+	float getScale();
 
-    MapTile getBorder();
-    MapTile & getMapData();
-    MapTile getMapDataValue(size_t h, size_t w);
-    void setMapDataValue(size_t h, size_t w, MapTile v);
-    void iniMapData();
+	MapTile getBorder();
+	MapTile& getMapData();
+	MapTile getMapDataValue(size_t h, size_t w);
+	void setMapDataValue(size_t h, size_t w, MapTile v);
+	void iniMapData();
 
-    void createMapImage();
+	void createMapImage();
 protected:
 private:
-    Controller & m_controller;
+	Controller& m_controller;
 
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-    std::string m_name= "";
+	std::string m_name = "";
 
-    size_t m_width = 0;
-    size_t m_height = 0;
+	size_t m_width = 0;
+	size_t m_height = 0;
 
-    size_t m_mapDataSize = 0;
+	size_t m_mapDataSize = 0;
 
-    size_t m_imgWidth = 0;
-    size_t m_imgHeight = 0;
+	size_t m_imgWidth = 0;
+	size_t m_imgHeight = 0;
 
-    float m_scale = 1;
+	float m_scale = 1;
 
-    MapTile * m_mapData;//pointer (2d-array) to Map Infos
-    MapTile m_border;
+	MapTile* m_mapData;//pointer (2d-array) to Map Infos
+	MapTile m_border;
 
-    sf::Image m_mapTiles;//Img with all tiles
-    sf::Image m_mapImage;//Img with map tiles
-    sf::Texture m_texture;
-    sf::Sprite m_sprite;
+	sf::Image m_mapTiles;//Img with all tiles
+	sf::Image m_mapImage;//Img with map tiles
+	sf::Texture m_texture;
+	sf::Sprite m_sprite;
 
-    bool m_mapDrawable = false;
+	bool m_mapDrawable = false;
 };
 
 #endif // MAP_H
