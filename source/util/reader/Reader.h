@@ -1,6 +1,7 @@
 #ifndef SWONE_UTIL_READER_READER_H
 #define SWONE_UTIL_READER_READER_H
 
+#include <functional>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -35,8 +36,9 @@ public:
 	void setPath(std::string path);
 	void read();
 
-	template<typename F>
-	void forEach(F fn);
+	// fn is callback with two parameters:
+	// void fn(std::string& paragraph, StringPair& keyValuePair);
+	void forEach(std::function<void(std::string, StringPair)> fn);
 
 	std::map<std::string, StringMap>& getParagraphMap();
 	StringMap& getParagraphStringMap(std::string paragraph);

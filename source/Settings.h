@@ -4,6 +4,9 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "util/reader/Reader.h"
+
+#define SETTINGS_FILE "../res/settings.ini"
 
 class Settings {
 public:
@@ -11,8 +14,8 @@ public:
 	virtual ~Settings();
 
 	//An den standart werten werden die elemente ausgerichtet
-	static const size_t STANDART_WIDTH = 640;
-	static const size_t STANDART_HEIGHT = 360;
+	static const size_t STANDARD_WIDTH = 640;
+	static const size_t STANDARD_HEIGHT = 360;
 
 	//das ist die eigentliche auflösung
 	static const size_t WIDTH = 640;

@@ -32,17 +32,16 @@ void Reader::read()
 	{
 		// ignore comment lines:
 		if (line.substr(0, 2) == "//")
-			break;
+			continue;
 		parseLine(m_paragraph, line);
 		m_lineCounter++;
 	}
 	endReading();
 };
 
-template<typename F>
-void Reader::forEach(F fn) {
-	for (auto& p : getParagraphMap()) {
-		for (auto& s : p.second) {
+void Reader::forEach(std::function<void(std::string, StringPair)> fn) {
+	for(auto p: getParagraphMap()){
+		for(auto s: p.second){
 			fn(p.first, s);
 		}
 	}
