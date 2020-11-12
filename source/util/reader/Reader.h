@@ -1,14 +1,13 @@
 #ifndef SWONE_UTIL_READER_READER_H
 #define SWONE_UTIL_READER_READER_H
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <stdexcept>
 #include <map>
 #include <utility>
-
-#include "Controller.h"
 
 typedef std::map<std::string, std::string> StringMap;
 typedef std::pair<std::string, std::string> StringPair;
@@ -29,13 +28,15 @@ class Reader {
 public:
     const std::string DEFAULT_PARAGRAPH = "global";
 
-    Reader(Controller & c, std::string path);
-    Reader(Controller & c);
+    Reader(std::string path);
+    Reader();
     virtual ~Reader();
 
     void setPath(std::string path);
     void read();
-    std::string toString();
+
+    template<typename F>
+    void forEach(F fn);
 
     std::map<std::string, StringMap>& getParagraphMap();
     StringMap& getParagraphStringMap(std::string paragraph);
@@ -62,7 +63,6 @@ public:
     // if you want to implement complete own logic use this
     virtual void parseLine(std::string paragraph, std::string line);
 protected:
-    Controller & m_controller;
 private:
     std::string m_path = "";
 

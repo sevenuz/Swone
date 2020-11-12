@@ -1,12 +1,12 @@
 #include "util/reader/Reader.h"
 
-Reader::Reader(Controller & c,std::string path): m_controller(c)
+Reader::Reader(std::string path)
 {
     m_path = path;
     read();
 }
 
-Reader::Reader(Controller & c): m_controller(c) {}
+Reader::Reader() {}
 
 Reader::~Reader()
 {
@@ -39,15 +39,13 @@ void Reader::read()
     endReading();
 };
 
-std::string Reader::toString() {
-	std::stringstream ss;
+template<typename F>
+void Reader::forEach(F fn) {
 	for(auto& p: getParagraphMap()){
-		ss << "Paragraph: " << p.first << std::endl;
 		for(auto& s: p.second){
-			ss << "Key: " << s.first << " Value: " << s.second << std::endl;
+			fn(p.first, s);
 		}
 	}
-	return ss.str();
 }
 
 std::map<std::string, StringMap>& Reader::getParagraphMap() {
@@ -73,11 +71,11 @@ StringPair Reader::parseValue(std::string line) const {
 };
 
 void Reader::startReading() {
-	m_controller.pushLogMsg("start reading " + m_path);
+	std::cout << "start reading " << std::endl;
 }
 
 void Reader::endReading() {
-	m_controller.pushLogMsg("end reading " + m_path);
+	std::cout << "end reading " << std::endl;
 }
 
 std::string Reader::getParagraph() {

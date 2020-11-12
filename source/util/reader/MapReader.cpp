@@ -1,8 +1,8 @@
 #include "util/reader/MapReader.h"
 
-MapReader::MapReader(Controller & c,std::string path, Map * mapObj): Reader(c, path), m_map(mapObj) {}
+MapReader::MapReader(Controller & c,std::string path, Map * mapObj): Reader(path), m_controller(c), m_map(mapObj) {}
 
-MapReader::MapReader(Controller & c): Reader(c) {}
+MapReader::MapReader(Controller & c): Reader(), m_controller(c) {}
 
 MapReader::~MapReader()
 {

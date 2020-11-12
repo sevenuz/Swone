@@ -23,6 +23,7 @@ public:
     void setMap(Map * mapObj);
     static MapTile charToMapTile(char);
 protected:
+    Controller & m_controller;
 private:
     Map * m_map = NULL;
 
