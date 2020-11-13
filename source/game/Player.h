@@ -8,10 +8,6 @@
 #ifndef SWONE_GAME_PLAYER_H_
 #define SWONE_GAME_PLAYER_H_
 
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
 

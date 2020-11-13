@@ -1,7 +1,6 @@
 #ifndef SWONE_CONTROLLER_H
 #define SWONE_CONTROLLER_H
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>

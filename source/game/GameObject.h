@@ -1,6 +1,7 @@
 #ifndef SWONE_GAME_GAMEOBJECT_H
 #define SWONE_GAME_GAMEOBJECT_H
 
+#include <cmath>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
 

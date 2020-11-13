@@ -1,8 +1,6 @@
 #ifndef SWONE_GAMEPANEL_H
 #define SWONE_GAMEPANEL_H
 
-#include <iostream>
-
 #include "imgui.h"
 #include "imgui-SFML.h"
 
