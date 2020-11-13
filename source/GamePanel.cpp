@@ -45,7 +45,7 @@ void GamePanel::readMapsFromDir() {
 	tinydir_open(&dir, m_controller.getSettings().getMapDirectory().c_str());
 
 	if (!dir.has_next) {
-		Log::ger().log("no files or no dir available.", Log::Label::ERROR);
+		Log::ger().log("no files or no dir available.", Log::Label::Error);
 		throw std::invalid_argument("no files or no dir available");
 	}
 	else {
@@ -80,7 +80,7 @@ void GamePanel::readMapsFromDir() {
 
 void GamePanel::setMapSelection(int i) {
 	if (!m_mapsFound) {
-		Log::ger().log("no maps found.", Log::Label::ERROR);
+		Log::ger().log("no maps found.", Log::Label::Error);
 		return;
 	}
 
@@ -114,7 +114,7 @@ void GamePanel::startGame() {
 		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
 	}
 	else {
-		Log::ger().log("No Map. Can't start the game.", Log::Label::ERROR);
+		Log::ger().log("No Map. Can't start the game.", Log::Label::Error);
 	}
 }
 

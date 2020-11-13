@@ -12,7 +12,7 @@
  */
 class Log { 
 public:
-	enum Label : char { LOG, WARNING, ERROR };
+	enum Label : char { Default, Warning, Error };
 	struct LogEntry {
 		std::string message;
 		Label label;
@@ -25,14 +25,14 @@ public:
 		return instance;
 	}
 	
-	void log(std::string msg, Label label = LOG)
+	void log(std::string msg, Label label = Default)
 	{
 		m_logs.push_back({msg, label});
 		std::cout << msg << std::endl;
 	}
 	
 	template<typename T>
-	void log(T msg, Label label = LOG)
+	void log(T msg, Label label = Default)
 	{
 		std::stringstream ss;
 		ss << msg;

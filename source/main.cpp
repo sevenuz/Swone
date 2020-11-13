@@ -67,13 +67,13 @@ void drawLog() {
 		{
 			switch(s.label)
 			{
-				case Log::Label::LOG:
+				case Log::Label::Default:
 					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(100, 140, 100).Value);
 					break;
-				case Log::Label::WARNING:
+				case Log::Label::Warning:
 					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(255, 165, 0).Value);
 					break;
-				case Log::Label::ERROR:
+				case Log::Label::Error:
 					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(210, 0, 0).Value);
 					break;
 				default:
