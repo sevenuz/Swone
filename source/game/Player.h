@@ -27,7 +27,7 @@ enum PlayerAnimation : char { LEFT, RIGHT, JUMP };
 
 class Player : public GameObject {
 public:
-	Player(float x, float y);
+	Player(std::string identifier, float x, float y, bool log = false);
 	virtual ~Player();
 
 	void update(sf::Time ellapsed) override;

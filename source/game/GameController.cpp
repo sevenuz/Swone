@@ -3,7 +3,7 @@
 
 GameController::GameController(Controller& c) : m_controller(c) {
 	// TODO move player adding
-	Player* p = new Player(0, 0);
+	Player* p = new Player("Kurt", 0, 0, true);
 	pushPlayer(p);
 }
 
@@ -108,5 +108,14 @@ void GameController::eventPlayers(sf::Event& e) {
 	for (size_t i = 0; i < getPlayers().size(); i++) {
 		getPlayers()[i]->event(e);
 	}
+}
+
+detailMap GameController::getDetails() {
+	detailMap map;
+	for (size_t i = 0; i < getPlayers().size(); i++) {
+		Player* current = getPlayers()[i];
+		map[current->getIdentifier()] = current->getDetails();
+	}
+	return map;
 }
 

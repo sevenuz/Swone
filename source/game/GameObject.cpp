@@ -1,5 +1,11 @@
 #include "GameObject.h"
 
+GameObject::GameObject(std::string identifier, float x, float y, bool log) {
+	this->identifier = identifier;
+	m_pos = sf::Vector2f(x, y);
+	detailsActive = log;
+}
+
 sf::Vector2f& GameObject::calculatePos(sf::Time ellapsed) {
 	const float s = ellapsed.asSeconds();
 	m_nextPos.x = m_pos.x + (m_vec.x * SPEED_FACTOR * s);
@@ -59,7 +65,6 @@ sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
 	float drag = calculateDrag(m_drag, speed);
 	float fy = m_vec.y + (g * s);
 	fy = fy > 0 ? std::max(fy - (drag * s), 0.0f) : std::min(fy + (drag * s), 0.0f);
-	//std::cout << m_vec.y << std::endl;
 
 	// speed lock on tile width/height,
 	// to prevent glitching on low frame rates
@@ -68,6 +73,16 @@ sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
 	m_nextVec.x = fx < Map::TILE_WIDTH ? fx : Map::TILE_WIDTH;
 	m_nextVec.y = fy < Map::TILE_HEIGHT ? fy : Map::TILE_HEIGHT;
 
+	if (detailsActive) 
+		detailEntrees["speed"] = std::to_string(speed);
+
 	return m_nextVec;
 }
 
+std::map<std::string, std::string> GameObject::getDetails() {
+	return detailEntrees;
+}
+
+std::string GameObject::getIdentifier() {
+	return identifier;
+}

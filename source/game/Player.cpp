@@ -7,9 +7,7 @@
 
 #include "Player.h"
 
-Player::Player(float x, float y) {
-	m_pos = sf::Vector2f(x, y);
-
+Player::Player(std::string identifier, float x, float y, bool log) : GameObject(identifier, x, y, log) {
 	if (!m_texture.loadFromFile("../res/sprites/player.png")) {
 		std::cout << "Failed to load player spritesheet!" << std::endl;
 	}

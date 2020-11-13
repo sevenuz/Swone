@@ -102,6 +102,26 @@ void drawLog() {
 	}
 }
 
+sf::Time detailsRefreshTime = sf::seconds(0.25);
+sf::Time detailsTimeSinceLastRefresh = sf::seconds(0.0);
+detailMap details;
+
+void drawDetails(sf::Time ellapsed) {
+	detailsTimeSinceLastRefresh += ellapsed;
+	if (detailsTimeSinceLastRefresh > detailsRefreshTime) {
+		details = m_gamePanel.getDetails();
+		detailsTimeSinceLastRefresh = sf::seconds(0.0);
+	}
+	for(auto& obj : details) {
+		ImGui::Begin(obj.first.c_str());
+		for (auto& detail : obj.second) {
+			std::string text = detail.first + ": " + detail.second;
+			ImGui::Text(text.c_str());
+		}
+		ImGui::End();
+	}
+}
+
 void startMainLoop() {
 	while (m_window.isOpen()) {
 		sf::Event event;
@@ -146,6 +166,7 @@ void startMainLoop() {
 		}
 
 		drawLog();
+		drawDetails(ellapsed);
 
 		ImGui::SFML::Render(m_window);
 

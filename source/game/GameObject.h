@@ -17,6 +17,8 @@
 
 class GameObject : public Handleable {
 public:
+	GameObject(std::string identifier, float x, float y, bool log = false);
+
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 	virtual void event(sf::Event& e) = 0;
 	virtual void update(sf::Time ellapsed) = 0;
@@ -41,7 +43,14 @@ public:
 	virtual sf::Vector2f getHitboxLeftBottom(const sf::Vector2f& pos);
 	virtual sf::Vector2f getHitboxRightBottom(const sf::Vector2f& pos);
 	virtual sf::FloatRect getHitboxBounds();
+
+	std::map<std::string, std::string> getDetails();
+	std::string getIdentifier();
 protected:
+	bool detailsActive;
+	std::map<std::string, std::string> detailEntrees;
+	std::string identifier;
+
 	sf::Vector2f m_pos = sf::Vector2f(0, 0); // position in map
 	sf::Vector2f m_vec = sf::Vector2f(0, 0); // direction vector
 	sf::Vector2f m_nextPos = sf::Vector2f(0, 0); // position in map after next calculation
