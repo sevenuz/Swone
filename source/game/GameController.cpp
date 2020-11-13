@@ -66,15 +66,16 @@ void GameController::eventMap(sf::Event& e) {
 		m_viewDelta.x = delta.x * 0.1f;
 		m_viewDelta.y = delta.y * 0.1f;
 	}
+	// TODO remove
 	if (e.type == sf::Event::KeyPressed) {
 		if (e.key.code == sf::Keyboard::D) {
 			Player* p = getPlayers()[0];
 			sf::Vector2f pos = p->getHitboxRightBottom(p->getPos());
 			MapTile tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
-			m_controller.pushLogMsg("-------");
-			m_controller.pushLogMsg(tile);
-			m_controller.pushLogMsg(pos.x);
-			m_controller.pushLogMsg(pos.y);
+			Log::ger().log("-------");
+			Log::ger().log(tile);
+			Log::ger().log(pos.x);
+			Log::ger().log(pos.y);
 		}
 	}
 }

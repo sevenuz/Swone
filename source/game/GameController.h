@@ -6,6 +6,7 @@
 #include "game/Map.h"
 #include "game/Player.h"
 #include "Controller.h"
+#include "util/Log.h"
 
 typedef std::map<std::string, std::map<std::string, std::string>> detailMap;
 

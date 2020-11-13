@@ -1,8 +1,8 @@
 #include <GamePanel.h>
 
-GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameController(c), m_gameWindow(m_gameController), m_mapReader(c) {
+GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameController(c), m_gameWindow(m_gameController) {
 
-	m_controller.pushLogMsg("GamePanel created");
+	Log::ger().log("GamePanel created");
 
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
@@ -37,7 +37,7 @@ GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameControlle
 
 GamePanel::~GamePanel() {
 	// TODO delete Map vector
-	m_controller.pushLogMsg("GamePanel destroyed");
+	Log::ger().log("GamePanel destroyed");
 }
 
 void GamePanel::readMapsFromDir() {
@@ -45,7 +45,7 @@ void GamePanel::readMapsFromDir() {
 	tinydir_open(&dir, m_controller.settings.mapDir);
 
 	if (!dir.has_next) {
-		m_controller.pushLogMsg("no files or no dir available.", "error");
+		Log::ger().log("no files or no dir available.", Log::Label::ERROR);
 		throw std::invalid_argument("no files or no dir available");
 	}
 	else {
@@ -59,7 +59,7 @@ void GamePanel::readMapsFromDir() {
 
 		if (!file.is_dir)
 		{
-			m_controller.pushLogMsg(file.name);
+			Log::ger().log(file.name);
 			Map* map = new Map(m_controller);
 
 			std::stringstream ss;
@@ -80,7 +80,7 @@ void GamePanel::readMapsFromDir() {
 
 void GamePanel::setMapSelection(int i) {
 	if (!m_mapsFound) {
-		m_controller.pushLogMsg("no maps found.", "error");
+		Log::ger().log("no maps found.", Log::Label::ERROR);
 		return;
 	}
 
@@ -94,7 +94,7 @@ void GamePanel::setMapSelection(int i) {
 	m_selectedMap = i;
 
 	m_mapName.setString(m_maps[m_selectedMap]->getName());
-	m_controller.pushLogMsg(m_maps[m_selectedMap]->getName());
+	Log::ger().log(m_maps[m_selectedMap]->getName());
 
 	m_gameController.setMap(m_maps[m_selectedMap]);
 }
@@ -111,11 +111,10 @@ void GamePanel::setActionSelection(char i) {
 
 void GamePanel::startGame() {
 	if (m_mapsFound) {
-		m_controller.pushLogMsg("start game");
 		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
 	}
 	else {
-		m_controller.pushLogMsg("No Map. Can't start the game.", "error");
+		Log::ger().log("No Map. Can't start the game.", Log::Label::ERROR);
 	}
 }
 

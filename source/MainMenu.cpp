@@ -2,7 +2,7 @@
 
 MainMenu::MainMenu(Controller& c) : m_ps(100), m_controller(c) {
 
-	m_controller.pushLogMsg("MainMenu created");
+	Log::ger().log("MainMenu created");
 
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
@@ -32,7 +32,7 @@ MainMenu::MainMenu(Controller& c) : m_ps(100), m_controller(c) {
 }
 
 MainMenu::~MainMenu() {
-	m_controller.pushLogMsg("MainMenu destroyed");
+	Log::ger().log("MainMenu destroyed");
 }
 
 void MainMenu::changeFont(sf::Font& font) {

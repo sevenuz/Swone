@@ -1,8 +1,8 @@
 #include "util/reader/MapReader.h"
 
-MapReader::MapReader(Controller& c, std::string path, Map* mapObj) : Reader(path), m_controller(c), m_map(mapObj) {}
+MapReader::MapReader(std::string path, Map* mapObj) : Reader(path), m_map(mapObj) {}
 
-MapReader::MapReader(Controller& c) : Reader(), m_controller(c) {}
+MapReader::MapReader() : Reader() {}
 
 MapReader::~MapReader()
 {
@@ -25,7 +25,7 @@ void MapReader::setParagraph(std::string p) {
 }
 
 void MapReader::addParagraphValue(std::string paragraph, StringPair p) {
-	m_controller.pushLogMsg("KEY: " + p.first + " VALUE: " + p.second);
+	Log::ger().log("KEY: " + p.first + " VALUE: " + p.second);
 
 	if (p.first == "width")
 		m_map->setWidth(std::stoi(p.second));
@@ -77,7 +77,7 @@ void MapReader::parseMap(std::string line)
 			}
 
 		}
-		m_controller.pushLogMsg(line + " " + std::to_string(m_mapLineCounter));
+		Log::ger().log(line + " " + std::to_string(m_mapLineCounter));
 		m_mapLineCounter++;
 	}
 };
@@ -87,7 +87,7 @@ void MapReader::startParseMap()
 	m_mapParse = true;
 	m_mapLineCounter = 0;
 	m_map->iniMapData();
-	m_controller.pushLogMsg("start map parsing");
+	Log::ger().log("start map parsing");
 }
 
 void MapReader::endParseMap() {
@@ -96,11 +96,11 @@ void MapReader::endParseMap() {
 		for (size_t i = 0; i < m_map->getWidth(); i++) {
 			parseMapChar(*" ", m_mapLineCounter, i);
 		}
-		m_controller.pushLogMsg(std::to_string(m_mapLineCounter));
+		Log::ger().log(std::to_string(m_mapLineCounter));
 		m_mapLineCounter++;
 	}
 	m_mapParse = false;
-	m_controller.pushLogMsg("end of map parsing");
+	Log::ger().log("end of map parsing");
 }
 
 MapTile MapReader::charToMapTile(char c)

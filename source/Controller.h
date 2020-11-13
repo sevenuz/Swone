@@ -6,6 +6,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
+#include "util/Log.h"
 #include "Settings.h"
 
 // Prefix in front of First and Last is necessary to avoid name clash of the both enums
@@ -41,25 +42,10 @@ public:
 
 	sf::RenderWindow& getWindow();
 
-	//Log
-	bool m_log_closed;
-
-	void toggleLogWindow();
-	bool isLogClosed();
-	void pushLogMsg(std::string msg, std::string type = "log");
-	void pushLogMsg(float msg, std::string type = "log");
-	void replaceLastLogMsg(std::string msg, std::string type = "log");
-	void clearLog();
-	std::string& getLastLogMsg();
-	std::vector<std::string>* getMsgList();
-	std::vector<std::string>* getMsgTypeList();
-
 	void setView(sf::View view);
 	void setDefaultView();
 protected:
-
 private:
-
 	sf::RenderWindow& m_window;
 
 	void iniSettings();
@@ -67,11 +53,6 @@ private:
 	ActiveGameWindow m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
 
 	sf::Vector2f m_scale = sf::Vector2f(1, 1);
-
-	//Log
-	char m_log_input;
-	std::vector<std::string> m_log_msgList;
-	std::vector<std::string> m_log_msgTypeList;
 };
 
 #endif // SWONE_CONTROLLER_H

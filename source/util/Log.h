@@ -64,7 +64,7 @@ public:
 private:
 	Log() {}
 	std::vector<LogEntry> m_logs;
-	bool m_log_closed = true;
+	bool m_log_closed = false;
 };
 
 #endif // SWONE_UTIL_Log_H

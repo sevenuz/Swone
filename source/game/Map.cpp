@@ -136,7 +136,7 @@ void Map::createMapImage() {
 void Map::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::C) {
-			m_controller.pushLogMsg("color switch");
+			Log::ger().log("color switch");
 
 			m_sprite.setColor(sf::Color(0, 255, 0, 128));
 		}

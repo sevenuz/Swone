@@ -10,6 +10,8 @@
 #include <map>
 #include <utility>
 
+#include "util/Log.h"
+
 typedef std::map<std::string, std::string> StringMap;
 typedef std::pair<std::string, std::string> StringPair;
 

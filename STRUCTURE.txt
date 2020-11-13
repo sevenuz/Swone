@@ -33,9 +33,7 @@ main.cpp--+-Controller m_controller-----Settings settings  // Controller which i
                                       |
                                       +-GameWindow m_gameWindow-------------GameController & m_gc  // Glue between GamePanel and GameController: TODO unnecessary?
                                       |
-                                      +-MapReader m_mapReader-------------+-Map * m_map
-                                      |                                   |
-                                      |                                   +-Controller & m_controller
+                                      +-MapReader m_mapReader---------------Map * m_map
                                       |
                                       +-std::vector<Map *> m_maps-----------Controller & m_controller // All read maps from res/map/ dir
                                       

@@ -8,7 +8,7 @@
 
 #include "util/reader/Reader.h"
 #include "game/Map.h"
-#include "Controller.h"
+#include "util/Log.h"
 
 class MapReader : public Reader
 {
@@ -16,14 +16,13 @@ public:
 	const std::string MAP_START_TOKEN = "map:start";
 	const std::string MAP_END_TOKEN = "map:end";
 
-	MapReader(Controller& c, std::string path, Map* mapObj);
-	MapReader(Controller& c);
+	MapReader(std::string path, Map* mapObj);
+	MapReader();
 	virtual ~MapReader();
 
 	void setMap(Map* mapObj);
 	static MapTile charToMapTile(char);
 protected:
-	Controller& m_controller;
 private:
 	Map* m_map = NULL;
 

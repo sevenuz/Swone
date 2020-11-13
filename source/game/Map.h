@@ -12,6 +12,7 @@
 
 #include "Controller.h"
 #include "Handleable.h"
+#include "util/Log.h"
 
 enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
 

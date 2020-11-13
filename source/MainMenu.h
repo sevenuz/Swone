@@ -14,6 +14,7 @@
 #include "Handleable.h"
 #include "Controller.h"
 #include "Settings.h"
+#include "util/Log.h"
 
 class MainMenu : public Handleable {
 private:

@@ -71,11 +71,11 @@ StringPair Reader::parseValue(std::string line) const {
 };
 
 void Reader::startReading() {
-	std::cout << "start reading " << std::endl;
+	Log::ger().log("start reading");
 }
 
 void Reader::endReading() {
-	std::cout << "end reading " << std::endl;
+	Log::ger().log("end reading");
 }
 
 std::string Reader::getParagraph() {

@@ -26,6 +26,7 @@
 #include "Settings.h"
 #include "Controller.h"
 #include "util/reader/MapReader.h"
+#include "util/Log.h"
 
 
 class GamePanel : public Handleable {
