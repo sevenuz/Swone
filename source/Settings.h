@@ -26,7 +26,7 @@ public:
 	size_t getBitsPerPixel();
 	void setBitsPerPixel(size_t v);
 
-	bool getVerticalSyncEnabled();
+	bool isVerticalSyncEnabled();
 	void setVerticalSyncEnabled(bool v);
 
 	std::string getMapDirectory();
@@ -36,9 +36,15 @@ public:
 	void setFontSource(std::string s);
 
 	sf::Font& getFont();
+	void loadFont();
 
 	sf::Color getClearingColor();
 	void setClearingColor(sf::Color c);
+
+	bool isChanged();
+	void setChanged(bool v);
+
+	void writeSettings();
 
 	// gets relative value to calculate absolute position
 	int toW(float w);

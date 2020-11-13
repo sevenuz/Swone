@@ -2,11 +2,33 @@
 
 Settings::Settings()
 {
-	Reader r(SETTINGS_FILE);
-	r.forEach([](std::string p, StringPair s){
-		std::cout << p << " " << s.first << "=" << s.second << std::endl;
-	});
-	setFontSource(m_font_src);
+	try {
+		Reader r(SETTINGS_FILE);
+		r.forEach([&](std::string p, std::string k, std::string v){
+			std::cout << p << " " << k << "=" << v << std::endl;
+			if(k=="width")
+				setWidth(Reader::toLong(v));
+			else if(k=="height")
+				setHeight(Reader::toLong(v));
+			else if(k=="bits_per_pixel")
+				setBitsPerPixel(Reader::toLong(v));
+			else if(k=="vertical_sync_enabled")
+				setVerticalSyncEnabled(Reader::toBool(v));
+			else if(k=="map_directory")
+				setMapDirectory(v);
+			else if(k=="font_source")
+				setFontSource(v);
+			else if(k=="clearing_color")
+				setClearingColor(Reader::toColor(v));
+			else
+				Log::ger().log(k + " is not a settings option", Log::Label::Warning);
+		});
+	} catch(...) {
+		// TODO catch not all errors, e.g. handle parsing errors
+		writeSettings();
+	}
+
+	loadFont();
 }
 
 Settings::~Settings()
@@ -44,7 +66,7 @@ void Settings::setBitsPerPixel(size_t v)
 	m_bits_per_pixel = v;
 }
 
-bool Settings::getVerticalSyncEnabled()
+bool Settings::isVerticalSyncEnabled()
 {
 	return m_vertical_sync_enabled;
 }
@@ -72,14 +94,18 @@ std::string Settings::getFontSource()
 void Settings::setFontSource(std::string s)
 {
 	m_font_src = s;
-	if (!m_font.loadFromFile(m_font_src)) {
-		throw std::invalid_argument("font not found");
-	}
 }
 
 sf::Font& Settings::getFont()
 {
 	return m_font;
+}
+
+void Settings::loadFont()
+{
+	if (!m_font.loadFromFile(m_font_src)) {
+		throw std::invalid_argument("font not found");
+	}
 }
 
 sf::Color Settings::getClearingColor()
@@ -90,6 +116,33 @@ sf::Color Settings::getClearingColor()
 void Settings::setClearingColor(sf::Color c)
 {
 	m_clearing_color = c;
+}
+
+bool Settings::isChanged()
+{
+	return m_changed;
+}
+
+void Settings::setChanged(bool v)
+{
+	m_changed = v;
+}
+
+void Settings::writeSettings()
+{
+	Reader::write(SETTINGS_FILE, {{"global", {
+		StringPair("width", std::to_string(getWidth())),
+		StringPair("height", std::to_string(getHeight())),
+		StringPair("bits_per_pixel", std::to_string(getBitsPerPixel())),
+		StringPair("vertical_sync_enabled", isVerticalSyncEnabled()?"true":"false"),
+		StringPair("map_directory", getMapDirectory()),
+		StringPair("font_source", getFontSource()),
+		StringPair("clearing_color", "Color(" +
+			std::to_string(getClearingColor().r) + "," +
+			std::to_string(getClearingColor().g) + "," +
+			std::to_string(getClearingColor().b) + ")"
+		)
+	}}});
 }
 
 int Settings::toW(float w){

@@ -7,7 +7,9 @@
 #include <string>
 #include <stdexcept>
 #include <map>
+#include <vector>
 #include <utility>
+#include <SFML/Graphics/Color.hpp>
 
 #include "util/Log.h"
 
@@ -36,10 +38,11 @@ public:
 
 	void setPath(std::string path);
 	void read();
+	static void write(std::string file, std::map<std::string, StringMap>);
 
 	// fn is callback with two parameters:
-	// void fn(std::string& paragraph, StringPair& keyValuePair);
-	void forEach(std::function<void(std::string, StringPair)> fn);
+	// void fn(std::string paragraph, std::string key, std::string value);
+	void forEach(std::function<void(std::string, std::string, std::string)> fn);
 
 	std::map<std::string, StringMap>& getParagraphMap();
 	StringMap& getParagraphStringMap(std::string paragraph);
@@ -65,6 +68,16 @@ public:
 	// calls addParagraphValue or setParagraph
 	// if you want to implement complete own logic use this
 	virtual void parseLine(std::string paragraph, std::string line);
+
+	// static convert fn
+	static std::vector<std::string> split(std::string str, char splitter);
+	static int toInt(std::string s);
+	static long toLong(std::string s);
+	static float toFloat(std::string s);
+	static double toDouble(std::string s);
+	static sf::Color toColor(std::string s);
+	// input should be true or false
+	static bool toBool(std::string s);
 protected:
 private:
 	std::string m_path = "";

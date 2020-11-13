@@ -2,7 +2,7 @@
 
 Controller::Controller(Settings settings, sf::RenderWindow& w) : m_settings(settings), m_window(w) {
 	Log::ger().log("Controller created");
-	m_window.setVerticalSyncEnabled(m_settings.getVerticalSyncEnabled());
+	m_window.setVerticalSyncEnabled(m_settings.isVerticalSyncEnabled());
 }
 
 Controller::~Controller() {
