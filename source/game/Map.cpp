@@ -79,7 +79,7 @@ void Map::setMapDataValue(size_t h, size_t w, MapTile v) {
 }
 
 void Map::scaleToFit() {
-	scaleToFit(m_controller.settings.WIDTH, m_controller.settings.HEIGHT);
+	scaleToFit(m_controller.getSettings().getWidth(), m_controller.getSettings().getHeight());
 }
 
 void Map::scaleToFit(size_t w, size_t h) {

@@ -3,6 +3,7 @@ obj/
 swone.layout
 /build/**
 *.swp
+.buildconfig
 .project
 bib/sfml/
 .vs/

@@ -11,24 +11,24 @@ MainMenu::MainMenu(Controller& c) : m_ps(100), m_controller(c) {
 	m_selectedMenupoint = Menupoint::LOKAL;
 
 	m_header.setString("Swone");
-	m_header.setCharacterSize(Settings::toF(TEXT_HEADER_SIZE));
+	m_header.setCharacterSize(m_controller.getSettings().toF(TEXT_HEADER_SIZE));
 	m_header.setStyle(sf::Text::Bold | sf::Text::Underlined);
 	m_header.setFillColor(sf::Color::Red);
-	m_header.setPosition(Settings::toW(TEXT_MARGIN_LEFT), Settings::toH(TEXT_MARGIN_TOP));
+	m_header.setPosition(m_controller.getSettings().toW(TEXT_MARGIN_LEFT), m_controller.getSettings().toH(TEXT_MARGIN_TOP));
 
 	m_lokal.setString("Lokal");
-	m_lokal.setPosition(Settings::toW(TEXT_MARGIN_LEFT), Settings::toH(TEXT_MARGIN_TOP * 2));
+	m_lokal.setPosition(m_controller.getSettings().toW(TEXT_MARGIN_LEFT), m_controller.getSettings().toH(TEXT_MARGIN_TOP * 2));
 
 	m_online.setString("Online");
-	m_online.setPosition(Settings::toW(TEXT_MARGIN_LEFT), Settings::toH(TEXT_MARGIN_TOP * 3));
+	m_online.setPosition(m_controller.getSettings().toW(TEXT_MARGIN_LEFT), m_controller.getSettings().toH(TEXT_MARGIN_TOP * 3));
 
 	m_settings.setString("Settings");
-	m_settings.setPosition(Settings::toW(TEXT_MARGIN_LEFT), Settings::toH(TEXT_MARGIN_TOP * 4));
+	m_settings.setPosition(m_controller.getSettings().toW(TEXT_MARGIN_LEFT), m_controller.getSettings().toH(TEXT_MARGIN_TOP * 4));
 
 	m_exit.setString("Exit");
-	m_exit.setPosition(Settings::toW(TEXT_MARGIN_LEFT), Settings::toH(TEXT_MARGIN_TOP * 5));
+	m_exit.setPosition(m_controller.getSettings().toW(TEXT_MARGIN_LEFT), m_controller.getSettings().toH(TEXT_MARGIN_TOP * 5));
 
-	changeSelectedMenupoint();
+	setFont(m_controller.getSettings().getFont());
 }
 
 MainMenu::~MainMenu() {
@@ -45,13 +45,13 @@ void MainMenu::changeFont(sf::Font& font) {
 }
 
 void MainMenu::selectedStyle(sf::Text& t) {
-	t.setCharacterSize(Settings::toF(TEXT_SELECTED_SIZE));
+	t.setCharacterSize(m_controller.getSettings().toF(TEXT_SELECTED_SIZE));
 	t.setFillColor(sf::Color::Yellow);
 	m_ps.setOrigin(t.getGlobalBounds().left, t.getGlobalBounds().top, t.getGlobalBounds().width, t.getGlobalBounds().height, Origin::ON_BORDER);
 }
 
 void MainMenu::deselectedStyle(sf::Text& t) {
-	t.setCharacterSize(Settings::toF(TEXT_MENUPOINT_SIZE));
+	t.setCharacterSize(m_controller.getSettings().toF(TEXT_MENUPOINT_SIZE));
 	t.setFillColor(sf::Color::White);
 }
 

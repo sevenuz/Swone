@@ -1,14 +1,12 @@
 #include <Controller.h>
 
-Controller::Controller(sf::RenderWindow& w) : m_window(w) {
-	iniSettings();
+Controller::Controller(Settings settings, sf::RenderWindow& w) : m_settings(settings), m_window(w) {
+	Log::ger().log("Controller created");
+	m_window.setVerticalSyncEnabled(m_settings.getVerticalSyncEnabled());
 }
 
 Controller::~Controller() {
 	Log::ger().log("Controller destroyed");
-}
-
-void Controller::iniSettings() {
 }
 
 void Controller::setActiveWindow(ActiveWindow i) {
@@ -43,6 +41,9 @@ void Controller::setScale(sf::Vector2f scale) {
 	m_scale = scale;
 }
 
+Settings& Controller::getSettings() {
+	return m_settings;
+}
 
 sf::RenderWindow& Controller::getWindow() {
 	return m_window;

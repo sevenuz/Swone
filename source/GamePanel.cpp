@@ -7,30 +7,30 @@ GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameControlle
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
 	m_ps.setLifetime(sf::seconds(3));
-	m_ps.setOrigin(Settings::toW(0.4f), Settings::toH(61), 150, 3, Origin::ON_BORDER);
+	m_ps.setOrigin(m_controller.getSettings().toW(0.4f), m_controller.getSettings().toH(61), 150, 3, Origin::ON_BORDER);
 
-	m_play.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
+	m_play.setFont(m_controller.getSettings().getFont());
 	m_play.setString("Play");
-	m_play.setPosition(Settings::toW(0.415f), Settings::toH(0.8f));
+	m_play.setPosition(m_controller.getSettings().toW(0.415f), m_controller.getSettings().toH(0.8f));
 	m_play.setFillColor(sf::Color::Yellow);
-	m_play.setCharacterSize(Settings::toF(50));
+	m_play.setCharacterSize(m_controller.getSettings().toF(50));
 
-	m_mapName.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
-	m_mapName.setPosition(Settings::toW(0.4f), Settings::toH(31));
+	m_mapName.setFont(m_controller.getSettings().getFont());
+	m_mapName.setPosition(m_controller.getSettings().toW(0.4f), m_controller.getSettings().toH(31));
 	m_mapName.setFillColor(sf::Color::White);
-	m_mapName.setCharacterSize(Settings::toF(30));
+	m_mapName.setCharacterSize(m_controller.getSettings().toF(30));
 
-	m_switchLeft.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
+	m_switchLeft.setFont(m_controller.getSettings().getFont());
 	m_switchLeft.setString("<");
-	m_switchLeft.setPosition(Settings::toW(30), Settings::toH(150));
+	m_switchLeft.setPosition(m_controller.getSettings().toW(30), m_controller.getSettings().toH(150));
 	m_switchLeft.setFillColor(sf::Color::Yellow);
-	m_switchLeft.setCharacterSize(Settings::toF(50));
+	m_switchLeft.setCharacterSize(m_controller.getSettings().toF(50));
 
-	m_switchRight.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
+	m_switchRight.setFont(m_controller.getSettings().getFont());
 	m_switchRight.setString(">");
-	m_switchRight.setPosition(Settings::toW(590), Settings::toH(150));
+	m_switchRight.setPosition(m_controller.getSettings().toW(590), m_controller.getSettings().toH(150));
 	m_switchRight.setFillColor(sf::Color::Yellow);
-	m_switchRight.setCharacterSize(Settings::toF(50));
+	m_switchRight.setCharacterSize(m_controller.getSettings().toF(50));
 
 	readMapsFromDir();
 }
@@ -42,7 +42,7 @@ GamePanel::~GamePanel() {
 
 void GamePanel::readMapsFromDir() {
 	tinydir_dir dir;
-	tinydir_open(&dir, m_controller.settings.mapDir);
+	tinydir_open(&dir, m_controller.getSettings().getMapDirectory().c_str());
 
 	if (!dir.has_next) {
 		Log::ger().log("no files or no dir available.", Log::Label::ERROR);
@@ -63,8 +63,8 @@ void GamePanel::readMapsFromDir() {
 			Map* map = new Map(m_controller);
 
 			std::stringstream ss;
-			ss << file.name;
-			m_mapReader.setPath(m_controller.settings.mapDir + ss.str());
+			ss << m_controller.getSettings().getMapDirectory() << file.name;
+			m_mapReader.setPath(ss.str());
 
 			m_mapReader.setMap(map);
 			m_mapReader.read();

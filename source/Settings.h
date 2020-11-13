@@ -13,36 +13,59 @@ public:
 	Settings();
 	virtual ~Settings();
 
-	//An den standart werten werden die elemente ausgerichtet
+	// standard resolution to calculate relative positions to real resolution
 	static const size_t STANDARD_WIDTH = 640;
 	static const size_t STANDARD_HEIGHT = 360;
 
-	//das ist die eigentliche auflösung
-	static const size_t WIDTH = 640;
-	static const size_t HEIGHT = 360;
-	static const size_t STANDART_BITS_PER_PIXEL = 32;
+	size_t getWidth();
+	void setWidth(size_t v);
 
-	static const bool STANDART_VERTICAL_SYNC_ENABLED = true;
+	size_t getHeight();
+	void setHeight(size_t v);
 
-	char mapDir[12] = "../res/map/";
+	size_t getBitsPerPixel();
+	void setBitsPerPixel(size_t v);
 
-	sf::Font font;
+	bool getVerticalSyncEnabled();
+	void setVerticalSyncEnabled(bool v);
 
-	static int toW(int w);
-	static int toH(int h);
-	static int toW(float w);
-	static int toH(float h);
+	std::string getMapDirectory();
+	void setMapDirectory(std::string s);
 
-	static int toF(int f);//font size
+	std::string getFontSource();
+	void setFontSource(std::string s);
 
-	//static sf::Color STANDART_CLEARING_COLOR = sf::Color::Black;
+	sf::Font& getFont();
 
-	//static const string STANDART_TEXT_FONT = "C:/Users/teetr/games/FARG_BETA/content/FARG.ttf";
+	sf::Color getClearingColor();
+	void setClearingColor(sf::Color c);
 
+	// gets relative value to calculate absolute position
+	int toW(float w);
+	int toH(float h);
+	// gets position relative to STANDARD RESOLUTION
+	// and calculates relative position to call toW(float)
+	int toW(int w);
+	int toH(int h);
+	//font size, same like toW(int)
+	int toF(int f);
 protected:
-
 private:
-	std::string fontSrc = "../res/Roboto-Medium.ttf";
+	// real resolution
+	size_t m_width = 640;
+	size_t m_height = 360;
+
+	size_t m_bits_per_pixel = 32;
+	bool m_vertical_sync_enabled = true;
+
+	std::string m_map_directory = "../res/map/";
+
+	std::string m_font_src = "../res/Roboto-Medium.ttf";
+	sf::Font m_font;
+	sf::Color m_clearing_color = sf::Color::Black;
+
+	// indicates if the settings changed compared to settings.ini
+	bool m_changed = false;
 };
 
 #endif

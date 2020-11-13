@@ -25,10 +25,8 @@ typedef std::function<void(close_reason const& reason)> close_listener;
 */
 class Controller {
 public:
-	Controller(sf::RenderWindow& w);
+	Controller(Settings settings, sf::RenderWindow& w);
 	virtual ~Controller();
-
-	Settings settings;
 
 	void setActiveWindow(ActiveWindow i);
 	ActiveWindow getActiveWindow();
@@ -39,15 +37,16 @@ public:
 	sf::Vector2f getScale();
 	void setScale(sf::Vector2f scale);
 
+	Settings& getSettings();
 	sf::RenderWindow& getWindow();
 
 	void setView(sf::View view);
 	void setDefaultView();
 protected:
 private:
+	Settings m_settings;
 	sf::RenderWindow& m_window;
 
-	void iniSettings();
 	ActiveWindow m_activeWindow = ActiveWindow::AW_FIRST;
 	ActiveGameWindow m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
 

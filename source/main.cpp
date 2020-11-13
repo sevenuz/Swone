@@ -25,47 +25,37 @@
 #define _WEBSOCKETPP_CPP11_FUNCTIONAL_
 */
 
+Settings settings;
+sf::RenderWindow window(sf::VideoMode(settings.getWidth(), settings.getHeight(), settings.getBitsPerPixel()), "Swone o.O");
+Controller controller(settings, window);
+MainMenu menu(controller);
+GamePanel gamePanel(controller);
+sf::Clock game_clock;
 
-sf::RenderWindow m_window(sf::VideoMode(Settings::WIDTH, Settings::HEIGHT, Settings::STANDART_BITS_PER_PIXEL), "SFML Test");
-Controller m_controller(m_window);
-MainMenu m_menu(m_controller);
-GamePanel m_gamePanel(m_controller);
-sf::Clock m_clock;
-
-bool KEY_STRG_PRESSED = false;
-bool KEY_L_PRESSED = false;
-
-void iniSettings() {
-	m_menu.setFont(m_controller.settings.font); // @suppress("Invalid arguments")
-	m_window.setVerticalSyncEnabled(Settings::STANDART_VERTICAL_SYNC_ENABLED);
-}
-
-void iniImGui() {
-	ImGui::SFML::Init(m_window);
-}
+bool key_strg_pressed = false;
+bool key_l_pressed = false;
 
 void handleAllEvents(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::LControl) {
-			KEY_STRG_PRESSED = true;
+			key_strg_pressed = true;
 		}
 		else if (event.key.code == sf::Keyboard::L) {
-			KEY_L_PRESSED = true;
+			key_l_pressed = true;
 		}
-		if (KEY_STRG_PRESSED && KEY_L_PRESSED) {
+		if (key_strg_pressed && key_l_pressed) {
 			Log::ger().toggleLogWindow();
 		}
 	}
 	else if (event.type == sf::Event::KeyReleased) {
 		if (event.key.code == sf::Keyboard::LControl) {
-			KEY_STRG_PRESSED = false;
+			key_strg_pressed = false;
 		}
 		else if (event.key.code == sf::Keyboard::L) {
-			KEY_L_PRESSED = false;
+			key_l_pressed = false;
 		}
 	}
 }
-
 
 void drawLog() {
 	if(Log::ger().isLogClosed()) {
@@ -98,7 +88,7 @@ void drawLog() {
 		ImGui::EndChild();
 		ImGui::Separator();
 
-		//ImGui::InputText("input",&m_controller.m_log_input,100);
+		//ImGui::InputText("input",&controller.log_input,100);
 
 		if (ImGui::Button("Clear")) {
 			Log::ger().clearLog();
@@ -114,7 +104,7 @@ detailMap details;
 void drawDetails(sf::Time ellapsed) {
 	detailsTimeSinceLastRefresh += ellapsed;
 	if (detailsTimeSinceLastRefresh > detailsRefreshTime) {
-		details = m_gamePanel.getDetails();
+		details = gamePanel.getDetails();
 		detailsTimeSinceLastRefresh = sf::seconds(0.0);
 	}
 	for(auto& obj : details) {
@@ -128,54 +118,54 @@ void drawDetails(sf::Time ellapsed) {
 }
 
 void startMainLoop() {
-	while (m_window.isOpen()) {
+	while (window.isOpen()) {
 		sf::Event event;
-		while (m_window.pollEvent(event)) {
+		while (window.pollEvent(event)) {
 			handleAllEvents(event);
 			ImGui::SFML::ProcessEvent(event);
 			if (event.type == sf::Event::Closed) {
-				m_window.close();
+				window.close();
 			}
 
-			switch (m_controller.getActiveWindow()) {
+			switch (controller.getActiveWindow()) {
 			case ActiveWindow::MAINMENU:
-				m_menu.event(event);
+				menu.event(event);
 				break;
 			case ActiveWindow::GAME:
-				m_gamePanel.event(event);
+				gamePanel.event(event);
 				break;
 			default:
-				m_menu.event(event);
+				menu.event(event);
 				break;
 			}
 		}
 
-		sf::Time ellapsed = m_clock.restart();
-		m_window.clear(sf::Color::Black);
+		sf::Time ellapsed = game_clock.restart();
+		window.clear(settings.getClearingColor());
 
-		ImGui::SFML::Update(m_window, ellapsed);
+		ImGui::SFML::Update(window, ellapsed);
 
-		switch (m_controller.getActiveWindow()) {
+		switch (controller.getActiveWindow()) {
 		case ActiveWindow::MAINMENU:
-			m_menu.update(ellapsed);
-			m_window.draw(m_menu);
+			menu.update(ellapsed);
+			window.draw(menu);
 			break;
 		case ActiveWindow::GAME:
-			m_gamePanel.update(ellapsed);
-			m_window.draw(m_gamePanel);
+			gamePanel.update(ellapsed);
+			window.draw(gamePanel);
 			break;
 		default:
-			m_menu.update(ellapsed);
-			m_window.draw(m_menu);
+			menu.update(ellapsed);
+			window.draw(menu);
 			break;
 		}
 
 		drawLog();
 		drawDetails(ellapsed);
 
-		ImGui::SFML::Render(m_window);
+		ImGui::SFML::Render(window);
 
-		m_window.display();
+		window.display();
 	}
 }
 
@@ -183,8 +173,7 @@ void startMainLoop() {
 int main() {
 	try {
 		std::cout << "hallo in main" << std::endl;
-		iniImGui();
-		iniSettings();
+		ImGui::SFML::Init(window);
 		startMainLoop();
 	}
 	catch (...) {
