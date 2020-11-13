@@ -11,6 +11,7 @@
 #include "Controller.h"
 #include "Settings.h"
 #include "util/reader/Reader.h"
+#include "util/Log.h"
 
 /*
 //Defines damit ASIO_STANDALONE und damit socketio++ gehen
@@ -52,7 +53,7 @@ void handleAllEvents(sf::Event& event) {
 			KEY_L_PRESSED = true;
 		}
 		if (KEY_STRG_PRESSED && KEY_L_PRESSED) {
-			m_controller.toggleLogWindow();
+			Log::ger().toggleLogWindow();
 		}
 	}
 	else if (event.type == sf::Event::KeyReleased) {
@@ -67,26 +68,30 @@ void handleAllEvents(sf::Event& event) {
 
 
 void drawLog() {
-	if (m_controller.isLogClosed()) {
-		ImGui::Begin("Log", &m_controller.m_log_closed);
-
-		std::vector<std::string> msgs = *m_controller.getMsgList();
-		std::vector<std::string> types = *m_controller.getMsgTypeList();
+	if(Log::ger().isLogClosed()) {
+		ImGui::Begin("Log", &Log::ger().isLogClosed());
 
 		ImGui::BeginChild("ScrollingRegion", ImVec2(0, -ImGui::GetItemsLineHeightWithSpacing()), false, ImGuiWindowFlags_HorizontalScrollbar);
 
-		for (unsigned int i = 0; i < msgs.size(); i++) {
+		for (Log::LogEntry& s : Log::ger().getLogs())
+		{
+			switch(s.label)
+			{
+				case Log::Label::LOG:
+					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(100, 140, 100).Value);
+					break;
+				case Log::Label::WARNING:
+					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(255, 165, 0).Value);
+					break;
+				case Log::Label::ERROR:
+					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(210, 0, 0).Value);
+					break;
+				default:
+					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(127, 127, 127).Value);
+					break;
+			}
 
-			if (types[i] == "log") {
-				ImGui::PushStyleColor(ImGuiCol_Text, ImColor(200, 200, 200).Value);
-			}
-			else if (types[i] == "error") {
-				ImGui::PushStyleColor(ImGuiCol_Text, ImColor(255, 100, 100).Value);
-			}
-			else {
-				ImGui::PushStyleColor(ImGuiCol_Text, ImColor(100, 100, 100).Value);
-			}
-			ImGui::Text(msgs[i].c_str());//msgs[i]
+			ImGui::Text(s.message.c_str());
 			ImGui::PopStyleColor();
 		}
 
@@ -96,7 +101,7 @@ void drawLog() {
 		//ImGui::InputText("input",&m_controller.m_log_input,100);
 
 		if (ImGui::Button("Clear")) {
-			m_controller.clearLog();
+			Log::ger().clearLog();
 		}
 		ImGui::End();
 	}
