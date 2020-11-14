@@ -2,6 +2,7 @@ width=20
 height=20
 border=#
 name=Sweap
+gravity=9.81
 
 map:start
 ....................

@@ -14,6 +14,8 @@
 #include "Handleable.h"
 #include "util/Log.h"
 
+#define GRAVITY 25
+
 enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
 
 class Map : public Handleable
@@ -33,6 +35,9 @@ public:
 
 	void setName(std::string);
 	std::string getName();
+
+	void setGravity(float f);
+	float getGravity();
 
 	sf::Sprite& getSprite();
 
@@ -63,6 +68,7 @@ private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 	std::string m_name = "";
+	float m_gravity = GRAVITY;
 
 	size_t m_width = 0;
 	size_t m_height = 0;

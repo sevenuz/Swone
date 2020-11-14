@@ -28,13 +28,17 @@ void MapReader::addParagraphValue(std::string paragraph, StringPair p) {
 	Log::ger().log("KEY: " + p.first + " VALUE: " + p.second);
 
 	if (p.first == "width")
-		m_map->setWidth(std::stoi(p.second));
+		m_map->setWidth(Reader::toInt(p.second));
 	else if (p.first == "height")
-		m_map->setHeight(std::stoi(p.second));
+		m_map->setHeight(Reader::toInt(p.second));
 	else if (p.first == "border")
 		m_map->setBorder(MapReader::charToMapTile(p.second[0]));
 	else if (p.first == "name")
 		m_map->setName(p.second);
+	else if (p.first == "gravity")
+		m_map->setGravity(Reader::toFloat(p.second));
+	else
+		Log::ger().log(p.first + " is not a map option", Log::Label::Warning);
 }
 
 void MapReader::parseLine(std::string paragraph, std::string line)

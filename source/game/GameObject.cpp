@@ -53,15 +53,15 @@ float calculateDrag(const float& drag, const float& speed) {
 	return pow(speed, 2) * drag * SCALE_DRAG_CONST;
 }
 
-sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
+sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, float gravity) {
+	// x linear, y accelerated
+	// gravity is passed from map obj
 	const float s = ellapsed.asSeconds();
-	const float g = GRAVITY;
 	float fx = m_vec.x;
-	// x linear, y beschleunigt
 
 	float speed = m_vec.y / s;
 	float drag = calculateDrag(m_drag, speed);
-	float fy = m_vec.y + (g * s);
+	float fy = m_vec.y + (gravity * s);
 	fy = fy > 0 ? std::max(fy - (drag * s), 0.0f) : std::min(fy + (drag * s), 0.0f);
 
 	// speed lock on tile width/height,
@@ -80,3 +80,4 @@ sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
 std::string GameObject::getIdentifier() {
 	return m_identifier;
 }
+

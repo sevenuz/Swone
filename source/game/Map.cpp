@@ -28,6 +28,17 @@ std::string Map::getName() {
 	return m_name;
 }
 
+void Map::setGravity(float f)
+{
+	m_gravity = f;
+}
+
+float Map::getGravity()
+{
+	return m_gravity;
+}
+
+
 void Map::setWidth(size_t w) {
 	m_width = w;
 }
