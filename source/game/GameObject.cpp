@@ -1,6 +1,6 @@
 #include "GameObject.h"
 
-GameObject::GameObject(std::string identifier, float x, float y, bool log) : m_identifier(identifier), m_log(log) {
+GameObject::GameObject(std::string identifier, float x, float y, bool log) : m_log(log), m_identifier(identifier) {
 	m_pos = sf::Vector2f(x, y);
 }
 
@@ -71,7 +71,7 @@ sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, float gravity) {
 	m_nextVec.x = fx < Map::TILE_WIDTH ? fx : Map::TILE_WIDTH;
 	m_nextVec.y = fy < Map::TILE_HEIGHT ? fy : Map::TILE_HEIGHT;
 
-	if (m_log) 
+	if (m_log)
 		Log::ger().detailsUpdateValue(std::to_string(speed), "speed", m_identifier);
 
 	return m_nextVec;

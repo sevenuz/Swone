@@ -15,13 +15,13 @@ Contains the rest o.0
 The following graph shows the hierarchy of the classes located in source/.
 > The right side is the member of the left...
 
-main.cpp--+-Controller m_controller-----Settings settings  // Controller which is passed through, holds the general state
+main.cpp--+-Controller controller-----Settings settings  // Controller which is passed through, holds the general state
           |
-          +-MainMenu m_menu-----------+-ParticleSystem m_ps
+          +-MainMenu menu-----------+-ParticleSystem m_ps
           |                           |
           |                           +-Controller & m_controller
           |
-          +-GamePanel m_gamePanel-----+-ParticleSystem m_ps
+          +-GameMenu gameMenu---------+-ParticleSystem m_ps
                                       |
                                       +-Controller & m_controller
                                       |
@@ -36,4 +36,4 @@ main.cpp--+-Controller m_controller-----Settings settings  // Controller which i
                                       +-MapReader m_mapReader---------------Map * m_map
                                       |
                                       +-std::vector<Map *> m_maps-----------Controller & m_controller // All read maps from res/map/ dir
-                                      
+

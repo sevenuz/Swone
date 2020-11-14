@@ -6,7 +6,7 @@
 #include <string>
 
 #include "MainMenu.h"
-#include "GamePanel.h"
+#include "GameMenu.h"
 #include "graphics/ParticleSystem.h"
 #include "Controller.h"
 #include "Settings.h"
@@ -29,7 +29,7 @@ Settings settings;
 sf::RenderWindow window(sf::VideoMode(settings.getWidth(), settings.getHeight(), settings.getBitsPerPixel()), "Swone o.O");
 Controller controller(settings, window);
 MainMenu menu(controller);
-GamePanel gamePanel(controller);
+GameMenu gameMenu(controller);
 sf::Clock game_clock;
 
 bool key_strg_pressed = false;
@@ -135,7 +135,7 @@ void startMainLoop() {
 				menu.event(event);
 				break;
 			case ActiveWindow::GAME:
-				gamePanel.event(event);
+				gameMenu.event(event);
 				break;
 			default:
 				menu.event(event);
@@ -155,8 +155,8 @@ void startMainLoop() {
 			window.draw(menu);
 			break;
 		case ActiveWindow::GAME:
-			gamePanel.update(ellapsed);
-			window.draw(gamePanel);
+			gameMenu.update(ellapsed);
+			window.draw(gameMenu);
 			break;
 		default:
 			menu.update(ellapsed);

@@ -1,6 +1,6 @@
-#include <GamePanel.h>
+#include <GameMenu.h>
 
-GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameController(c), m_gameWindow(m_gameController) {
+GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameController(c), m_gameWindow(m_gameController) {
 
 	Log::ger().log("GamePanel created");
 
@@ -35,12 +35,12 @@ GamePanel::GamePanel(Controller& c) :m_ps(100), m_controller(c), m_gameControlle
 	readMapsFromDir();
 }
 
-GamePanel::~GamePanel() {
+GameMenu::~GameMenu() {
 	// TODO delete Map vector
 	Log::ger().log("GamePanel destroyed");
 }
 
-void GamePanel::readMapsFromDir() {
+void GameMenu::readMapsFromDir() {
 	tinydir_dir dir;
 	tinydir_open(&dir, m_controller.getSettings().getMapDirectory().c_str());
 
@@ -78,7 +78,7 @@ void GamePanel::readMapsFromDir() {
 	setMapSelection(0);
 }
 
-void GamePanel::setMapSelection(int i) {
+void GameMenu::setMapSelection(int i) {
 	if (!m_mapsFound) {
 		Log::ger().log("no maps found.", Log::Label::Error);
 		return;
@@ -99,7 +99,7 @@ void GamePanel::setMapSelection(int i) {
 	m_gameController.setMap(m_maps[m_selectedMap]);
 }
 
-void GamePanel::setActionSelection(char i) {
+void GameMenu::setActionSelection(char i) {
 	if (i > GamePanelMenuPoint::LAST) {
 		i = GamePanelMenuPoint::FIRST;
 	}
@@ -109,7 +109,7 @@ void GamePanel::setActionSelection(char i) {
 	m_selectedAction = i;
 }
 
-void GamePanel::startGame() {
+void GameMenu::startGame() {
 	if (m_mapsFound) {
 		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
 	}
@@ -118,7 +118,7 @@ void GamePanel::startGame() {
 	}
 }
 
-void GamePanel::event(sf::Event& event) {
+void GameMenu::event(sf::Event& event) {
 	sf::RenderWindow& w = m_controller.getWindow();
 	sf::Vector2i pixelPos = sf::Mouse::getPosition(w);
 	sf::Vector2f worldPos = w.mapPixelToCoords(pixelPos);
@@ -168,7 +168,7 @@ void GamePanel::event(sf::Event& event) {
 	}
 }
 
-void GamePanel::update(sf::Time ellapsed) {
+void GameMenu::update(sf::Time ellapsed) {
 	m_ps.update(ellapsed);
 	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
@@ -182,7 +182,7 @@ void GamePanel::update(sf::Time ellapsed) {
 	}
 }
 
-void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;
 	sf::View view(sf::FloatRect(0, 0, m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getImageHeight()));
@@ -210,4 +210,5 @@ void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		m_controller.setActiveGameWindow(ActiveGameWindow::MAPSELECTION);
 		break;
 	}
-};
+}
+
