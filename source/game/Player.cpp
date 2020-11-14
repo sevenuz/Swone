@@ -12,6 +12,9 @@ Player::Player(std::string identifier, float x, float y, bool log) : GameObject(
 		std::cout << "Failed to load player spritesheet!" << std::endl;
 	}
 
+	if (m_log) 
+		Log::ger().detailsPutTexture(&m_texture, "player_texture", m_identifier);
+
 	m_ani_jump.setSpriteSheet(m_texture);
 	m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
 	m_ani_jump.addFrame(sf::IntRect(64, 0, 32, 32));

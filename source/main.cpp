@@ -97,21 +97,17 @@ void drawLog() {
 	}
 }
 
-sf::Time detailsRefreshTime = sf::seconds(0.25);
-sf::Time detailsTimeSinceLastRefresh = sf::seconds(0.0);
-detailMap details;
-
-void drawDetails(sf::Time ellapsed) {
-	detailsTimeSinceLastRefresh += ellapsed;
-	if (detailsTimeSinceLastRefresh > detailsRefreshTime) {
-		details = gamePanel.getDetails();
-		detailsTimeSinceLastRefresh = sf::seconds(0.0);
-	}
-	for(auto& obj : details) {
+void drawDetails() {
+	for(auto& obj : Log::ger().getValueMap()) {
 		ImGui::Begin(obj.first.c_str());
 		for (auto& detail : obj.second) {
 			std::string text = detail.first + ": " + detail.second;
 			ImGui::Text(text.c_str());
+		}
+		for (auto& detail : Log::ger().getTextureMap()[obj.first]) {
+			std::string text = detail.first + ": ";
+			ImGui::Text(text.c_str());
+			ImGui::Image(*detail.second);
 		}
 		ImGui::End();
 	}
@@ -141,6 +137,7 @@ void startMainLoop() {
 		}
 
 		sf::Time ellapsed = game_clock.restart();
+		Log::ger().updateTime(ellapsed);
 		window.clear(settings.getClearingColor());
 
 		ImGui::SFML::Update(window, ellapsed);
@@ -161,7 +158,8 @@ void startMainLoop() {
 		}
 
 		drawLog();
-		drawDetails(ellapsed);
+		//drawDetails();  // Uncomment to see details
+		Log::ger().resetTime();
 
 		ImGui::SFML::Render(window);
 

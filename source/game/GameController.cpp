@@ -110,13 +110,3 @@ void GameController::eventPlayers(sf::Event& e) {
 		getPlayers()[i]->event(e);
 	}
 }
-
-detailMap GameController::getDetails() {
-	detailMap map;
-	for (size_t i = 0; i < getPlayers().size(); i++) {
-		Player* current = getPlayers()[i];
-		map[current->getIdentifier()] = current->getDetails();
-	}
-	return map;
-}
-

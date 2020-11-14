@@ -8,8 +8,6 @@
 #include "Controller.h"
 #include "util/Log.h"
 
-typedef std::map<std::string, std::map<std::string, std::string>> detailMap;
-
 class GameController {
 public:
 	GameController(Controller& c);
@@ -32,8 +30,6 @@ public:
 	void setMap(Map* m);
 	// TODO should be GameObject fn
 	void pushPlayer(Player*);
-
-	detailMap getDetails();
 protected:
 private:
 	Controller& m_controller;

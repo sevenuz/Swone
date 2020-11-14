@@ -211,7 +211,3 @@ void GamePanel::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		break;
 	}
 };
-
-detailMap GamePanel::getDetails() {
-	return m_gameController.getDetails();
-}

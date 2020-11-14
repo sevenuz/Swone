@@ -63,8 +63,6 @@ public:
 	void event(sf::Event& e);
 	GamePanel(Controller& c);
 	~GamePanel();
-
-	detailMap getDetails();
 };
 
 #endif

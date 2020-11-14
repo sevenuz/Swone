@@ -48,9 +48,8 @@ public:
 	std::map<std::string, std::string> getDetails();
 	std::string getIdentifier();
 protected:
-	bool detailsActive;
-	std::map<std::string, std::string> detailEntrees;
-	std::string identifier;
+	bool m_log;
+	const std::string m_identifier;
 
 	sf::Vector2f m_pos = sf::Vector2f(0, 0); // position in map
 	sf::Vector2f m_vec = sf::Vector2f(0, 0); // direction vector

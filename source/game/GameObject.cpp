@@ -1,9 +1,7 @@
 #include "GameObject.h"
 
-GameObject::GameObject(std::string identifier, float x, float y, bool log) {
-	this->identifier = identifier;
+GameObject::GameObject(std::string identifier, float x, float y, bool log) : m_identifier(identifier), m_log(log) {
 	m_pos = sf::Vector2f(x, y);
-	detailsActive = log;
 }
 
 sf::Vector2f& GameObject::calculatePos(sf::Time ellapsed) {
@@ -73,16 +71,12 @@ sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, sf::Vector2f newPos) {
 	m_nextVec.x = fx < Map::TILE_WIDTH ? fx : Map::TILE_WIDTH;
 	m_nextVec.y = fy < Map::TILE_HEIGHT ? fy : Map::TILE_HEIGHT;
 
-	if (detailsActive) 
-		detailEntrees["speed"] = std::to_string(speed);
+	if (m_log) 
+		Log::ger().detailsUpdateValue(std::to_string(speed), "speed", m_identifier);
 
 	return m_nextVec;
 }
 
-std::map<std::string, std::string> GameObject::getDetails() {
-	return detailEntrees;
-}
-
 std::string GameObject::getIdentifier() {
-	return identifier;
+	return m_identifier;
 }
