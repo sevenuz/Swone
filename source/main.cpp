@@ -34,6 +34,7 @@ sf::Clock game_clock;
 
 bool key_strg_pressed = false;
 bool key_l_pressed = false;
+bool object_viewer_activated = false;
 
 void handleAllEvents(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
@@ -92,6 +93,10 @@ void drawLog() {
 
 		if (ImGui::Button("Clear")) {
 			Log::ger().clearLog();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Object Viewer")) {
+			object_viewer_activated = !object_viewer_activated;
 		}
 		ImGui::End();
 	}
@@ -158,7 +163,8 @@ void startMainLoop() {
 		}
 
 		drawLog();
-		//drawDetails();  // Uncomment to see details
+		if(object_viewer_activated)
+			drawDetails();
 		Log::ger().resetTime();
 
 		ImGui::SFML::Render(window);
