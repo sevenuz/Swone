@@ -11,15 +11,11 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "graphics/Animation.h"
-#include "graphics/AnimatedSprite.h"
 #include "Map.h"
 #include "GameObject.h"
 
 #define JUMP_FORCE 16
 #define MOVE_FORCE 7
-
-enum PlayerAnimation : char { LEFT, RIGHT, JUMP };
 
 class Player : public GameObject {
 public:

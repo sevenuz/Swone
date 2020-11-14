@@ -102,9 +102,10 @@ void drawLog() {
 	}
 }
 
-void drawDetails() {
+void drawObjectViewer() {
+	ImGui::Begin("Object Viewer");
 	for(auto& obj : Log::ger().getValueMap()) {
-		ImGui::Begin(obj.first.c_str());
+		ImGui::BeginChild(obj.first.c_str(), ImVec2(0,0), true, ImGuiWindowFlags_::ImGuiWindowFlags_None);
 		for (auto& detail : obj.second) {
 			std::string text = detail.first + ": " + detail.second;
 			ImGui::Text(text.c_str());
@@ -114,8 +115,9 @@ void drawDetails() {
 			ImGui::Text(text.c_str());
 			ImGui::Image(*detail.second);
 		}
-		ImGui::End();
+		ImGui::EndChild();
 	}
+	ImGui::End();
 }
 
 void startMainLoop() {
@@ -162,9 +164,11 @@ void startMainLoop() {
 			break;
 		}
 
+		//ImGui::ShowDemoWindow();
+
 		drawLog();
 		if(object_viewer_activated)
-			drawDetails();
+			drawObjectViewer();
 		Log::ger().resetTime();
 
 		ImGui::SFML::Render(window);

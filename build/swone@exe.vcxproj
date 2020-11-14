@@ -79,6 +79,12 @@
       <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)bib_imgui_imgui_draw.cpp.obj</ObjectFileName>
     </CLCompile>
+    <CLCompile Include="..\bib/imgui/imgui_demo.cpp">
+      <AdditionalOptions>"/EHsc" "/std:c++14" "/permissive-" %(AdditionalOptions) "-std=c++11"</AdditionalOptions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)bib_imgui_imgui_demo.cpp.obj</ObjectFileName>
+    </CLCompile>
     <CLCompile Include="..\source/main.cpp">
       <AdditionalOptions>"/EHsc" "/std:c++14" "/permissive-" %(AdditionalOptions) "-std=c++11"</AdditionalOptions>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>

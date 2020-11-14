@@ -16,6 +16,7 @@ iTinydir = include_directories('./bib/tinydir')
 src = [	'bib/imgui/imgui-SFML.cpp',
 	'bib/imgui/imgui.cpp',
 	'bib/imgui/imgui_draw.cpp',
+	'bib/imgui/imgui_demo.cpp',
 	'source/main.cpp',
 	'source/Controller.cpp',
 	'source/GamePanel.cpp',

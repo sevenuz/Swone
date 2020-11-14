@@ -7,6 +7,8 @@
 
 #include "Handleable.h"
 #include "Map.h"
+#include "graphics/Animation.h"
+#include "graphics/AnimatedSprite.h"
 
 #define GRAVITY 25
 #define SPEED_FACTOR 0.5
@@ -15,6 +17,8 @@
 // This scales the drag, so that with a Gravity of 25 and a 
 // drag property of 100, a terminal velocity of 50 is reached
 #define SCALE_DRAG_CONST 0.0000000276f
+
+enum PlayerAnimation : char { LEFT, RIGHT, JUMP };
 
 class GameObject : public Handleable {
 public:
@@ -44,8 +48,8 @@ public:
 	virtual sf::Vector2f getHitboxLeftBottom(const sf::Vector2f& pos);
 	virtual sf::Vector2f getHitboxRightBottom(const sf::Vector2f& pos);
 	virtual sf::FloatRect getHitboxBounds();
+	virtual AnimatedSprite* getAnimatedSprite();
 
-	std::map<std::string, std::string> getDetails();
 	std::string getIdentifier();
 protected:
 	bool m_log;

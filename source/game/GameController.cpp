@@ -4,12 +4,12 @@
 GameController::GameController(Controller& c) : m_controller(c) {
 	// TODO move player adding
 	Player* p = new Player("Kurt", 0, 0, true);
-	pushPlayer(p);
+	pushGameObject(p);
 }
 
 GameController::~GameController() {
-	for (size_t i = 0; i < m_player.size(); i++) {
-		delete m_player[i];
+	for (size_t i = 0; i < m_game_objects.size(); i++) {
+		delete m_game_objects[i];
 	}
 }
 
@@ -25,8 +25,8 @@ sf::View GameController::getView() {
 	return m_view;
 }
 
-std::vector<Player*> GameController::getPlayers() {
-	return m_player;
+std::vector<GameObject*> GameController::getGameObjects() {
+	return m_game_objects;
 }
 
 void GameController::setViewCenter(sf::Vector2f pos) {
@@ -42,8 +42,8 @@ void GameController::setMap(Map* map) {
 	m_view.zoom(1 / map->getScale());
 }
 
-void GameController::pushPlayer(Player* player) {
-	m_player.push_back(player);
+void GameController::pushGameObject(GameObject* game_object) {
+	m_game_objects.push_back(game_object);
 }
 
 void GameController::updateMap(sf::Time ellapsed) {
@@ -62,15 +62,15 @@ void GameController::eventMap(sf::Event& e) {
 	}
 	if (e.type == sf::Event::MouseMoved) // Move view
 	{
-		sf::Vector2f delta = worldPos - getPlayers()[0]->getPos();
+		sf::Vector2f delta = worldPos - m_game_objects[0]->getPos();
 		m_viewDelta.x = delta.x * 0.1f;
 		m_viewDelta.y = delta.y * 0.1f;
 	}
 	// TODO remove
 	if (e.type == sf::Event::KeyPressed) {
 		if (e.key.code == sf::Keyboard::D) {
-			Player* p = getPlayers()[0];
-			sf::Vector2f pos = p->getHitboxRightBottom(p->getPos());
+			GameObject* g = m_game_objects[0];
+			sf::Vector2f pos = g->getHitboxRightBottom(g->getPos());
 			MapTile tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
 			Log::ger().log("-------");
 			Log::ger().log(tile);
@@ -80,33 +80,33 @@ void GameController::eventMap(sf::Event& e) {
 	}
 }
 
-void GameController::updatePlayers(sf::Time ellapsed) {
-	for (size_t i = 0; i < getPlayers().size(); i++) {
-		Player* p = getPlayers()[i];
-		sf::Vector2f& pos = p->calculatePos(ellapsed);
-		sf::Vector2f& vec = p->calculateVec(ellapsed, pos);
+void GameController::updateGameObjects(sf::Time ellapsed) {
+	for (size_t i = 0; i < m_game_objects.size(); i++) {
+		GameObject* g = m_game_objects[i];
+		sf::Vector2f& pos = g->calculatePos(ellapsed);
+		sf::Vector2f& vec = g->calculateVec(ellapsed, pos);
 
 		if (pos.x > m_map->getWidth() || pos.x < 0 || pos.y > m_map->getHeight() || pos.y < 0) {
-			p->onOutOfMap();
+			g->onOutOfMap();
 		}
 		else {
-			sf::Vector2f hbrb = p->getHitboxRightBottom(pos);
-			sf::Vector2f hblb = p->getHitboxLeftBottom(pos);
-			sf::Vector2f hbrt = p->getHitboxRightBottom(pos);
-			sf::Vector2f hblt = p->getHitboxLeftBottom(pos);
+			sf::Vector2f hbrb = g->getHitboxRightBottom(pos);
+			sf::Vector2f hblb = g->getHitboxLeftBottom(pos);
+			sf::Vector2f hbrt = g->getHitboxRightBottom(pos);
+			sf::Vector2f hblt = g->getHitboxLeftBottom(pos);
 			MapTile tile_rb = m_map->getMapDataValue(round(hbrb.y), round(hbrb.x));
 			MapTile tile_lb = m_map->getMapDataValue(round(hblb.y), round(hblb.x));
 			MapTile tile_rt = m_map->getMapDataValue(round(hbrt.y), round(hbrt.x));
 			MapTile tile_lt = m_map->getMapDataValue(round(hblt.y), round(hblt.x));
-			p->onTiles(tile_lt, tile_rt, tile_lb, tile_rb);
+			g->onTiles(tile_lt, tile_rt, tile_lb, tile_rb);
 		}
 
-		setViewCenter(p->getPos());
-		p->update(ellapsed);
+		setViewCenter(g->getPos());
+		g->update(ellapsed);
 	}
 }
-void GameController::eventPlayers(sf::Event& e) {
-	for (size_t i = 0; i < getPlayers().size(); i++) {
-		getPlayers()[i]->event(e);
+void GameController::eventGameObjects(sf::Event& e) {
+	for (size_t i = 0; i < m_game_objects.size(); i++) {
+		m_game_objects[i]->event(e);
 	}
 }

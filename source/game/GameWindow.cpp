@@ -10,7 +10,7 @@ GameWindow::~GameWindow() {
 
 void GameWindow::update(sf::Time ellapsed) {
 	m_gc.updateMap(ellapsed);
-	m_gc.updatePlayers(ellapsed);
+	m_gc.updateGameObjects(ellapsed);
 }
 
 void GameWindow::event(sf::Event& event) {
@@ -20,17 +20,17 @@ void GameWindow::event(sf::Event& event) {
 		}
 	}
 	m_gc.eventMap(event);
-	m_gc.eventPlayers(event);
+	m_gc.eventGameObjects(event);
 }
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	m_gc.getController().setView(m_gc.getView());
 	target.draw(*m_gc.getMap(), states);
-	for (unsigned int i = 0; i < m_gc.getPlayers().size(); i++) {
-		Player* p = m_gc.getPlayers()[i];
-		target.draw(*p->getAnimatedSprite(), states);
+	for (unsigned int i = 0; i < m_gc.getGameObjects().size(); i++) {
+		GameObject* g = m_gc.getGameObjects()[i];
+		target.draw(*g->getAnimatedSprite(), states);
 
-		sf::FloatRect h = p->getHitboxBounds();
+		sf::FloatRect h = g->getHitboxBounds();
 		sf::RectangleShape rectangle;
 		rectangle.setSize(sf::Vector2f(h.width, h.height));
 		rectangle.setOutlineColor(sf::Color::Red);
@@ -39,4 +39,8 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		rectangle.setPosition(h.left, h.top);
 		target.draw(rectangle);
 	}
+}
+
+AnimatedSprite* GameObject::getAnimatedSprite() {
+	return nullptr;
 }
