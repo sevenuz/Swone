@@ -76,6 +76,7 @@ private:
 	sf::Font m_font;
 	sf::Color m_clearing_color = sf::Color::Black;
 
+	// TODO change flag on settings change
 	// indicates if the settings changed compared to settings.ini
 	bool m_changed = false;
 };

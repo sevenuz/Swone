@@ -1,4 +1,3 @@
-
 #include "GameObject.h"
 
 GameObject::GameObject(std::string identifier, float x, float y) : m_identifier(identifier) {

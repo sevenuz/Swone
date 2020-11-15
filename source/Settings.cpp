@@ -3,7 +3,7 @@
 Settings::Settings()
 {
 	try {
-		Log::ger().log("Settings:");
+		Log::ger().log("-----Settings-----");
 		Reader r(SETTINGS_FILE);
 		r.forEach([&](std::string p, std::string k, std::string v){
 			Log::ger().log(k + " = " + v);
@@ -26,7 +26,7 @@ Settings::Settings()
 			else
 				Log::ger().log(k + " is not a settings option", Log::Label::Warning);
 		});
-		Log::ger().log("---------");
+		Log::ger().log("------------------");
 	} catch(const std::invalid_argument& ia) {
 		Log::ger().log(ia.what(), Log::Label::Error);
 		writeSettings();

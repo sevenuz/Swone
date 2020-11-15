@@ -11,6 +11,8 @@
 #include "util/Log.h"
 #include "util/Helper.h"
 
+#define SHOW_LOG_MAPREADER false
+
 class MapReader : public Reader
 {
 public:

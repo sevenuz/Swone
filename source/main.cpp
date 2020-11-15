@@ -67,6 +67,8 @@ void drawLog() {
 
 		for (Log::LogEntry& s : Log::ger().getLogs())
 		{
+			if(!s.visible)
+				continue;
 			switch(s.label)
 			{
 				case Log::Label::Default:
@@ -251,7 +253,6 @@ void startMainLoop() {
 
 int main() {
 	try {
-		std::cout << "hallo in main" << std::endl;
 		ImGui::SFML::Init(window);
 		startMainLoop();
 	}

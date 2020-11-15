@@ -1,13 +1,10 @@
 #include <Controller.h>
 
 Controller::Controller(Settings settings, sf::RenderWindow& w) : m_settings(settings), m_window(w) {
-	Log::ger().log("Controller created");
 	m_window.setVerticalSyncEnabled(m_settings.isVerticalSyncEnabled());
 }
 
-Controller::~Controller() {
-	Log::ger().log("Controller destroyed");
-}
+Controller::~Controller() {}
 
 void Controller::setActiveWindow(ActiveWindow i) {
 	if (i > ActiveWindow::AW_LAST) {

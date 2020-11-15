@@ -1,0 +1,48 @@
+type=player
+name=Kurt
+// depends of the map?
+initial_position=(0,0)
+// movement velocity (x,y)
+velocity=(7,16)
+posible_jumps=2
+// in seconds
+jump_cooldown=3
+color=Color(100,100,30)
+
+texture=../res/sprites/player.png
+ani_up
+1=(32, 0, 32, 32)
+2=(64, 0, 32, 32)
+3=(32, 0, 32, 32)
+4=(0, 0, 32, 32)
+ani_left
+1=(32, 32, 32, 32)
+2=(64, 32, 32, 32)
+3=(32, 32, 32, 32)
+4=(0, 32, 32, 32)
+ani_right
+1=(32, 64, 32, 32)
+2=(64, 64, 32, 32)
+3=(32, 64, 32, 32)
+4=(0, 64, 32, 32)
+// here same like ani_up
+ani_down
+1=(32, 0, 32, 32)
+2=(64, 0, 32, 32)
+3=(32, 0, 32, 32)
+4=(0, 0, 32, 32)
+// here same like ani_up
+ani_steady
+1=(32, 0, 32, 32)
+2=(64, 0, 32, 32)
+3=(32, 0, 32, 32)
+4=(0, 0, 32, 32)
+
+skills
+multijump=true
+hook=false
+aguatransform=false
+paraglide=true
+teleport=false
+boost=true
+

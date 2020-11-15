@@ -1,9 +1,6 @@
 #include <MainMenu.h>
 
 MainMenu::MainMenu(Controller& c) : m_ps(100), m_controller(c) {
-
-	Log::ger().log("MainMenu created");
-
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
 	m_ps.setLifetime(sf::seconds(3));
@@ -31,9 +28,7 @@ MainMenu::MainMenu(Controller& c) : m_ps(100), m_controller(c) {
 	setFont(m_controller.getSettings().getFont());
 }
 
-MainMenu::~MainMenu() {
-	Log::ger().log("MainMenu destroyed");
-}
+MainMenu::~MainMenu() {}
 
 void MainMenu::changeFont(sf::Font& font) {
 	m_header.setFont(font);

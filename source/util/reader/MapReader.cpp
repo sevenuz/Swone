@@ -25,7 +25,7 @@ void MapReader::setParagraph(std::string p) {
 }
 
 void MapReader::addParagraphValue(std::string paragraph, StringPair p) {
-	Log::ger().log("KEY: " + p.first + " VALUE: " + p.second);
+	Log::ger().log("KEY: " + p.first + " VALUE: " + p.second,Log::Label::Default,SHOW_LOG_MAPREADER);
 
 	if (p.first == "width")
 		m_map->setWidth(Helper::toInt(p.second));
@@ -81,7 +81,7 @@ void MapReader::parseMap(std::string line)
 			}
 
 		}
-		Log::ger().log(line + " " + std::to_string(m_mapLineCounter));
+		Log::ger().log(line + " " + std::to_string(m_mapLineCounter),Log::Label::Default,SHOW_LOG_MAPREADER);
 		m_mapLineCounter++;
 	}
 };
@@ -91,7 +91,7 @@ void MapReader::startParseMap()
 	m_mapParse = true;
 	m_mapLineCounter = 0;
 	m_map->iniMapData();
-	Log::ger().log("start map parsing");
+	Log::ger().log("start map parsing",Log::Label::Default,SHOW_LOG_MAPREADER);
 }
 
 void MapReader::endParseMap() {
@@ -100,11 +100,11 @@ void MapReader::endParseMap() {
 		for (size_t i = 0; i < m_map->getWidth(); i++) {
 			parseMapChar(*" ", m_mapLineCounter, i);
 		}
-		Log::ger().log(std::to_string(m_mapLineCounter));
+		Log::ger().log(std::to_string(m_mapLineCounter),Log::Label::Default,SHOW_LOG_MAPREADER);
 		m_mapLineCounter++;
 	}
 	m_mapParse = false;
-	Log::ger().log("end of map parsing");
+	Log::ger().log("end of map parsing",Log::Label::Default,SHOW_LOG_MAPREADER);
 }
 
 MapTile MapReader::charToMapTile(char c)

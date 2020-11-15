@@ -1,11 +1,11 @@
-bin/
-obj/
+./bin/
+./obj/
 swone.layout
 /build/**
 *.swp
 .buildconfig
 .project
-bib/sfml/
+./bib/sfml/
 .vs/
 !/build/swone@exe.vcxproj
 !/build/swone.sln

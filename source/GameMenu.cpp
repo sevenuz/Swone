@@ -1,9 +1,6 @@
 #include <GameMenu.h>
 
 GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameController(c), m_gameWindow(m_gameController) {
-
-	Log::ger().log("GamePanel created");
-
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
 	m_ps.setLifetime(sf::seconds(3));
@@ -38,7 +35,6 @@ GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameController(
 
 GameMenu::~GameMenu() {
 	// TODO delete Map vector
-	Log::ger().log("GamePanel destroyed");
 }
 
 void GameMenu::readMapsFromDir() {
@@ -48,7 +44,6 @@ void GameMenu::readMapsFromDir() {
 			[&](tinydir_file& file){
 				if (!file.is_dir)
 				{
-					Log::ger().log(file.name);
 					Map* map = new Map(m_controller);
 
 					std::stringstream ss;
@@ -87,7 +82,7 @@ void GameMenu::readGameObjectsFromDir() {
 					if(type=="player")
 						Log::ger().log("Create Player");
 					else if(type=="object")
-						Log::ger().log("Create Player");
+						Log::ger().log("Create Object");
 					else
 						Log::ger().log("Unknown Type of object: " + type, Log::Label::Warning);
 				}
@@ -116,7 +111,6 @@ void GameMenu::setMapSelection(int i) {
 	m_selectedMap = i;
 
 	m_mapName.setString(m_maps[m_selectedMap]->getName());
-	Log::ger().log(m_maps[m_selectedMap]->getName());
 
 	m_gameController.setMap(m_maps[m_selectedMap]);
 }
