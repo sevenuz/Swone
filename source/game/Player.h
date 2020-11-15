@@ -19,7 +19,7 @@
 
 class Player : public GameObject {
 public:
-	Player(std::string identifier, float x, float y, bool log = false);
+	Player(std::string identifier, float x, float y);
 	virtual ~Player();
 
 	void update(sf::Time ellapsed) override;
@@ -51,6 +51,8 @@ public:
 
 	void setPos(sf::Vector2f pos);
 	void setVec(sf::Vector2f pos);
+
+	void toggleLogging() override;
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	void setAnimation(PlayerAnimation ani);

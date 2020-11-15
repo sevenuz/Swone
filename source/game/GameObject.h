@@ -21,7 +21,7 @@ enum PlayerAnimation : char { LEFT, RIGHT, JUMP };
 
 class GameObject : public Handleable {
 public:
-	GameObject(std::string identifier, float x, float y, bool log = false);
+	GameObject(std::string identifier, float x, float y);
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 	virtual void event(sf::Event& e) = 0;
@@ -49,9 +49,11 @@ public:
 	virtual sf::FloatRect getHitboxBounds();
 	virtual AnimatedSprite* getAnimatedSprite();
 
-	std::string getIdentifier();
+	virtual void toggleLogging();
+
+	std::string getIdentifier() const;
 protected:
-	bool m_log;
+	bool m_log = false;
 	const std::string m_identifier;
 
 	sf::Vector2f m_pos = sf::Vector2f(0, 0); // position in map

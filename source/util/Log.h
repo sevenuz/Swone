@@ -86,8 +86,11 @@ public:
 	// Resets time if greater than refresh time
 	void resetTime();
 
-	valueDetailMap getValueMap() const;
-	textureDetailMap getTextureMap() const;
+	void toggleObjectInspect(std::string identifier);
+
+	const std::vector<std::string>& getObjectIdentifiers() const;
+	const valueDetailMap& getValueMap() const;
+	const textureDetailMap& getTextureMap() const;
 	
 	Log(Log const&)				= delete;
 	void operator=(Log const&)	= delete;
@@ -95,6 +98,7 @@ private:
 	Log() {}
 	std::vector<LogEntry> m_logs;
 	bool m_log_closed = false;
+	std::vector<std::string> m_object_identifiers;
 	valueDetailMap m_value_map;
 	textureDetailMap m_texture_map;
 	sf::Time m_refresh_time = sf::seconds(0.25);

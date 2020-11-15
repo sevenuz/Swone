@@ -7,13 +7,10 @@
 
 #include "Player.h"
 
-Player::Player(std::string identifier, float x, float y, bool log) : GameObject(identifier, x, y, log) {
+Player::Player(std::string identifier, float x, float y) : GameObject(identifier, x, y) {
 	if (!m_texture.loadFromFile("../res/sprites/player.png")) {
 		std::cout << "Failed to load player spritesheet!" << std::endl;
 	}
-
-	if (m_log) 
-		Log::ger().detailsPutTexture(&m_texture, "player_texture", m_identifier);
 
 	m_ani_jump.setSpriteSheet(m_texture);
 	m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
@@ -206,5 +203,12 @@ void Player::onOutOfMap() {
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	target.draw(m_sprite, states);
+}
+
+void Player::toggleLogging()
+{
+	m_log = !m_log;
+	if(m_log)
+		Log::ger().detailsPutTexture(&m_texture, "player_texture", m_identifier);
 }
 

@@ -210,5 +210,13 @@ void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		m_controller.setActiveGameWindow(ActiveGameWindow::MAPSELECTION);
 		break;
 	}
+};
+
+const std::vector<GameObject*>& GameMenu::getGameObjects() const {
+	return m_gameController.getGameObjects();
 }
 
+GameObject* GameMenu::getGameObjectById(const std::string& id) const
+{
+	return m_gameController.getGameObjectById(id);
+}

@@ -33,10 +33,26 @@ void Log::resetTime() {
 		m_time_since_refresh = sf::seconds(0.0);
 }
 
-valueDetailMap Log::getValueMap() const {
+const std::vector<std::string>& Log::getObjectIdentifiers() const {
+	return m_object_identifiers;
+}
+
+const valueDetailMap& Log::getValueMap() const {
 	return m_value_map;
 }
 
-textureDetailMap Log::getTextureMap() const {
+const textureDetailMap& Log::getTextureMap() const {
 	return m_texture_map;
+}
+
+void Log::toggleObjectInspect(std::string identifier) {
+	auto it = std::find(m_object_identifiers.begin(),
+		m_object_identifiers.end(), identifier);
+
+	if (it == m_object_identifiers.end()) {
+		m_object_identifiers.push_back(identifier);
+	}
+	else {
+		m_object_identifiers.erase(it);
+	}
 }

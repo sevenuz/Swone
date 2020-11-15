@@ -1,6 +1,7 @@
+
 #include "GameObject.h"
 
-GameObject::GameObject(std::string identifier, float x, float y, bool log) : m_log(log), m_identifier(identifier) {
+GameObject::GameObject(std::string identifier, float x, float y) : m_identifier(identifier) {
 	m_pos = sf::Vector2f(x, y);
 }
 
@@ -77,7 +78,10 @@ sf::Vector2f& GameObject::calculateVec(sf::Time ellapsed, float gravity) {
 	return m_nextVec;
 }
 
-std::string GameObject::getIdentifier() {
+std::string GameObject::getIdentifier() const {
 	return m_identifier;
 }
 
+void GameObject::toggleLogging() {
+	m_log = !m_log;
+}

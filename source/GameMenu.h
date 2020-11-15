@@ -62,6 +62,9 @@ public:
 	void event(sf::Event& e);
 	GameMenu(Controller& c);
 	~GameMenu();
+
+	const std::vector<GameObject*>& getGameObjects() const;
+	GameObject* getGameObjectById(const std::string& id) const;
 };
 
 #endif

@@ -16,19 +16,19 @@ public:
 
 	Map* getMap();
 	sf::View getView();
-	std::vector<GameObject*> getGameObjects();
+	const std::vector<GameObject*>& getGameObjects() const;
+	GameObject* getGameObjectById(const std::string& id) const;
 
 	void updateMap(sf::Time ellapsed);
 	void eventMap(sf::Event& e);
 
-	// TODO should be GameObject functions
 	void updateGameObjects(sf::Time ellapsed);
 	void eventGameObjects(sf::Event& e);
 
 	void setViewCenter(sf::Vector2f pos);
 
 	void setMap(Map* m);
-	// TODO should be GameObject fn
+
 	void pushGameObject(GameObject* game_object);
 protected:
 private:

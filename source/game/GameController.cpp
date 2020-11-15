@@ -1,9 +1,10 @@
+
 #include <game/GameController.h>
 
 
 GameController::GameController(Controller& c) : m_controller(c) {
 	// TODO move player adding
-	Player* p = new Player("Kurt", 0, 0, true);
+	Player* p = new Player("Kurt", 0, 0);
 	pushGameObject(p);
 }
 
@@ -25,7 +26,7 @@ sf::View GameController::getView() {
 	return m_view;
 }
 
-std::vector<GameObject*> GameController::getGameObjects() {
+const std::vector<GameObject*>& GameController::getGameObjects() const{
 	return m_game_objects;
 }
 
@@ -111,3 +112,11 @@ void GameController::eventGameObjects(sf::Event& e) {
 	}
 }
 
+GameObject* GameController::getGameObjectById(const std::string & id) const
+{
+	for (GameObject* g : m_game_objects)
+	{
+		if (g->getIdentifier() == id)
+			return g;
+	}
+}

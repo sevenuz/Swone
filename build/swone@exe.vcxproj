@@ -97,11 +97,11 @@
       <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)source_Controller.cpp.obj</ObjectFileName>
     </CLCompile>
-    <CLCompile Include="..\source/GamePanel.cpp">
+    <CLCompile Include="..\source/GameMenu.cpp">
       <AdditionalOptions>"/EHsc" "/std:c++14" "/permissive-" %(AdditionalOptions) "-std=c++11"</AdditionalOptions>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ObjectFileName>$(IntDir)source_GamePanel.cpp.obj</ObjectFileName>
+      <ObjectFileName>$(IntDir)source_GameMenu.cpp.obj</ObjectFileName>
     </CLCompile>
     <CLCompile Include="..\source/MainMenu.cpp">
       <AdditionalOptions>"/EHsc" "/std:c++14" "/permissive-" %(AdditionalOptions) "-std=c++11"</AdditionalOptions>

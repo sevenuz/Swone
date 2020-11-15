@@ -35,6 +35,7 @@ sf::Clock game_clock;
 bool key_strg_pressed = false;
 bool key_l_pressed = false;
 bool object_viewer_activated = false;
+bool demo_window_activated = false;
 
 void handleAllEvents(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
@@ -95,28 +96,96 @@ void drawLog() {
 			Log::ger().clearLog();
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Object Viewer")) {
+		if (ImGui::Button("Demo Window"))
+		{
+			demo_window_activated = !demo_window_activated;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Object Viewer"))
+		{
 			object_viewer_activated = !object_viewer_activated;
 		}
 		ImGui::End();
 	}
 }
 
-void drawObjectViewer() {
-	ImGui::Begin("Object Viewer");
-	for(auto& obj : Log::ger().getValueMap()) {
-		ImGui::BeginChild(obj.first.c_str(), ImVec2(0,0), true, ImGuiWindowFlags_::ImGuiWindowFlags_None);
-		for (auto& detail : obj.second) {
-			std::string text = detail.first + ": " + detail.second;
-			ImGui::Text(text.c_str());
+void renderObjectSelector()
+{
+	const static std::vector<GameObject*>& gameObjects = gameMenu.getGameObjects();
+
+	if (ImGui::TreeNode("GameObjects"))
+	{
+		if (ImGui::TreeNode("all"))
+		{
+			for (GameObject* g : gameObjects)
+			{
+				ImGui::Text(g->getIdentifier().c_str());
+				ImGui::SameLine();
+				if (ImGui::SmallButton("Inspect Object"))
+				{
+					g->toggleLogging();
+					Log::ger().toggleObjectInspect(g->getIdentifier());
+				}
+			}
+			ImGui::TreePop();
 		}
-		for (auto& detail : Log::ger().getTextureMap()[obj.first]) {
-			std::string text = detail.first + ": ";
-			ImGui::Text(text.c_str());
-			ImGui::Image(*detail.second);
-		}
-		ImGui::EndChild();
+		ImGui::TreePop();
 	}
+}
+
+void drawObjectViewer()
+{
+	ImGui::Begin("Object Viewer", NULL, ImGuiWindowFlags_MenuBar);
+
+	static bool objectSelectorOpen = false;
+
+	if(ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("View"))
+		{
+			ImGui::MenuItem("Inspect", NULL, &objectSelectorOpen);
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+
+	if (objectSelectorOpen)
+		renderObjectSelector();
+
+	const static textureDetailMap& texture_detail_map = Log::ger().getTextureMap();
+	const static valueDetailMap& value_detail_map = Log::ger().getValueMap();
+	const static std::vector<std::string>& inspected_obj_ids = Log::ger().getObjectIdentifiers();
+
+	for (const std::string& id : inspected_obj_ids)
+	{
+		bool open = true;
+		if(ImGui::CollapsingHeader(id.c_str(), &open))
+		{
+			try
+			{
+				for (auto& pair : value_detail_map.at(id))
+				{
+					std::string s = pair.first + ": " + pair.second;
+					ImGui::Text(s.c_str());
+				}
+			} catch(...){}
+			try
+			{
+				for (auto& pair : texture_detail_map.at(id))
+				{
+					std::string s = pair.first + ": ";
+					ImGui::Text(s.c_str());
+					ImGui::Image(*pair.second);
+				}
+			} catch(...){}
+		}
+		if (!open)
+		{
+			gameMenu.getGameObjectById(id)->toggleLogging();
+			Log::ger().toggleObjectInspect(id);
+		}
+	}
+
 	ImGui::End();
 }
 
@@ -164,9 +233,11 @@ void startMainLoop() {
 			break;
 		}
 
-		//ImGui::ShowDemoWindow();
-
 		drawLog();
+		if (demo_window_activated)
+		{
+			ImGui::ShowDemoWindow();
+		}
 		if(object_viewer_activated)
 			drawObjectViewer();
 		Log::ger().resetTime();
