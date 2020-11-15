@@ -71,6 +71,10 @@ public:
 
 	// static convert fn
 	static std::vector<std::string> split(std::string str, char splitter);
+	// splits by "," and converts with given fn.
+	// if length is set, an error is thrown if the tupel has an other length
+	template<typename T>
+	static std::vector<T> toTupel(std::string str, T (*conv)(std::string), size_t length = 0);
 	static int toInt(std::string s);
 	static long toLong(std::string s);
 	static float toFloat(std::string s);

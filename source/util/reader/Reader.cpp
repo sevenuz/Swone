@@ -138,6 +138,23 @@ std::vector<std::string> Reader::split(std::string str, char splitter)
 	return seglist;
 }
 
+template<typename T>
+std::vector<T> Reader::toTupel(std::string str, T (*conv)(std::string), size_t length)
+{
+	if(str[0]!='(' && str[str.length()-1]!=')')
+		throw std::invalid_argument("Tupel needs format (a,b,c,...)" + str);
+	// replace bracets
+	str = str.replace(0,1,"").replace(str.length()-1,1,"");
+	std::vector<std::string> v = split(str, ',');
+	if(length>0 && v.size()!=length)
+		throw std::invalid_argument("Tupel violates length");
+	std::vector<T> values;
+	for(std::string s : v)
+		values.push_back(conv(s));
+	return values;
+}
+
+
 int Reader::toInt(std::string s)
 {
 	return std::stoi(s);
@@ -160,15 +177,10 @@ double Reader::toDouble(std::string s)
 
 sf::Color Reader::toColor(std::string s)
 {
-	if(s.find_first_of("Color(")==std::string::npos || s.find_first_of(")")==s.size())
+	if(s.compare("Color")==-1)
 		throw std::invalid_argument("string not of type Color(r,g,b)");
-	std::vector<std::string> values = split(s.substr(6), ',');
-	if(values.size()!=3)
-		throw std::invalid_argument("Color(r,g,b) needs 3 int values");
-	Log::ger().log(values[0]);
-	Log::ger().log(values[1]);
-	Log::ger().log(values[2]);
-	return sf::Color(toInt(values[0]), toInt(values[1]), toInt(values[2]));
+	std::vector<int> values = toTupel(s.substr(5), toInt, 3);
+	return sf::Color(values[0], values[1], values[2]);
 }
 
 bool Reader::toBool(std::string s)
