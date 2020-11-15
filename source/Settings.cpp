@@ -7,21 +7,21 @@ Settings::Settings()
 		Reader r(SETTINGS_FILE);
 		r.forEach([&](std::string p, std::string k, std::string v){
 			Log::ger().log(k + " = " + v);
-			if(k=="width")
+			if(k==SETTINGS_WIDTH_NAME)
 				setWidth(Helper::toLong(v));
-			else if(k=="height")
+			else if(k==SETTINGS_HEIGHT_NAME)
 				setHeight(Helper::toLong(v));
-			else if(k=="bits_per_pixel")
+			else if(k==SETTINGS_BITS_PER_PIXEL_NAME)
 				setBitsPerPixel(Helper::toLong(v));
-			else if(k=="vertical_sync_enabled")
+			else if(k==SETTINGS_VERTICAL_SYNC_ENABLED_NAME)
 				setVerticalSyncEnabled(Helper::toBool(v));
-			else if(k=="map_directory")
+			else if(k==SETTINGS_MAP_DIRECTORY_NAME)
 				setMapDirectory(v);
-			else if(k=="obj_directory")
+			else if(k==SETTINGS_OBJ_DIRECTORY_NAME)
 				setGameObjectDirectory(v);
-			else if(k=="font_source")
+			else if(k==SETTINGS_FONT_SOURCE_NAME)
 				setFontSource(v);
-			else if(k=="clearing_color")
+			else if(k==SETTINGS_CLEARING_COLOR_NAME)
 				setClearingColor(Helper::toColor(v));
 			else
 				Log::ger().log(k + " is not a settings option", Log::Label::Warning);
@@ -146,14 +146,14 @@ void Settings::setChanged(bool v)
 void Settings::writeSettings()
 {
 	Reader::write(SETTINGS_FILE, {{"global", {
-		StringPair("width", std::to_string(getWidth())),
-		StringPair("height", std::to_string(getHeight())),
-		StringPair("bits_per_pixel", std::to_string(getBitsPerPixel())),
-		StringPair("vertical_sync_enabled", isVerticalSyncEnabled()?"true":"false"),
-		StringPair("map_directory", getMapDirectory()),
-		StringPair("obj_directory", getGameObjectDirectory()),
-		StringPair("font_source", getFontSource()),
-		StringPair("clearing_color", "Color(" +
+		StringPair(SETTINGS_WIDTH_NAME, std::to_string(getWidth())),
+		StringPair(SETTINGS_HEIGHT_NAME, std::to_string(getHeight())),
+		StringPair(SETTINGS_BITS_PER_PIXEL_NAME, std::to_string(getBitsPerPixel())),
+		StringPair(SETTINGS_VERTICAL_SYNC_ENABLED_NAME, isVerticalSyncEnabled()?"true":"false"),
+		StringPair(SETTINGS_MAP_DIRECTORY_NAME, getMapDirectory()),
+		StringPair(SETTINGS_OBJ_DIRECTORY_NAME, getGameObjectDirectory()),
+		StringPair(SETTINGS_FONT_SOURCE_NAME, getFontSource()),
+		StringPair(SETTINGS_CLEARING_COLOR_NAME, "Color(" +
 			std::to_string(getClearingColor().r) + "," +
 			std::to_string(getClearingColor().g) + "," +
 			std::to_string(getClearingColor().b) + ")"

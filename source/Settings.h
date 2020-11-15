@@ -10,6 +10,16 @@
 
 #define SETTINGS_FILE "../res/settings.ini"
 
+// settings property names
+#define SETTINGS_WIDTH_NAME "width"
+#define SETTINGS_HEIGHT_NAME "height"
+#define SETTINGS_BITS_PER_PIXEL_NAME "bits_per_pixel"
+#define SETTINGS_VERTICAL_SYNC_ENABLED_NAME "vertical_sync_enabled"
+#define SETTINGS_MAP_DIRECTORY_NAME "map_directory"
+#define SETTINGS_OBJ_DIRECTORY_NAME "obj_directory"
+#define SETTINGS_FONT_SOURCE_NAME "font_source"
+#define SETTINGS_CLEARING_COLOR_NAME "clearing_color"
+
 class Settings {
 public:
 	Settings();
