@@ -59,7 +59,7 @@ void Reader::write(std::string file, std::map<std::string, StringMap> m)
 		outfile.close();
 	}
 	else
-		Log::ger().log("Could not write file: " + file, Log::Label::Error);
+		throw std::invalid_argument("Could not write file: " + file);
 }
 
 
@@ -94,13 +94,9 @@ StringPair Reader::parseValue(std::string line) const {
 	}
 };
 
-void Reader::startReading() {
-	Log::ger().log("start reading");
-}
+void Reader::startReading() {}
 
-void Reader::endReading() {
-	Log::ger().log("end reading");
-}
+void Reader::endReading() {}
 
 std::string Reader::getParagraph() {
 	return m_paragraph;
@@ -123,73 +119,3 @@ void Reader::parseLine(std::string paragraph, std::string line)
 		setParagraph(line);
 	}
 };
-
-// convert fn
-std::vector<std::string> Reader::split(std::string str, char splitter)
-{
-	std::stringstream ss(str);
-	std::string segment;
-	std::vector<std::string> seglist;
-
-	while(std::getline(ss, segment, splitter))
-	{
-		 seglist.push_back(segment);
-	}
-	return seglist;
-}
-
-template<typename T>
-std::vector<T> Reader::toTupel(std::string str, T (*conv)(std::string), size_t length)
-{
-	if(str[0]!='(' && str[str.length()-1]!=')')
-		throw std::invalid_argument("Tupel needs format (a,b,c,...)" + str);
-	// replace bracets
-	str = str.replace(0,1,"").replace(str.length()-1,1,"");
-	std::vector<std::string> v = split(str, ',');
-	if(length>0 && v.size()!=length)
-		throw std::invalid_argument("Tupel violates length");
-	std::vector<T> values;
-	for(std::string s : v)
-		values.push_back(conv(s));
-	return values;
-}
-
-
-int Reader::toInt(std::string s)
-{
-	return std::stoi(s);
-}
-
-long Reader::toLong(std::string s)
-{
-	return std::stol(s);
-}
-
-float Reader::toFloat(std::string s)
-{
-	return std::stof(s);
-}
-
-double Reader::toDouble(std::string s)
-{
-	return std::stod(s);
-}
-
-sf::Color Reader::toColor(std::string s)
-{
-	if(s.compare("Color")==-1)
-		throw std::invalid_argument("string not of type Color(r,g,b)");
-	std::vector<int> values = toTupel(s.substr(5), toInt, 3);
-	return sf::Color(values[0], values[1], values[2]);
-}
-
-bool Reader::toBool(std::string s)
-{
-	if(s=="true")
-		return true;
-	else if(s=="false")
-		return false;
-	else
-		throw std::invalid_argument("Bool can be \"true\" or \"false\" only");
-}
-

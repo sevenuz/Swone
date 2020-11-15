@@ -9,6 +9,7 @@
 #include "util/reader/Reader.h"
 #include "game/Map.h"
 #include "util/Log.h"
+#include "util/Helper.h"
 
 class MapReader : public Reader
 {

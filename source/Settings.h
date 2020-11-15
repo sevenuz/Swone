@@ -5,6 +5,8 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "util/reader/Reader.h"
+#include "util/Log.h"
+#include "util/Helper.h"
 
 #define SETTINGS_FILE "../res/settings.ini"
 
@@ -31,6 +33,9 @@ public:
 
 	std::string getMapDirectory();
 	void setMapDirectory(std::string s);
+
+	std::string getGameObjectDirectory();
+	void setGameObjectDirectory(std::string s);
 
 	std::string getFontSource();
 	void setFontSource(std::string s);
@@ -65,6 +70,7 @@ private:
 	bool m_vertical_sync_enabled = true;
 
 	std::string m_map_directory = "../res/map/";
+	std::string m_obj_directory = "../res/obj/";
 
 	std::string m_font_src = "../res/Roboto-Medium.ttf";
 	sf::Font m_font;

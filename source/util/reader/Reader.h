@@ -9,9 +9,6 @@
 #include <map>
 #include <vector>
 #include <utility>
-#include <SFML/Graphics/Color.hpp>
-
-#include "util/Log.h"
 
 typedef std::map<std::string, std::string> StringMap;
 typedef std::pair<std::string, std::string> StringPair;
@@ -68,20 +65,6 @@ public:
 	// calls addParagraphValue or setParagraph
 	// if you want to implement complete own logic use this
 	virtual void parseLine(std::string paragraph, std::string line);
-
-	// static convert fn
-	static std::vector<std::string> split(std::string str, char splitter);
-	// splits by "," and converts with given fn.
-	// if length is set, an error is thrown if the tupel has an other length
-	template<typename T>
-	static std::vector<T> toTupel(std::string str, T (*conv)(std::string), size_t length = 0);
-	static int toInt(std::string s);
-	static long toLong(std::string s);
-	static float toFloat(std::string s);
-	static double toDouble(std::string s);
-	static sf::Color toColor(std::string s);
-	// input should be true or false
-	static bool toBool(std::string s);
 protected:
 private:
 	std::string m_path = "";

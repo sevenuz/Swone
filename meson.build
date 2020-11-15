@@ -30,6 +30,7 @@ src = [	'bib/imgui/imgui-SFML.cpp',
 	'source/util/reader/Reader.cpp',
 	'source/util/reader/MapReader.cpp',
 	'source/util/Log.cpp',
+	'source/util/Helper.cpp',
 	'source/graphics/ParticleSystem.cpp',
 	'source/graphics/Animation.cpp',
 	'source/graphics/AnimatedSprite.cpp']

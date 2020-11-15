@@ -3,28 +3,32 @@
 Settings::Settings()
 {
 	try {
+		Log::ger().log("Settings:");
 		Reader r(SETTINGS_FILE);
 		r.forEach([&](std::string p, std::string k, std::string v){
-			std::cout << p << " " << k << "=" << v << std::endl;
+			Log::ger().log(k + " = " + v);
 			if(k=="width")
-				setWidth(Reader::toLong(v));
+				setWidth(Helper::toLong(v));
 			else if(k=="height")
-				setHeight(Reader::toLong(v));
+				setHeight(Helper::toLong(v));
 			else if(k=="bits_per_pixel")
-				setBitsPerPixel(Reader::toLong(v));
+				setBitsPerPixel(Helper::toLong(v));
 			else if(k=="vertical_sync_enabled")
-				setVerticalSyncEnabled(Reader::toBool(v));
+				setVerticalSyncEnabled(Helper::toBool(v));
 			else if(k=="map_directory")
 				setMapDirectory(v);
+			else if(k=="obj_directory")
+				setGameObjectDirectory(v);
 			else if(k=="font_source")
 				setFontSource(v);
 			else if(k=="clearing_color")
-				setClearingColor(Reader::toColor(v));
+				setClearingColor(Helper::toColor(v));
 			else
 				Log::ger().log(k + " is not a settings option", Log::Label::Warning);
 		});
-	} catch(...) {
-		// TODO catch not all errors, e.g. handle parsing errors
+		Log::ger().log("---------");
+	} catch(const std::invalid_argument& ia) {
+		Log::ger().log(ia.what(), Log::Label::Error);
 		writeSettings();
 	}
 
@@ -86,6 +90,17 @@ void Settings::setMapDirectory(std::string s)
 	m_map_directory = s;
 }
 
+std::string Settings::getGameObjectDirectory()
+{
+	return m_obj_directory;
+}
+
+void Settings::setGameObjectDirectory(std::string s)
+{
+	m_obj_directory = s;
+}
+
+
 std::string Settings::getFontSource()
 {
 	return m_font_src;
@@ -136,6 +151,7 @@ void Settings::writeSettings()
 		StringPair("bits_per_pixel", std::to_string(getBitsPerPixel())),
 		StringPair("vertical_sync_enabled", isVerticalSyncEnabled()?"true":"false"),
 		StringPair("map_directory", getMapDirectory()),
+		StringPair("obj_directory", getGameObjectDirectory()),
 		StringPair("font_source", getFontSource()),
 		StringPair("clearing_color", "Color(" +
 			std::to_string(getClearingColor().r) + "," +

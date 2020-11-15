@@ -33,6 +33,7 @@ GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameController(
 	m_switchRight.setCharacterSize(m_controller.getSettings().toF(50));
 
 	readMapsFromDir();
+	readGameObjectsFromDir();
 }
 
 GameMenu::~GameMenu() {
@@ -41,41 +42,62 @@ GameMenu::~GameMenu() {
 }
 
 void GameMenu::readMapsFromDir() {
-	tinydir_dir dir;
-	tinydir_open(&dir, m_controller.getSettings().getMapDirectory().c_str());
+	try {
+		Helper::readDirectory(
+			m_controller.getSettings().getMapDirectory(),
+			[&](tinydir_file& file){
+				if (!file.is_dir)
+				{
+					Log::ger().log(file.name);
+					Map* map = new Map(m_controller);
 
-	if (!dir.has_next) {
-		Log::ger().log("no files or no dir available.", Log::Label::Error);
-		throw std::invalid_argument("no files or no dir available");
-	}
-	else {
+					std::stringstream ss;
+					ss << m_controller.getSettings().getMapDirectory() << file.name;
+					m_mapReader.setPath(ss.str());
+
+					m_mapReader.setMap(map);
+					m_mapReader.read();
+
+					m_maps.push_back(map);
+				}
+			}
+		);
 		m_mapsFound = true;
+		setMapSelection(0);
+	} catch(const std::invalid_argument& ia) {
+		Log::ger().log(ia.what(), Log::Label::Error);
 	}
+}
 
-	while (dir.has_next)
-	{
-		tinydir_file file;
-		tinydir_readfile(&dir, &file);
-
-		if (!file.is_dir)
-		{
-			Log::ger().log(file.name);
-			Map* map = new Map(m_controller);
-
-			std::stringstream ss;
-			ss << m_controller.getSettings().getMapDirectory() << file.name;
-			m_mapReader.setPath(ss.str());
-
-			m_mapReader.setMap(map);
-			m_mapReader.read();
-
-			m_maps.push_back(map);
-		}
-
-		tinydir_next(&dir);
+void GameMenu::readGameObjectsFromDir() {
+	try {
+		Reader r;
+		Helper::readDirectory(
+			m_controller.getSettings().getGameObjectDirectory(),
+			[&](tinydir_file& file){
+				if (!file.is_dir)
+				{
+					Log::ger().log(file.name);
+					std::stringstream ss;
+					ss << m_controller.getSettings().getGameObjectDirectory() << file.name;
+					r.setPath(ss.str());
+					r.read();
+					// TODO strings should be defined somewhere
+					std::string type = r.getParagraphStringMap(r.DEFAULT_PARAGRAPH)["type"];
+					if(type=="player")
+						Log::ger().log("Create Player");
+					else if(type=="object")
+						Log::ger().log("Create Player");
+					else
+						Log::ger().log("Unknown Type of object: " + type, Log::Label::Warning);
+				}
+			}
+		);
+		m_mapsFound = true;
+		setMapSelection(0);
+	} catch(const std::invalid_argument& ia) {
+		Log::ger().log(ia.what(), Log::Label::Error);
 	}
-
-	setMapSelection(0);
 }
 
 void GameMenu::setMapSelection(int i) {

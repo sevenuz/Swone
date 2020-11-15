@@ -25,6 +25,7 @@
 #include "Controller.h"
 #include "util/reader/MapReader.h"
 #include "util/Log.h"
+#include "util/Helper.h"
 
 class GameMenu : public Handleable {
 private:
@@ -50,6 +51,7 @@ private:
 	std::vector<Map*> m_maps;
 
 	void readMapsFromDir();
+	void readGameObjectsFromDir();
 	void setMapSelection(int);
 	void setActionSelection(char);
 
