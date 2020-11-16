@@ -143,6 +143,7 @@ void GameObject::stopFalling() {
 }
 
 void GameObject::apply() {
+	updateFlags();
 	setPos(m_nextPos);
 	setVel(m_nextVel);
 }

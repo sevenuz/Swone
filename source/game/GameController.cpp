@@ -85,7 +85,7 @@ void GameController::updateGameObjects(sf::Time ellapsed) {
 	for (size_t i = 0; i < m_game_objects.size(); i++) {
 		GameObject* g = m_game_objects[i];
 		sf::Vector2f& pos = g->calculatePos(ellapsed);
-		g->calculateVec(ellapsed, m_map->getGravity());
+		g->calculateVel(ellapsed, m_map->getGravity());
 
 		if (pos.x > m_map->getWidth() || pos.x < 0 || pos.y > m_map->getHeight() || pos.y < 0) {
 			g->onOutOfMap();
