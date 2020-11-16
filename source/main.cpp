@@ -166,11 +166,15 @@ void drawObjectViewer()
 
 void startMainLoop()
 {
+	ImGuiIO& io = ImGui::GetIO();
 	while(window.isOpen()) {
 		sf::Event event;
 		while(window.pollEvent(event)) {
-			handleAllEvents(event);
 			ImGui::SFML::ProcessEvent(event);
+			if((event.type == sf::Event::MouseWheelScrolled
+				|| event.type == sf::Event::MouseWheelMoved) && io.WantCaptureMouse)
+				continue;
+			handleAllEvents(event);
 			if(event.type == sf::Event::Closed) {
 				window.close();
 			}
