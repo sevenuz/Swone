@@ -163,6 +163,12 @@
       <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)source_util_Log.cpp.obj</ObjectFileName>
     </CLCompile>
+    <CLCompile Include="..\source/util/Helper.cpp">
+      <AdditionalOptions>"/EHsc" "/std:c++14" "/permissive-" %(AdditionalOptions) "-std=c++11"</AdditionalOptions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)source_util_Helper.cpp.obj</ObjectFileName>
+    </CLCompile>
     <CLCompile Include="..\source/graphics/ParticleSystem.cpp">
       <AdditionalOptions>"/EHsc" "/std:c++14" "/permissive-" %(AdditionalOptions) "-std=c++11"</AdditionalOptions>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>

@@ -6,11 +6,28 @@
 #include <vector>
 #include <string>
 #include <SFML/Graphics.hpp>
+#include <functional>
+#include <memory>
 
-typedef std::map<std::string, std::string> stringMap;
-typedef std::map<std::string, stringMap> valueDetailMap;
-typedef std::map<std::string, sf::Texture*> textureMap;
-typedef std::map<std::string, textureMap> textureDetailMap;
+struct Value {
+	virtual void display() const = 0;
+	virtual ~Value() = 0;
+};
+
+template<typename T>
+struct SubV : Value {
+	SubV(T v, std::function<void(T)>& display) : m_v(v), m_display(display)
+	{}
+	void display() const override
+	{
+		m_display(m_v);
+	}
+	std::function<void(T)>& m_display;
+	T m_v;
+};
+
+typedef std::map<std::string, std::unique_ptr<Value>> ValueMap;
+typedef std::map<std::string, ValueMap> ValueDetailMap;
 
 /*
  * Logger as Singleton inspired by
@@ -92,10 +109,12 @@ public:
 
 	void toggleObjectInspect(std::string identifier);
 
-	const std::vector<std::string>& getObjectIdentifiers() const;
-	const valueDetailMap& getValueMap() const;
-	const textureDetailMap& getTextureMap() const;
+	void registerStringDisplayFun(std::function<void(std::string)> fun);
+	void registerTextureDisplayFun(std::function<void(sf::Texture*)> fun);
 
+	const std::vector<std::string>& getObjectIdentifiers() const;
+	const ValueDetailMap& getValueMap() const;
+	
 	Log(Log const&)				= delete;
 	void operator=(Log const&)	= delete;
 private:
@@ -103,10 +122,12 @@ private:
 	std::vector<LogEntry> m_logs;
 	bool m_log_closed = false;
 	std::vector<std::string> m_object_identifiers;
-	valueDetailMap m_value_map;
-	textureDetailMap m_texture_map;
+	ValueDetailMap m_value_map;
 	sf::Time m_refresh_time = sf::seconds(0.25);
 	sf::Time m_time_since_refresh = m_refresh_time+sf::seconds(1.0);
+
+	std::function<void(std::string)> m_display_string;
+	std::function<void(sf::Texture*)> m_display_texture;
 };
 
 #endif // SWONE_UTIL_Log_H

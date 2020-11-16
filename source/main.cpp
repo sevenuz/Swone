@@ -37,52 +37,49 @@ bool key_l_pressed = false;
 bool object_viewer_activated = false;
 bool demo_window_activated = false;
 
-void handleAllEvents(sf::Event& event) {
-	if (event.type == sf::Event::KeyPressed) {
-		if (event.key.code == sf::Keyboard::LControl) {
+void handleAllEvents(sf::Event& event)
+{
+	if(event.type == sf::Event::KeyPressed) {
+		if(event.key.code == sf::Keyboard::LControl) {
 			key_strg_pressed = true;
-		}
-		else if (event.key.code == sf::Keyboard::L) {
+		} else if(event.key.code == sf::Keyboard::L) {
 			key_l_pressed = true;
 		}
-		if (key_strg_pressed && key_l_pressed) {
+		if(key_strg_pressed && key_l_pressed) {
 			Log::ger().toggleLogWindow();
 		}
-	}
-	else if (event.type == sf::Event::KeyReleased) {
-		if (event.key.code == sf::Keyboard::LControl) {
+	} else if(event.type == sf::Event::KeyReleased) {
+		if(event.key.code == sf::Keyboard::LControl) {
 			key_strg_pressed = false;
-		}
-		else if (event.key.code == sf::Keyboard::L) {
+		} else if(event.key.code == sf::Keyboard::L) {
 			key_l_pressed = false;
 		}
 	}
 }
 
-void drawLog() {
+void drawLog()
+{
 	if(Log::ger().isLogClosed()) {
 		ImGui::Begin("Log", &Log::ger().isLogClosed());
 
 		ImGui::BeginChild("ScrollingRegion", ImVec2(0, -ImGui::GetItemsLineHeightWithSpacing()), false, ImGuiWindowFlags_HorizontalScrollbar);
 
-		for (Log::LogEntry& s : Log::ger().getLogs())
-		{
+		for(Log::LogEntry& s : Log::ger().getLogs()) {
 			if(!s.visible)
-				continue;
-			switch(s.label)
-			{
-				case Log::Label::Default:
-					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(100, 140, 100).Value);
-					break;
-				case Log::Label::Warning:
-					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(255, 165, 0).Value);
-					break;
-				case Log::Label::Error:
-					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(210, 0, 0).Value);
-					break;
-				default:
-					ImGui::PushStyleColor(ImGuiCol_Text, ImColor(127, 127, 127).Value);
-					break;
+				continue;	
+			switch(s.label) {
+			case Log::Label::Default:
+				ImGui::PushStyleColor(ImGuiCol_Text, ImColor(100, 140, 100).Value);
+				break;
+			case Log::Label::Warning:
+				ImGui::PushStyleColor(ImGuiCol_Text, ImColor(255, 165, 0).Value);
+				break;
+			case Log::Label::Error:
+				ImGui::PushStyleColor(ImGuiCol_Text, ImColor(210, 0, 0).Value);
+				break;
+			default:
+				ImGui::PushStyleColor(ImGuiCol_Text, ImColor(127, 127, 127).Value);
+				break;
 			}
 
 			ImGui::Text(s.message.c_str());
@@ -94,17 +91,15 @@ void drawLog() {
 
 		//ImGui::InputText("input",&controller.log_input,100);
 
-		if (ImGui::Button("Clear")) {
+		if(ImGui::Button("Clear")) {
 			Log::ger().clearLog();
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Demo Window"))
-		{
+		if(ImGui::Button("Demo Window")) {
 			demo_window_activated = !demo_window_activated;
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Object Viewer"))
-		{
+		if(ImGui::Button("Object Viewer")) {
 			object_viewer_activated = !object_viewer_activated;
 		}
 		ImGui::End();
@@ -115,16 +110,12 @@ void renderObjectSelector()
 {
 	const static std::vector<GameObject*>& gameObjects = gameMenu.getGameObjects();
 
-	if (ImGui::TreeNode("GameObjects"))
-	{
-		if (ImGui::TreeNode("all"))
-		{
-			for (GameObject* g : gameObjects)
-			{
+	if(ImGui::TreeNode("GameObjects")) {
+		if(ImGui::TreeNode("all")) {
+			for(GameObject* g : gameObjects) {
 				ImGui::Text(g->getIdentifier().c_str());
 				ImGui::SameLine();
-				if (ImGui::SmallButton("Inspect Object"))
-				{
+				if(ImGui::SmallButton("Inspect Object")) {
 					g->toggleLogging();
 					Log::ger().toggleObjectInspect(g->getIdentifier());
 				}
@@ -141,48 +132,30 @@ void drawObjectViewer()
 
 	static bool objectSelectorOpen = false;
 
-	if(ImGui::BeginMenuBar())
-	{
-		if (ImGui::BeginMenu("View"))
-		{
+	if(ImGui::BeginMenuBar()) {
+		if(ImGui::BeginMenu("View")) {
 			ImGui::MenuItem("Inspect", NULL, &objectSelectorOpen);
 			ImGui::EndMenu();
 		}
 		ImGui::EndMenuBar();
 	}
 
-	if (objectSelectorOpen)
+	if(objectSelectorOpen)
 		renderObjectSelector();
 
-	const static textureDetailMap& texture_detail_map = Log::ger().getTextureMap();
-	const static valueDetailMap& value_detail_map = Log::ger().getValueMap();
+	const static ValueDetailMap& value_detail_map = Log::ger().getValueMap();
 	const static std::vector<std::string>& inspected_obj_ids = Log::ger().getObjectIdentifiers();
 
-	for (const std::string& id : inspected_obj_ids)
-	{
+	for(const std::string& id : inspected_obj_ids) {
 		bool open = true;
-		if(ImGui::CollapsingHeader(id.c_str(), &open))
-		{
-			try
-			{
-				for (auto& pair : value_detail_map.at(id))
-				{
-					std::string s = pair.first + ": " + pair.second;
-					ImGui::Text(s.c_str());
-				}
-			} catch(...){}
-			try
-			{
-				for (auto& pair : texture_detail_map.at(id))
-				{
-					std::string s = pair.first + ": ";
-					ImGui::Text(s.c_str());
-					ImGui::Image(*pair.second);
-				}
-			} catch(...){}
+		if(ImGui::CollapsingHeader(id.c_str(), &open)) {
+			for(auto& pair : value_detail_map.at(id)) {
+				std::string s = pair.first + ": ";
+				ImGui::Text(s.c_str());
+				pair.second->display();
+			}
 		}
-		if (!open)
-		{
+		if(!open) {
 			gameMenu.getGameObjectById(id)->toggleLogging();
 			Log::ger().toggleObjectInspect(id);
 		}
@@ -191,17 +164,18 @@ void drawObjectViewer()
 	ImGui::End();
 }
 
-void startMainLoop() {
-	while (window.isOpen()) {
+void startMainLoop()
+{
+	while(window.isOpen()) {
 		sf::Event event;
-		while (window.pollEvent(event)) {
+		while(window.pollEvent(event)) {
 			handleAllEvents(event);
 			ImGui::SFML::ProcessEvent(event);
-			if (event.type == sf::Event::Closed) {
+			if(event.type == sf::Event::Closed) {
 				window.close();
 			}
 
-			switch (controller.getActiveWindow()) {
+			switch(controller.getActiveWindow()) {
 			case ActiveWindow::MAINMENU:
 				menu.event(event);
 				break;
@@ -220,7 +194,7 @@ void startMainLoop() {
 
 		ImGui::SFML::Update(window, ellapsed);
 
-		switch (controller.getActiveWindow()) {
+		switch(controller.getActiveWindow()) {
 		case ActiveWindow::MAINMENU:
 			menu.update(ellapsed);
 			window.draw(menu);
@@ -236,8 +210,7 @@ void startMainLoop() {
 		}
 
 		drawLog();
-		if (demo_window_activated)
-		{
+		if(demo_window_activated) {
 			ImGui::ShowDemoWindow();
 		}
 		if(object_viewer_activated)
@@ -250,13 +223,27 @@ void startMainLoop() {
 	}
 }
 
+void initLogger()
+{
+	std::function<void(std::string)> imguiDisplayString = [](std::string s) {
+		ImGui::Text(s.c_str());
+	};
 
-int main() {
+	std::function<void(sf::Texture*)> imguiDisplayTexture = [](sf::Texture* t) {
+		ImGui::Image(*t);
+	};
+
+	Log::ger().registerStringDisplayFun(imguiDisplayString);
+	Log::ger().registerTextureDisplayFun(imguiDisplayTexture);
+}
+
+int main()
+{
 	try {
 		ImGui::SFML::Init(window);
+		initLogger();
 		startMainLoop();
-	}
-	catch (...) {
+	} catch(...) {
 		std::cout << "error" << std::endl;
 	}
 
