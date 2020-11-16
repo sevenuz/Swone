@@ -36,8 +36,7 @@ private:
 	Map* m_map = NULL;
 	sf::Vector2f m_viewDelta = sf::Vector2f(0, 0);
 	sf::View m_view;
-	// TODO should be GameObject vector
-	// multi dimensional -> back/forground
+	// TODO multi dimensional -> back/forground
 	std::vector<GameObject*> m_game_objects;
 
 	size_t round(float f) {

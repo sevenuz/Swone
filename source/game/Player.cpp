@@ -12,11 +12,11 @@ Player::Player(std::string identifier, float x, float y) : GameObject(identifier
 		std::cout << "Failed to load player spritesheet!" << std::endl;
 	}
 
-	m_ani_jump.setSpriteSheet(m_texture);
-	m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
-	m_ani_jump.addFrame(sf::IntRect(64, 0, 32, 32));
-	m_ani_jump.addFrame(sf::IntRect(32, 0, 32, 32));
-	m_ani_jump.addFrame(sf::IntRect(0, 0, 32, 32));
+	m_ani_up.setSpriteSheet(m_texture);
+	m_ani_up.addFrame(sf::IntRect(32, 0, 32, 32));
+	m_ani_up.addFrame(sf::IntRect(64, 0, 32, 32));
+	m_ani_up.addFrame(sf::IntRect(32, 0, 32, 32));
+	m_ani_up.addFrame(sf::IntRect(0, 0, 32, 32));
 
 	m_ani_left.setSpriteSheet(m_texture);
 	m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
@@ -30,7 +30,7 @@ Player::Player(std::string identifier, float x, float y) : GameObject(identifier
 	m_ani_right.addFrame(sf::IntRect(32, 64, 32, 32));
 	m_ani_right.addFrame(sf::IntRect(0, 64, 32, 32));
 
-	setAnimation(PlayerAnimation::LEFT);
+	setAnimation(AnimationType::Left);
 
 	m_sprite.setPosition(sf::Vector2f(x, y));
 	m_sprite.play(*m_ani);
@@ -40,76 +40,29 @@ Player::~Player() {
 	// TODO Auto-generated destructor stub
 }
 
-void Player::setAnimation(PlayerAnimation ani) {
-	switch (ani) {
-	case PlayerAnimation::LEFT:
-		m_ani = &m_ani_left;
-		break;
-	case PlayerAnimation::RIGHT:
-		m_ani = &m_ani_right;
-		break;
-	case PlayerAnimation::JUMP:
-		m_ani = &m_ani_jump;
-		break;
-	}
-}
-
-AnimatedSprite* Player::getAnimatedSprite() {
-	return &m_sprite;
-}
-
-bool Player::isMoving() {
-	return m_isMoving;
-}
-
-bool Player::isJumping() {
-	return m_isJumping;
-}
-
-bool Player::isFalling() {
-	return m_isFalling;
-}
-
-void Player::toggleFalling(bool falling) {
-	m_isFalling = falling;
-	m_isJumping = !falling && m_vec.y < 0;
-}
-
-void Player::stopFalling() {
-	m_vec.y = 0;
-	m_nextVec.y = 0;
-	toggleFalling(false);
-}
-
-void Player::startFalling() {
-	toggleFalling(true);
-}
-
 void Player::jump() {
 	if (m_jumps > 0) {
 		m_jumps--;
-		m_vec.y = -1 * m_jf; // Startkraft nach oben
-		toggleFalling(false);
+		m_vel.y = -1 * m_possibleVel.y; // Startkraft nach oben
 	}
 }
 
 void Player::move(float fx) {
-	m_vec.x = fx;
-	m_isMoving = fx != 0;
+	m_vel.x = fx;
 }
 
 void Player::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Left) {
-			setAnimation(PlayerAnimation::LEFT);
-			move(-m_mf);
+			setAnimation(AnimationType::Left);
+			move(-m_possibleVel.x);
 		}
 		else if (event.key.code == sf::Keyboard::Right) {
-			setAnimation(PlayerAnimation::RIGHT);
-			move(m_mf);
+			setAnimation(AnimationType::Right);
+			move(m_possibleVel.x);
 		}
 		else if (event.key.code == sf::Keyboard::Up) {
-			setAnimation(PlayerAnimation::JUMP);
+			setAnimation(AnimationType::Up);
 			jump();
 		}
 	}
@@ -123,35 +76,8 @@ void Player::event(sf::Event& event) {
 	}
 }
 
-sf::Vector2f& Player::calculatePos(sf::Time ellapsed) {
-	const float s = ellapsed.asSeconds();
-	m_nextPos.x = m_pos.x + (m_vec.x * SPEED_FACTOR * s);
-	m_nextPos.y = m_pos.y + (m_vec.y * SPEED_FACTOR * s);
-	return m_nextPos;
-}
-
-void Player::apply() {
-	setPos(m_nextPos);
-	setVec(m_nextVec);
-}
-
-void Player::applyX() {
-	m_nextPos.y = m_pos.y;
-	apply();
-}
-
-void Player::applyY() {
-	m_nextPos.x = m_pos.x;
-	apply();
-}
 void Player::update(sf::Time ellapsed) {
-	if (isMoving()) {
-		m_sprite.play(*m_ani);
-		m_sprite.update(ellapsed);
-	}
-	else {
-		m_sprite.stop();
-	}
+	GameObject::update(ellapsed);
 	refreshJump(ellapsed);
 }
 
@@ -169,46 +95,3 @@ void Player::resetJump() {
 	m_jumpCooldown = sf::seconds(0);
 	m_jumps = m_jumpsPossible;
 }
-
-void Player::setPos(sf::Vector2f pos) {
-	m_pos = pos;
-	m_sprite.setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
-}
-
-void Player::setVec(sf::Vector2f vec) {
-	m_vec.x = vec.x;
-	m_vec.y = vec.y;
-}
-
-sf::Vector2f Player::getSpritePos() {
-	return m_sprite.getPosition();
-}
-
-void Player::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
-	if (leftBottom != MapTile::SPACE || rightBottom != MapTile::SPACE) {
-		stopFalling();
-		resetJump();
-		applyX();
-	}
-	else {
-		startFalling();
-		apply();
-	}
-}
-
-void Player::onOutOfMap() {
-	//std::cout << "oh noo!" << std::endl;
-	apply();
-};
-
-void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	target.draw(m_sprite, states);
-}
-
-void Player::toggleLogging()
-{
-	m_log = !m_log;
-	if(m_log)
-		Log::ger().detailsPutTexture(&m_texture, "player_texture", m_identifier);
-}
-

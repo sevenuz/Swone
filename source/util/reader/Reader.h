@@ -27,7 +27,8 @@ typedef std::pair<std::string, std::string> StringPair;
 
 class Reader {
 public:
-	const std::string DEFAULT_PARAGRAPH = "global";
+	// https://stackoverflow.com/a/24341128
+	static constexpr const char* DEFAULT_PARAGRAPH = "global";
 
 	Reader(std::string path);
 	Reader();

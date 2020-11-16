@@ -36,7 +36,6 @@ typedef std::map<std::string, ValueMap> ValueDetailMap;
 class Log {
 public:
 	enum Label : char { Default, Warning, Error };
-	// TODO add visible state
 	struct LogEntry {
 		std::string message;
 		Label label;

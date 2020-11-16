@@ -29,7 +29,7 @@ main.cpp--+-Controller controller-----Settings settings  // Controller which is 
                                       |                                   |
                                       |                                   +-Map * m_map  // map of the game, set from the GamePanel::m_maps
                                       |                                   |
-                                      |                                   +-std::vector<GameObject *> m_gameObjects  // TODO objects and players in map
+                                      |                                   +-std::vector<GameObject *> m_gameObjects
                                       |
                                       +-GameWindow m_gameWindow-------------GameController & m_gc  // Glue between GamePanel and GameController: TODO unnecessary?
                                       |

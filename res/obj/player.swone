@@ -1,5 +1,6 @@
 type=player
 name=Kurt
+id=Kurt
 // depends of the map?
 initial_position=(0,0)
 // movement velocity (x,y)
@@ -8,6 +9,12 @@ posible_jumps=2
 // in seconds
 jump_cooldown=3
 color=Color(100,100,30)
+hitbox=(0.1875, 0.0, 0.1094, 0.5)
+
+controls
+left=71
+right=72
+jump=73
 
 texture=../res/sprites/player.png
 ani_up

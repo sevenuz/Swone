@@ -40,7 +40,3 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		target.draw(rectangle);
 	}
 }
-
-AnimatedSprite* GameObject::getAnimatedSprite() {
-	return nullptr;
-}

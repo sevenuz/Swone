@@ -72,13 +72,12 @@ void GameMenu::readGameObjectsFromDir() {
 			[&](tinydir_file& file){
 				if (!file.is_dir)
 				{
-					Log::ger().log(file.name);
 					std::stringstream ss;
 					ss << m_controller.getSettings().getGameObjectDirectory() << file.name;
 					r.setPath(ss.str());
 					r.read();
 					// TODO strings should be defined somewhere
-					std::string type = r.getParagraphStringMap(r.DEFAULT_PARAGRAPH)["type"];
+					std::string type = r.getParagraphStringMap(Reader::DEFAULT_PARAGRAPH)["type"];
 					if(type=="player")
 						Log::ger().log("Create Player");
 					else if(type=="object")
