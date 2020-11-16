@@ -119,6 +119,7 @@ GameObject* GameController::getGameObjectById(const std::string & id) const
 		if (g->getIdentifier() == id)
 			return g;
 	}
+	return nullptr;
 }
 
 void GameController::updateLog() const
