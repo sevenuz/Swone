@@ -120,3 +120,10 @@ GameObject* GameController::getGameObjectById(const std::string & id) const
 			return g;
 	}
 }
+
+void GameController::updateLog() const
+{
+	for (GameObject* g : m_game_objects) {
+		g->updateLog();
+	}
+}

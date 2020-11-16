@@ -98,6 +98,9 @@ public:
 	sf::FloatRect getSpriteBounds();
 
 	void setAnimation(AnimationType ani);
+
+	// Write all the values that should be updated every tick into this function
+	void updateLog() const;
 protected:
 	bool m_log = false;
 	const std::string m_identifier;

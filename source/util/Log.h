@@ -22,8 +22,8 @@ struct SubV : Value {
 	{
 		m_display(m_v);
 	}
-	std::function<void(T)>& m_display;
 	T m_v;
+	std::function<void(T)>& m_display;
 };
 
 typedef std::map<std::string, std::unique_ptr<Value>> ValueMap;

@@ -146,6 +146,7 @@ void drawObjectViewer()
 	const static ValueDetailMap& value_detail_map = Log::ger().getValueMap();
 	const static std::vector<std::string>& inspected_obj_ids = Log::ger().getObjectIdentifiers();
 
+	gameMenu.updateLog();
 	for(const std::string& id : inspected_obj_ids) {
 		bool open = true;
 		if(ImGui::CollapsingHeader(id.c_str(), &open)) {

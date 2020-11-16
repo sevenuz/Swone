@@ -206,3 +206,13 @@ void GameObject::toggleLogging()
 	if(m_log)
 		Log::ger().detailsPutTexture(&m_texture, "gameObject_texture", m_identifier);
 }
+
+void GameObject::updateLog() const
+{
+	if(!m_log)
+		return;
+	Log& log = Log::ger();
+	log.detailsPutValue(std::to_string(m_isFalling), "isFalling", m_identifier);
+	log.detailsPutValue(std::to_string(m_isMoving), "isMoving", m_identifier);
+	log.detailsPutValue(std::to_string(m_isRising), "isRising", m_identifier);
+}

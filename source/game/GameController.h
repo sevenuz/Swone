@@ -19,6 +19,8 @@ public:
 	const std::vector<GameObject*>& getGameObjects() const;
 	GameObject* getGameObjectById(const std::string& id) const;
 
+	void updateLog() const;
+
 	void updateMap(sf::Time ellapsed);
 	void eventMap(sf::Event& e);
 

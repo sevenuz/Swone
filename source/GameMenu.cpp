@@ -235,3 +235,8 @@ GameObject* GameMenu::getGameObjectById(const std::string& id) const
 {
 	return m_gameController.getGameObjectById(id);
 }
+
+void GameMenu::updateLog() const
+{
+	m_gameController.updateLog();
+}
