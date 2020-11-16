@@ -57,9 +57,9 @@ void GameController::eventMap(sf::Event& e) {
 
 	getMap()->event(e);
 	// TODO get numbers from settings
-	if (e.type == sf::Event::MouseWheelMoved) // Zomm in or out if the mouse wheel moves
+	if (e.type == sf::Event::MouseWheelScrolled) // Zomm in or out if the mouse wheel moves
 	{
-		m_view.zoom(1.f + e.mouseWheel.delta * 0.1f);
+		m_view.zoom(1.f + e.mouseWheelScroll.delta * 0.1f);
 	}
 	if (e.type == sf::Event::MouseMoved) // Move view
 	{

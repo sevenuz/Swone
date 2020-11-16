@@ -171,8 +171,7 @@ void startMainLoop()
 		sf::Event event;
 		while(window.pollEvent(event)) {
 			ImGui::SFML::ProcessEvent(event);
-			if((event.type == sf::Event::MouseWheelScrolled
-				|| event.type == sf::Event::MouseWheelMoved) && io.WantCaptureMouse)
+			if(event.type == sf::Event::MouseWheelScrolled && io.WantCaptureMouse)
 				continue;
 			handleAllEvents(event);
 			if(event.type == sf::Event::Closed) {
