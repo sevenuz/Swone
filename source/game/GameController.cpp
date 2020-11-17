@@ -2,11 +2,7 @@
 #include <game/GameController.h>
 
 
-GameController::GameController(Controller& c) : m_controller(c) {
-	// TODO move player adding
-	Player* p = new Player("Kurt", 0, 0);
-	pushGameObject(p);
-}
+GameController::GameController(Controller& c) : m_controller(c) {}
 
 GameController::~GameController() {
 	for (size_t i = 0; i < m_game_objects.size(); i++) {

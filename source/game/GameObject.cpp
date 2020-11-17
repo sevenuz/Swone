@@ -1,22 +1,47 @@
 #include "GameObject.h"
 
-GameObject::GameObject(std::string identifier, float x, float y) : m_identifier(identifier) {
-	m_pos = sf::Vector2f(x, y);
-}
-
 GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
+	: m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_ID_NAME])
 {
+	for(auto& s: setupMap[Reader::DEFAULT_PARAGRAPH]){
+		const std::string k = s.first;
+		const std::string v = s.second;
+		if(k == GAMEOBJECT_NAME_NAME)
+			setName(v);
+		else if(k == GAMEOBJECT_VELOCITY_NAME)
+			setPossibleVel(Helper::toVector2f(v));
+		else if(k == GAMEOBJECT_COLOR_NAME)
+			setColor(Helper::toColor(v));
+		else if(k == GAMEOBJECT_TEXTURE_NAME)
+			setTexturePath(v);
+		else if(k == GAMEOBJECT_HITBOX_NAME)
+			setHitbox(Helper::toFloatRect(v));
+		else if(k == GAMEOBJECT_DRAG_NAME)
+			setDrag(Helper::toFloat(v));
+	}
 	for(auto& p: setupMap){
 		std::string paragraph = p.first;
-		for(auto& s: p.second){
-			std::string k = s.first;
-			std::string v = s.second;
-			if(k==GAMEOBJECT_NAME_NAME)
-				Log::ger().log(v);
-				//setName(v);
-			else
-				Log::ger().log(k + " is not a settings option", Log::Label::Warning);
+		if(paragraph == GAMEOBJECT_ANI_UP_PARAGRAPH) {
+			setAnimationFrames(m_ani_up, p.second);
+		} else if(paragraph == GAMEOBJECT_ANI_LEFT_PARAGRAPH) {
+			setAnimationFrames(m_ani_left, p.second);
+		} else if(paragraph == GAMEOBJECT_ANI_RIGHT_PARAGRAPH) {
+			setAnimationFrames(m_ani_right, p.second);
+		} else if(paragraph == GAMEOBJECT_ANI_DOWN_PARAGRAPH) {
+			setAnimationFrames(m_ani_down, p.second);
+		} else if(paragraph == GAMEOBJECT_ANI_STEADY_PARAGRAPH) {
+			setAnimationFrames(m_ani_steady, p.second);
 		}
+	}
+}
+
+void GameObject::setAnimationFrames(Animation& animation, StringMap& frames)
+{
+	if(m_texturePath.empty())
+		throw std::invalid_argument("GameObject Texture is missing.");
+	animation.setSpriteSheet(m_texture);
+	for(auto& s: frames){
+		animation.addFrame(Helper::toIntRect(s.second));
 	}
 }
 
@@ -25,17 +50,6 @@ sf::Vector2f& GameObject::calculatePos(sf::Time ellapsed) {
 	m_nextPos.x = m_pos.x + (m_vel.x * SPEED_FACTOR * s);
 	m_nextPos.y = m_pos.y + (m_vel.y * SPEED_FACTOR * s);
 	return m_nextPos;
-}
-
-sf::Vector2f& GameObject::getVel() {
-	return m_vel;
-}
-sf::Vector2f& GameObject::getPos() {
-	return m_pos;
-}
-
-sf::FloatRect GameObject::getHitbox() {
-	return m_hitbox;
 }
 
 sf::Vector2f GameObject::getHitboxLeftTop(const sf::Vector2f& pos) {
@@ -88,8 +102,18 @@ sf::Vector2f& GameObject::calculateVel(sf::Time ellapsed, float gravity) {
 	return m_nextVel;
 }
 
-std::string GameObject::getIdentifier() const {
-	return m_identifier;
+void GameObject::setAnimation()
+{
+	if(isMoving() && m_vel.x < 0)
+		setAnimation(AnimationType::Left);
+	else if(isMoving() && m_vel.x > 0)
+		setAnimation(AnimationType::Right);
+	else if(isFalling())
+		setAnimation(AnimationType::Down);
+	else if(isRising())
+		setAnimation(AnimationType::Up);
+	else
+		setAnimation(AnimationType::Steady);
 }
 
 void GameObject::setAnimation(AnimationType ani) {
@@ -112,23 +136,8 @@ void GameObject::setAnimation(AnimationType ani) {
 		default:
 			m_ani = &m_ani_steady;
 			break;
-		}
-}
-
-AnimatedSprite* GameObject::getAnimatedSprite() {
-	return &m_sprite;
-}
-
-bool GameObject::isMoving() {
-	return m_isMoving;
-}
-
-bool GameObject::isRising() {
-	return m_isRising;
-}
-
-bool GameObject::isFalling() {
-	return m_isFalling;
+	}
+	m_sprite.play(*m_ani);
 }
 
 void GameObject::updateFlags() {
@@ -146,6 +155,8 @@ void GameObject::apply() {
 	updateFlags();
 	setPos(m_nextPos);
 	setVel(m_nextVel);
+	updateFlags();
+	setAnimation();
 }
 
 void GameObject::applyX() {
@@ -159,27 +170,7 @@ void GameObject::applyY() {
 }
 
 void GameObject::update(sf::Time ellapsed) {
-	if (isMoving()) {
-		m_sprite.play(*m_ani);
-		m_sprite.update(ellapsed);
-	}
-	else {
-		m_sprite.stop();
-	}
-}
-
-void GameObject::setPos(sf::Vector2f pos) {
-	m_pos = pos;
-	m_sprite.setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
-}
-
-void GameObject::setVel(sf::Vector2f vel) {
-	m_vel.x = vel.x;
-	m_vel.y = vel.y;
-}
-
-sf::Vector2f GameObject::getSpritePos() {
-	return m_sprite.getPosition();
+	m_sprite.update(ellapsed);
 }
 
 void GameObject::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
@@ -215,4 +206,108 @@ void GameObject::updateLog() const
 	log.detailsPutValue(std::to_string(m_isFalling), "isFalling", m_identifier);
 	log.detailsPutValue(std::to_string(m_isMoving), "isMoving", m_identifier);
 	log.detailsPutValue(std::to_string(m_isRising), "isRising", m_identifier);
+}
+
+std::string GameObject::getIdentifier() const {
+	return m_identifier;
+}
+
+std::string GameObject::getName()
+{
+	return m_name;
+}
+
+void GameObject::setName(std::string s)
+{
+	m_name = s;
+}
+
+sf::Color GameObject::getColor()
+{
+	return m_color;
+}
+
+void GameObject::setColor(sf::Color s)
+{
+	m_color = s;
+}
+
+std::string GameObject::getTexturePath()
+{
+	return m_texturePath;
+}
+
+void GameObject::setTexturePath(std::string s)
+{
+	m_texturePath = s;
+	Log::ger().log("load: " + s);
+	if (!m_texture.loadFromFile(m_texturePath)) {
+		Log::ger().log(m_identifier + ": Failed to load texture", Log::Label::Error);
+		throw std::invalid_argument("Failed to load texture");
+	}
+}
+
+sf::Vector2f GameObject::getPossibleVel()
+{
+	return m_possibleVel;
+}
+
+void GameObject::setPossibleVel(sf::Vector2f s)
+{
+	m_possibleVel = s;
+}
+
+sf::FloatRect GameObject::getHitbox() {
+	return m_hitbox;
+}
+
+void GameObject::setHitbox(sf::FloatRect f)
+{
+	m_hitbox = f;
+}
+
+float GameObject::getDrag()
+{
+	return m_drag;
+}
+
+void GameObject::setDrag(float s)
+{
+	m_drag = s;
+}
+
+sf::Vector2f& GameObject::getVel() {
+	return m_vel;
+}
+sf::Vector2f& GameObject::getPos() {
+	return m_pos;
+}
+
+AnimatedSprite* GameObject::getAnimatedSprite() {
+	return &m_sprite;
+}
+
+bool GameObject::isMoving() {
+	return m_isMoving;
+}
+
+bool GameObject::isRising() {
+	return m_isRising;
+}
+
+bool GameObject::isFalling() {
+	return m_isFalling;
+}
+
+void GameObject::setPos(sf::Vector2f pos) {
+	m_pos = pos;
+	m_sprite.setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
+}
+
+void GameObject::setVel(sf::Vector2f vel) {
+	m_vel = vel;
+}
+
+sf::Vector2f GameObject::getSpritePos() {
+	return m_sprite.getPosition();
 }

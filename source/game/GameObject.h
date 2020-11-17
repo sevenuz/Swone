@@ -10,6 +10,8 @@
 #include "Map.h"
 #include "graphics/Animation.h"
 #include "graphics/AnimatedSprite.h"
+#include "util/reader/Reader.h"
+#include "util/Helper.h"
 
 #define SPEED_FACTOR 0.5
 #define DEFAULT_DRAG 100
@@ -29,24 +31,17 @@ public:
 	static constexpr const char* GAMEOBJECT_NAME_NAME = "name";
 	static constexpr const char* GAMEOBJECT_ID_NAME = "id";
 	static constexpr const char* GAMEOBJECT_VELOCITY_NAME = "velocity";
-	static constexpr const char* GAMEOBJECT_POSIBLE_JUMPS_NAME = "posible_jumps";
-	static constexpr const char* GAMEOBJECT_JUMP_COOLDOWN_NAME = "jump_cooldown";
 	static constexpr const char* GAMEOBJECT_COLOR_NAME = "color";
 	static constexpr const char* GAMEOBJECT_TEXTURE_NAME = "texture";
-	// controls
-	static constexpr const char* GAMEOBJECT_CONTROLS_PARAGRAPH = "controls";
-	static constexpr const char* GAMEOBJECT_CONTROLS_LEFT_NAME = "left";
-	static constexpr const char* GAMEOBJECT_CONTROLS_RIGHT_NAME = "right";
-	static constexpr const char* GAMEOBJECT_CONTROLS_JUMP_NAME = "jump";
-	// ani paragraphs (names are irrelevant)
+	static constexpr const char* GAMEOBJECT_HITBOX_NAME = "hitbox";
+	static constexpr const char* GAMEOBJECT_DRAG_NAME = "drag";
+	// animation paragraphs (keys are irrelevant)
 	static constexpr const char* GAMEOBJECT_ANI_UP_PARAGRAPH = "ani_up";
 	static constexpr const char* GAMEOBJECT_ANI_LEFT_PARAGRAPH = "ani_left";
 	static constexpr const char* GAMEOBJECT_ANI_RIGHT_PARAGRAPH = "ani_right";
 	static constexpr const char* GAMEOBJECT_ANI_DOWN_PARAGRAPH = "ani_down";
 	static constexpr const char* GAMEOBJECT_ANI_STEADY_PARAGRAPH = "ani_steady";
 
-
-	GameObject(std::string identifier, float x, float y);
 	GameObject(std::map<std::string, StringMap>& setupMap);
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -64,23 +59,40 @@ public:
 	// if the object is complete out of map, this function is called
 	virtual void onOutOfMap();
 
-	virtual sf::Vector2f& getVel();
-	void setVel(sf::Vector2f pos);
-
-	virtual sf::Vector2f& getPos();
-	void setPos(sf::Vector2f pos);
-
-	virtual sf::FloatRect getHitbox();
-	virtual sf::Vector2f getHitboxLeftTop(const sf::Vector2f& pos);
-	virtual sf::Vector2f getHitboxRightTop(const sf::Vector2f& pos);
-	virtual sf::Vector2f getHitboxLeftBottom(const sf::Vector2f& pos);
-	virtual sf::Vector2f getHitboxRightBottom(const sf::Vector2f& pos);
-	virtual sf::FloatRect getHitboxBounds();
-	virtual AnimatedSprite* getAnimatedSprite();
+	sf::Vector2f getHitboxLeftTop(const sf::Vector2f& pos);
+	sf::Vector2f getHitboxRightTop(const sf::Vector2f& pos);
+	sf::Vector2f getHitboxLeftBottom(const sf::Vector2f& pos);
+	sf::Vector2f getHitboxRightBottom(const sf::Vector2f& pos);
+	sf::FloatRect getHitboxBounds();
+	AnimatedSprite* getAnimatedSprite();
 
 	void toggleLogging();
 
 	std::string getIdentifier() const;
+
+	std::string getName();
+	void setName(std::string s);
+
+	sf::Color getColor();
+	void setColor(sf::Color s);
+
+	std::string getTexturePath();
+	void setTexturePath(std::string s);
+
+	sf::Vector2f getPossibleVel();
+	void setPossibleVel(sf::Vector2f s);
+
+	sf::Vector2f& getVel();
+	void setVel(sf::Vector2f pos);
+
+	sf::Vector2f& getPos();
+	void setPos(sf::Vector2f pos);
+
+	sf::FloatRect getHitbox();
+	void setHitbox(sf::FloatRect);
+
+	float getDrag();
+	void setDrag(float s);
 
 	bool isMoving();
 	bool isFalling();
@@ -97,6 +109,8 @@ public:
 	sf::Vector2f getSpritePos();
 	sf::FloatRect getSpriteBounds();
 
+	// sets animation depending on obj state
+	void setAnimation();
 	void setAnimation(AnimationType ani);
 
 	// Write all the values that should be updated every tick into this function
@@ -104,9 +118,10 @@ public:
 protected:
 	bool m_log = false;
 	const std::string m_identifier;
-	const std::string m_name;
+	std::string m_name;
 
 	sf::Color m_color;
+	std::string m_texturePath;
 	sf::Texture m_texture;
 	Animation m_ani_up;
 	Animation m_ani_left;
@@ -132,6 +147,8 @@ protected:
 
 	// higher drag means slower falling
 	float m_drag = DEFAULT_DRAG;
+private:
+	void setAnimationFrames(Animation& animation, StringMap& frames);
 };
 
 float calculateDrag(const float& drag, const float& speed);

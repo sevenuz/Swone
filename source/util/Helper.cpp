@@ -82,6 +82,24 @@ sf::Color Helper::toColor(std::string s)
 	return sf::Color(values[0], values[1], values[2]);
 }
 
+sf::Vector2f Helper::toVector2f(std::string s)
+{
+	std::vector<float> values = toTupel(s, toFloat, 2);
+	return sf::Vector2f(values[0], values[1]);
+}
+
+sf::IntRect Helper::toIntRect(std::string s)
+{
+	std::vector<int> values = toTupel(s, toInt, 4);
+	return sf::IntRect(values[0], values[1], values[2], values[3]);
+}
+
+sf::FloatRect Helper::toFloatRect(std::string s)
+{
+	std::vector<float> values = toTupel(s, toFloat, 4);
+	return sf::FloatRect(values[0], values[1], values[2], values[3]);
+}
+
 bool Helper::toBool(std::string s)
 {
 	if(s=="true")

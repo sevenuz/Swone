@@ -10,6 +10,8 @@
 #include <tinydir.h>
 
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/System/Vector2.hpp>
 
 class Helper
 {
@@ -34,6 +36,9 @@ public:
 	static float toFloat(std::string s);
 	static double toDouble(std::string s);
 	static sf::Color toColor(std::string s);
+	static sf::Vector2f toVector2f(std::string s);
+	static sf::IntRect toIntRect(std::string s);
+	static sf::FloatRect toFloatRect(std::string s);
 	// input should be true or false
 	static bool toBool(std::string s);
 

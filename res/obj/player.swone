@@ -10,12 +10,6 @@ posible_jumps=2
 jump_cooldown=3
 color=Color(100,100,30)
 hitbox=(0.1875, 0.0, 0.1094, 0.5)
-
-controls
-left=71
-right=72
-jump=73
-
 texture=../res/sprites/player.png
 ani_up
 1=(32, 0, 32, 32)
@@ -44,7 +38,10 @@ ani_steady
 2=(64, 0, 32, 32)
 3=(32, 0, 32, 32)
 4=(0, 0, 32, 32)
-
+controls
+left=71
+right=72
+jump=73
 skills
 multijump=true
 hook=false
@@ -52,4 +49,3 @@ aguatransform=false
 paraglide=true
 teleport=false
 boost=true
-

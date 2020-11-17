@@ -7,33 +7,25 @@
 
 #include "Player.h"
 
-Player::Player(std::string identifier, float x, float y) : GameObject(identifier, x, y) {
-	if (!m_texture.loadFromFile("../res/sprites/player.png")) {
-		std::cout << "Failed to load player spritesheet!" << std::endl;
+Player::Player(std::map<std::string, StringMap>& setupMap) : GameObject(setupMap)
+{
+	for(auto& p: setupMap){
+		std::string paragraph = p.first;
+		if(paragraph == GAMEOBJECT_CONTROLS_PARAGRAPH) {
+			for(auto& s: p.second){
+				const std::string k = s.first;
+				const std::string v = s.second;
+				if(k==GAMEOBJECT_CONTROLS_LEFT_NAME)
+					m_key_left = (sf::Keyboard::Key)Helper::toInt(v);
+				if(k==GAMEOBJECT_CONTROLS_RIGHT_NAME)
+					m_key_right = (sf::Keyboard::Key)Helper::toInt(v);
+				if(k==GAMEOBJECT_CONTROLS_JUMP_NAME)
+					m_key_up = (sf::Keyboard::Key)Helper::toInt(v);
+				else
+					Log::ger().log(k + " is not a GameObject option", Log::Label::Warning);
+			}
+		}
 	}
-
-	m_ani_up.setSpriteSheet(m_texture);
-	m_ani_up.addFrame(sf::IntRect(32, 0, 32, 32));
-	m_ani_up.addFrame(sf::IntRect(64, 0, 32, 32));
-	m_ani_up.addFrame(sf::IntRect(32, 0, 32, 32));
-	m_ani_up.addFrame(sf::IntRect(0, 0, 32, 32));
-
-	m_ani_left.setSpriteSheet(m_texture);
-	m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
-	m_ani_left.addFrame(sf::IntRect(64, 32, 32, 32));
-	m_ani_left.addFrame(sf::IntRect(32, 32, 32, 32));
-	m_ani_left.addFrame(sf::IntRect(0, 32, 32, 32));
-
-	m_ani_right.setSpriteSheet(m_texture);
-	m_ani_right.addFrame(sf::IntRect(32, 64, 32, 32));
-	m_ani_right.addFrame(sf::IntRect(64, 64, 32, 32));
-	m_ani_right.addFrame(sf::IntRect(32, 64, 32, 32));
-	m_ani_right.addFrame(sf::IntRect(0, 64, 32, 32));
-
-	setAnimation(AnimationType::Left);
-
-	m_sprite.setPosition(sf::Vector2f(x, y));
-	m_sprite.play(*m_ani);
 }
 
 Player::~Player() {
@@ -53,24 +45,24 @@ void Player::move(float fx) {
 
 void Player::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
-		if (event.key.code == sf::Keyboard::Left) {
+		if (event.key.code == m_key_left) {
 			setAnimation(AnimationType::Left);
 			move(-m_possibleVel.x);
 		}
-		else if (event.key.code == sf::Keyboard::Right) {
+		else if (event.key.code == m_key_right) {
 			setAnimation(AnimationType::Right);
 			move(m_possibleVel.x);
 		}
-		else if (event.key.code == sf::Keyboard::Up) {
+		else if (event.key.code == m_key_up) {
 			setAnimation(AnimationType::Up);
 			jump();
 		}
 	}
 	else if (event.type == sf::Event::KeyReleased) {
-		if (event.key.code == sf::Keyboard::Left) {
+		if (event.key.code == m_key_left) {
 			move(0);
 		}
-		else if (event.key.code == sf::Keyboard::Right) {
+		else if (event.key.code == m_key_right) {
 			move(0);
 		}
 	}

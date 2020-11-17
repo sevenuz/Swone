@@ -78,9 +78,11 @@ void GameMenu::readGameObjectsFromDir() {
 					r.read();
 					// TODO strings should be defined somewhere
 					std::string type = r.getParagraphStringMap(Reader::DEFAULT_PARAGRAPH)["type"];
-					if(type=="player")
+					if(type=="player") {
 						Log::ger().log("Create Player");
-					else if(type=="object")
+						Player* p = new Player(r.getParagraphMap());
+						m_gameController.pushGameObject(p);
+					} else if(type=="object")
 						Log::ger().log("Create Object");
 					else
 						Log::ger().log("Unknown Type of object: " + type, Log::Label::Warning);
