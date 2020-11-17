@@ -2,13 +2,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swone", "swone@exe.vcxproj", "{0C32E1EC-6CE7-4DDF-B923-DB3200CD4CDD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swone", "swone@exe.vcxproj", "{E75A0518-1F7D-4F67-9882-7D19F5035675}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_TESTS", "RUN_TESTS.vcxproj", "{7854C74B-9650-46DB-9017-378469DC0D3E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_TESTS", "RUN_TESTS.vcxproj", "{6A338DD4-DE4B-4E1C-ADE3-1F9679448C27}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "REGEN", "REGEN.vcxproj", "{F424126B-936C-410E-B6BF-9136FD664C8F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "REGEN", "REGEN.vcxproj", "{AA16A7A4-3DC9-48E2-BCA5-6C3E0938BBD1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_INSTALL", "RUN_INSTALL.vcxproj", "{C023130A-2CC8-4142-9B7E-89B7540B6091}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RUN_INSTALL", "RUN_INSTALL.vcxproj", "{49609B95-B7C4-4BDB-ABFF-FF8BF5E05D86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,23 +16,23 @@ Global
 		plain|x64 = plain|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0C32E1EC-6CE7-4DDF-B923-DB3200CD4CDD}.plain|Win32.ActiveCfg = plain|Win32
-		{0C32E1EC-6CE7-4DDF-B923-DB3200CD4CDD}.plain|Win32.Build.0 = plain|Win32
-		{0C32E1EC-6CE7-4DDF-B923-DB3200CD4CDD}.plain|x64.ActiveCfg = plain|x64
-		{0C32E1EC-6CE7-4DDF-B923-DB3200CD4CDD}.plain|x64.Build.0 = plain|x64
-		{7854C74B-9650-46DB-9017-378469DC0D3E}.plain|Win32.ActiveCfg = plain|Win32
-		{7854C74B-9650-46DB-9017-378469DC0D3E}.plain|x64.ActiveCfg = plain|x64
-		{F424126B-936C-410E-B6BF-9136FD664C8F}.plain|Win32.ActiveCfg = plain|Win32
-		{F424126B-936C-410E-B6BF-9136FD664C8F}.plain|Win32.Build.0 = plain|Win32
-		{F424126B-936C-410E-B6BF-9136FD664C8F}.plain|x64.ActiveCfg = plain|x64
-		{F424126B-936C-410E-B6BF-9136FD664C8F}.plain|x64.Build.0 = plain|x64
-		{C023130A-2CC8-4142-9B7E-89B7540B6091}.plain|Win32.ActiveCfg = plain|Win32
-		{C023130A-2CC8-4142-9B7E-89B7540B6091}.plain|x64.ActiveCfg = plain|x64
+		{E75A0518-1F7D-4F67-9882-7D19F5035675}.plain|Win32.ActiveCfg = plain|Win32
+		{E75A0518-1F7D-4F67-9882-7D19F5035675}.plain|Win32.Build.0 = plain|Win32
+		{E75A0518-1F7D-4F67-9882-7D19F5035675}.plain|x64.ActiveCfg = plain|x64
+		{E75A0518-1F7D-4F67-9882-7D19F5035675}.plain|x64.Build.0 = plain|x64
+		{6A338DD4-DE4B-4E1C-ADE3-1F9679448C27}.plain|Win32.ActiveCfg = plain|Win32
+		{6A338DD4-DE4B-4E1C-ADE3-1F9679448C27}.plain|x64.ActiveCfg = plain|x64
+		{AA16A7A4-3DC9-48E2-BCA5-6C3E0938BBD1}.plain|Win32.ActiveCfg = plain|Win32
+		{AA16A7A4-3DC9-48E2-BCA5-6C3E0938BBD1}.plain|Win32.Build.0 = plain|Win32
+		{AA16A7A4-3DC9-48E2-BCA5-6C3E0938BBD1}.plain|x64.ActiveCfg = plain|x64
+		{AA16A7A4-3DC9-48E2-BCA5-6C3E0938BBD1}.plain|x64.Build.0 = plain|x64
+		{49609B95-B7C4-4BDB-ABFF-FF8BF5E05D86}.plain|Win32.ActiveCfg = plain|Win32
+		{49609B95-B7C4-4BDB-ABFF-FF8BF5E05D86}.plain|x64.ActiveCfg = plain|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {0B06C41C-B284-449D-A4C1-B8E85E0C080D}
+		SolutionGuid = {8DD8A119-7F11-40E7-8AEF-907154905322}
 	EndGlobalSection
 EndGlobal

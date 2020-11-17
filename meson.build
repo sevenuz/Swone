@@ -35,4 +35,4 @@ src = [	'bib/imgui/imgui-SFML.cpp',
 	'source/graphics/Animation.cpp',
 	'source/graphics/AnimatedSprite.cpp']
 
-executable('swone', src, cpp_args : [], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow])
+executable('swone', src, cpp_args : ['-DNOMINMAX'], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow])
