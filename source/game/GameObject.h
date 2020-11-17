@@ -118,7 +118,7 @@ public:
 	void setAnimation(AnimationType ani);
 
 	// Write all the values that should be updated every tick into this function
-	void updateLog() const;
+	void updateLog();
 protected:
 	bool m_log = false;
 	const std::string m_identifier;
@@ -134,6 +134,7 @@ protected:
 	Animation m_ani_steady;
 	Animation* m_ani;
 	AnimatedSprite m_sprite;
+	sf::Sprite m_sprite_for_inspector;
 
 	bool m_isRising = false; // movement to top
 	bool m_isFalling = false; // movement to bottom

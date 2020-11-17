@@ -248,6 +248,8 @@ void initLogger()
 	Log::ger().registerDisplayFun<std::string>(imguiDisplayString);
 	Log::ger().registerDisplayFun<const sf::Texture*>(imguiDisplayTexture);
 	Log::ger().registerDisplayFun<const sf::Sprite*>(imguiDisplaySprite);
+	Log::ger().registerDisplayFun<sf::Texture*>(imguiDisplayTexture);
+	Log::ger().registerDisplayFun<sf::Sprite*>(imguiDisplaySprite);
 }
 
 int main()
