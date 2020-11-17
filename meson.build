@@ -1,4 +1,4 @@
-project('swone', 'cpp', default_options : ['cpp_std=c++11'])
+project('swone', 'cpp', default_options : ['cpp_std=c++17'])
 
 GL = dependency('GL')
 
@@ -35,4 +35,4 @@ src = [	'bib/imgui/imgui-SFML.cpp',
 	'source/graphics/Animation.cpp',
 	'source/graphics/AnimatedSprite.cpp']
 
-executable('swone', src, cpp_args : ['-std=c++11'], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow])
+executable('swone', src, cpp_args : [], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow])

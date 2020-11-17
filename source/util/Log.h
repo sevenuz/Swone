@@ -8,6 +8,8 @@
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include <memory>
+#include <any>
+#include <typeinfo>
 
 struct Value {
 	virtual void display() const = 0;
@@ -20,7 +22,11 @@ struct SubV : Value {
 	{}
 	void display() const override
 	{
-		m_display(m_v);
+		try {
+			m_display(m_v);
+		} catch(...) {
+			std::cout << "Problem with displaying " << typeid(T).name() << std::endl;
+		}
 	}
 	T m_v;
 	std::function<void(T)>& m_display;
@@ -85,21 +91,32 @@ public:
 		return m_log_closed;
 	}
 
-	// used to set textures that are seldomly updated
-	// ignores the refreshment timer
-	void detailsPutTexture(sf::Texture* texture,
-		std::string key, std::string identifier);
-	// used to set values that are seldomly updated
-	// ignores the refreshment timer
-	void detailsPutValue(std::string value,
-		std::string key, std::string identifier);
 
-	// Used to set textures that need to be updatet very often
-	void detailsUpdateTexture(sf::Texture* texture,
-		std::string key, std::string identifier);
-	// Used to set values that need to be updatet very often
-	void detailsUpdateValue(std::string value,
-		std::string key, std::string identifier);
+	template<typename T>
+	void detailsPutValue(T value,
+		std::string key, std::string identifier)
+	{
+		try {
+			std::function<void(T)>& f = std::any_cast<std::function<void(T)>&>(m_funs.at(typeid(T).name()));
+			m_value_map[identifier][key] = std::unique_ptr<Value>(new SubV<T>(value, f));
+		} catch(...) {
+			std::cout << "Problem with display function of " << typeid(T).name() << std::endl;
+		}
+	}
+
+	template<typename T>
+	void detailsUpdateValue(T value,
+		std::string key, std::string identifier)
+	{
+		if(m_time_since_refresh < m_refresh_time)
+			return;
+		try{
+			std::function<void(T)>& f = std::any_cast<std::function<void(T)>&>(m_funs.at(typeid(T).name()));
+			m_value_map[identifier][key] = std::unique_ptr<Value>(new SubV<T>(value, f));
+		} catch(...) {
+			std::cout << "Problem with display function of " << typeid(T).name() << std::endl;
+		}
+	}
 
 	// Adds ellapsed time to time since last value refresh
 	void updateTime(sf::Time ellapsed);
@@ -108,8 +125,11 @@ public:
 
 	void toggleObjectInspect(std::string identifier);
 
-	void registerStringDisplayFun(std::function<void(std::string)> fun);
-	void registerTextureDisplayFun(std::function<void(sf::Texture*)> fun);
+	template<typename T>
+	void registerDisplayFun(std::function<void(T)> fun)
+	{
+		m_funs[typeid(T).name()] = fun;
+	}
 
 	const std::vector<std::string>& getObjectIdentifiers() const;
 	const ValueDetailMap& getValueMap() const;
@@ -125,8 +145,7 @@ private:
 	sf::Time m_refresh_time = sf::seconds(0.25);
 	sf::Time m_time_since_refresh = m_refresh_time+sf::seconds(1.0);
 
-	std::function<void(std::string)> m_display_string;
-	std::function<void(sf::Texture*)> m_display_texture;
+	std::map<std::string, std::any> m_funs;
 };
 
 #endif // SWONE_UTIL_Log_H

@@ -199,7 +199,7 @@ void GameObject::toggleLogging()
 {
 	m_log = !m_log;
 	if(m_log)
-		Log::ger().detailsPutTexture(&m_texture, "gameObject_texture", m_identifier);
+		Log::ger().detailsPutValue<const sf::Texture*>(&m_texture, "gameObject_texture", m_identifier);
 }
 
 void GameObject::updateLog() const
@@ -210,6 +210,7 @@ void GameObject::updateLog() const
 	log.detailsPutValue(std::to_string(m_isFalling), "isFalling", m_identifier);
 	log.detailsPutValue(std::to_string(m_isMoving), "isMoving", m_identifier);
 	log.detailsPutValue(std::to_string(m_isRising), "isRising", m_identifier);
+	log.detailsPutValue(m_ani->getSpriteSheet(), "Ani", m_identifier);
 }
 
 std::string GameObject::getIdentifier() const {
