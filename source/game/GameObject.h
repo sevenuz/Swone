@@ -28,8 +28,13 @@ public:
 	enum AnimationType : char { Up, Left, Right, Down, Steady };
 	// gameobject property names
 	// global
+	static constexpr const char* GAMEOBJECT_TYPE_NAME = "type";
+	static constexpr const char* GAMEOBJECT_PLAYER_TYPE = "player";
+	static constexpr const char* GAMEOBJECT_OBJECT_TYPE = "object";
+
 	static constexpr const char* GAMEOBJECT_NAME_NAME = "name";
 	static constexpr const char* GAMEOBJECT_ID_NAME = "id";
+	static constexpr const char* GAMEOBJECT_INITIAL_POS_NAME = "initial_position";
 	static constexpr const char* GAMEOBJECT_VELOCITY_NAME = "velocity";
 	static constexpr const char* GAMEOBJECT_COLOR_NAME = "color";
 	static constexpr const char* GAMEOBJECT_TEXTURE_NAME = "texture";
@@ -45,7 +50,7 @@ public:
 	GameObject(std::map<std::string, StringMap>& setupMap);
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	virtual void event(sf::Event& e) = 0;
+	virtual void event(sf::Event& e);
 	virtual void update(sf::Time ellapsed);
 
 	// TODO standard implementation of this functions
@@ -107,7 +112,6 @@ public:
 	void applyY();
 
 	sf::Vector2f getSpritePos();
-	sf::FloatRect getSpriteBounds();
 
 	// sets animation depending on obj state
 	void setAnimation();

@@ -8,6 +8,8 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 		const std::string v = s.second;
 		if(k == GAMEOBJECT_NAME_NAME)
 			setName(v);
+		else if(k == GAMEOBJECT_INITIAL_POS_NAME)
+			setPos(Helper::toVector2f(v));
 		else if(k == GAMEOBJECT_VELOCITY_NAME)
 			setPossibleVel(Helper::toVector2f(v));
 		else if(k == GAMEOBJECT_COLOR_NAME)
@@ -173,6 +175,8 @@ void GameObject::update(sf::Time ellapsed) {
 	m_sprite.update(ellapsed);
 }
 
+void GameObject::event(sf::Event& e) {}
+
 void GameObject::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
 	if (leftBottom != MapTile::SPACE || rightBottom != MapTile::SPACE) {
 		stopFalling();
@@ -230,6 +234,7 @@ sf::Color GameObject::getColor()
 void GameObject::setColor(sf::Color s)
 {
 	m_color = s;
+	m_sprite.setColor(s);
 }
 
 std::string GameObject::getTexturePath()
@@ -240,7 +245,6 @@ std::string GameObject::getTexturePath()
 void GameObject::setTexturePath(std::string s)
 {
 	m_texturePath = s;
-	Log::ger().log("load: " + s);
 	if (!m_texture.loadFromFile(m_texturePath)) {
 		Log::ger().log(m_identifier + ": Failed to load texture", Log::Label::Error);
 		throw std::invalid_argument("Failed to load texture");

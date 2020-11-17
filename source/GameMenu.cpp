@@ -66,7 +66,6 @@ void GameMenu::readMapsFromDir() {
 
 void GameMenu::readGameObjectsFromDir() {
 	try {
-		Reader r;
 		Helper::readDirectory(
 			m_controller.getSettings().getGameObjectDirectory(),
 			[&](tinydir_file& file){
@@ -74,18 +73,17 @@ void GameMenu::readGameObjectsFromDir() {
 				{
 					std::stringstream ss;
 					ss << m_controller.getSettings().getGameObjectDirectory() << file.name;
-					r.setPath(ss.str());
-					r.read();
-					// TODO strings should be defined somewhere
-					std::string type = r.getParagraphStringMap(Reader::DEFAULT_PARAGRAPH)["type"];
-					if(type=="player") {
-						Log::ger().log("Create Player");
+					// TODO should only once create Reader
+					Reader r(ss.str());
+					std::string type = r.getParagraphStringMap(Reader::DEFAULT_PARAGRAPH)[GameObject::GAMEOBJECT_TYPE_NAME];
+					if(type == GameObject::GAMEOBJECT_PLAYER_TYPE) {
 						Player* p = new Player(r.getParagraphMap());
 						m_gameController.pushGameObject(p);
-					} else if(type=="object")
-						Log::ger().log("Create Object");
-					else
-						Log::ger().log("Unknown Type of object: " + type, Log::Label::Warning);
+					} else if(type == GameObject::GAMEOBJECT_OBJECT_TYPE) {
+						GameObject* o = new GameObject(r.getParagraphMap());
+						m_gameController.pushGameObject(o);
+					} else
+						Log::ger().log("Unknown Type of object: " + ss.str(), Log::Label::Warning);
 				}
 			}
 		);

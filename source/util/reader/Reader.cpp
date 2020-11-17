@@ -35,6 +35,7 @@ void Reader::read()
 	std::string line;
 	while (std::getline(infile, line))
 	{
+		// TODO ignore empty lines
 		// ignore comment lines:
 		if (line.substr(0, 2) == "//")
 			continue;

@@ -63,18 +63,6 @@ void GameController::eventMap(sf::Event& e) {
 		m_viewDelta.x = delta.x * 0.1f;
 		m_viewDelta.y = delta.y * 0.1f;
 	}
-	// TODO remove
-	if (e.type == sf::Event::KeyPressed) {
-		if (e.key.code == sf::Keyboard::D) {
-			GameObject* g = m_game_objects[0];
-			sf::Vector2f pos = g->getHitboxRightBottom(g->getPos());
-			MapTile tile = m_map->getMapDataValue(round(pos.y), round(pos.x));
-			Log::ger().log("-------");
-			Log::ger().log(tile);
-			Log::ger().log(pos.x);
-			Log::ger().log(pos.y);
-		}
-	}
 }
 
 void GameController::updateGameObjects(sf::Time ellapsed) {

@@ -15,14 +15,14 @@ Player::Player(std::map<std::string, StringMap>& setupMap) : GameObject(setupMap
 			for(auto& s: p.second){
 				const std::string k = s.first;
 				const std::string v = s.second;
-				if(k==GAMEOBJECT_CONTROLS_LEFT_NAME)
+				if(k == GAMEOBJECT_CONTROLS_LEFT_NAME)
 					m_key_left = (sf::Keyboard::Key)Helper::toInt(v);
-				if(k==GAMEOBJECT_CONTROLS_RIGHT_NAME)
+				else if(k == GAMEOBJECT_CONTROLS_RIGHT_NAME)
 					m_key_right = (sf::Keyboard::Key)Helper::toInt(v);
-				if(k==GAMEOBJECT_CONTROLS_JUMP_NAME)
+				else if(k == GAMEOBJECT_CONTROLS_JUMP_NAME)
 					m_key_up = (sf::Keyboard::Key)Helper::toInt(v);
 				else
-					Log::ger().log(k + " is not a GameObject option", Log::Label::Warning);
+					Log::ger().log(k + " is not a Player Controls option", Log::Label::Warning);
 			}
 		}
 	}

@@ -1,14 +1,14 @@
 type=player
-name=Kurt
-id=Kurt
+name=Kurt2
+id=Kurt2
 // depends of the map?
-initial_position=(0,0)
+initial_position=(9.1,0)
 // movement velocity (x,y)
 velocity=(7,16)
 posible_jumps=2
 // in seconds
 jump_cooldown=3
-color=Color(0,0,200)
+color=Color(0,100,0)
 hitbox=(0.1875, 0.0, 0.1094, 0.5)
 texture=../res/sprites/player.png
 ani_up
@@ -39,9 +39,9 @@ ani_steady
 3=(32, 0, 32, 32)
 4=(0, 0, 32, 32)
 controls
-left=71
-right=72
-jump=73
+left=0
+right=3
+jump=22
 skills
 multijump=true
 hook=false
