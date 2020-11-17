@@ -112,13 +112,17 @@ void renderObjectSelector()
 
 	if(ImGui::TreeNode("GameObjects")) {
 		if(ImGui::TreeNode("all")) {
+			int id = 0;
 			for(GameObject* g : gameObjects) {
+				ImGui::PushID(id);
 				ImGui::Text(g->getIdentifier().c_str());
 				ImGui::SameLine();
 				if(ImGui::SmallButton("Inspect Object")) {
 					g->toggleLogging();
 					Log::ger().toggleObjectInspect(g->getIdentifier());
 				}
+				ImGui::PopID();
+				id++;
 			}
 			ImGui::TreePop();
 		}
