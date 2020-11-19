@@ -200,11 +200,11 @@ void GameObject::toggleLogging()
 	m_log = !m_log;
 	if(m_log) {
 		Log::ger().detailsPutValue(&m_texture, "gameObject_texture", m_identifier);
-		Log::ger().detailsPutValue(&m_sprite_for_inspector, "gameObject_ani", m_identifier);
+		Log::ger().detailsPutValue(&m_sprite, "ani", m_identifier);
 	}
 }
 
-void GameObject::updateLog()
+void GameObject::updateLog() const
 {
 	if(!m_log)
 		return;
@@ -212,7 +212,6 @@ void GameObject::updateLog()
 	log.detailsPutValue(std::to_string(m_isFalling), "isFalling", m_identifier);
 	log.detailsPutValue(std::to_string(m_isMoving), "isMoving", m_identifier);
 	log.detailsPutValue(std::to_string(m_isRising), "isRising", m_identifier);
-	m_sprite_for_inspector.setTextureRect(m_ani->getFrame(m_sprite.getCurrentFrame()));
 }
 
 std::string GameObject::getIdentifier() const {
@@ -252,7 +251,6 @@ void GameObject::setTexturePath(std::string s)
 		Log::ger().log(m_identifier + ": Failed to load texture", Log::Label::Error);
 		throw std::invalid_argument("Failed to load texture");
 	}
-	m_sprite_for_inspector.setTexture(m_texture);
 }
 
 sf::Vector2f GameObject::getPossibleVel()

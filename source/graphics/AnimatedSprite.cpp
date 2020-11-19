@@ -191,3 +191,23 @@ std::size_t AnimatedSprite::getCurrentFrame() const
 {
 	return m_currentFrame;
 }
+
+const sf::Texture* AnimatedSprite::getTexture() const {
+	return m_texture;
+}
+
+const sf::Color& AnimatedSprite::getColor() const {
+	return m_vertices[0].color;
+}
+
+const sf::IntRect& AnimatedSprite::getTextureRect() const {
+	return m_animation->getFrame(m_currentFrame);
+}
+
+void Image(const AnimatedSprite& sprite) {
+	sf::FloatRect global_bounds = sprite.getGlobalBounds();
+	sf::Vector2f size(global_bounds.width, global_bounds.height);
+
+	ImGui::Image(*sprite.getTexture(), size, static_cast<sf::FloatRect>(sprite.getTextureRect()),
+		sprite.getColor());
+}

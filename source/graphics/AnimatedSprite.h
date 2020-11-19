@@ -29,6 +29,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <imgui-SFML.h>
 
 #include "Animation.h"
 
@@ -55,6 +56,12 @@ public:
 	void setFrame(std::size_t newFrame, bool resetTime = true);
 	std::size_t getCurrentFrame() const;
 
+	// Custom
+
+	const sf::Texture* getTexture() const;
+	const sf::Color& getColor() const;
+	const sf::IntRect& getTextureRect() const;
+
 private:
 	const Animation* m_animation;
 	sf::Time m_frameTime;
@@ -68,5 +75,9 @@ private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 };
+
+// Custom
+
+void Image(const AnimatedSprite&);
 
 #endif // ANIMATEDSPRITE_INCLUDE

@@ -245,11 +245,17 @@ void initLogger()
 		ImGui::Image(*t);
 	};
 
+	std::function<void(const AnimatedSprite*)> imguiDisplayAnimatedSprite = [](const AnimatedSprite* t) {
+		Image(*t);
+	};
+
 	Log::ger().registerDisplayFun<std::string>(imguiDisplayString);
 	Log::ger().registerDisplayFun<const sf::Texture*>(imguiDisplayTexture);
 	Log::ger().registerDisplayFun<const sf::Sprite*>(imguiDisplaySprite);
 	Log::ger().registerDisplayFun<sf::Texture*>(imguiDisplayTexture);
 	Log::ger().registerDisplayFun<sf::Sprite*>(imguiDisplaySprite);
+	Log::ger().registerDisplayFun<const AnimatedSprite*>(imguiDisplayAnimatedSprite);
+	Log::ger().registerDisplayFun<AnimatedSprite*>(imguiDisplayAnimatedSprite);
 }
 
 int main()
