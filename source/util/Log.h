@@ -12,24 +12,24 @@
 #include <typeinfo>
 
 struct Value {
-	virtual void display() const = 0;
+	virtual void display(float scale = 1.0) const = 0;
 	virtual ~Value() = 0;
 };
 
 template<typename T>
 struct SubV : Value {
-	SubV(T v, std::function<void(T)>& display) : m_v(v), m_display(display)
+	SubV(T v, std::function<void(T, float)>& display) : m_v(v), m_display(display)
 	{}
-	void display() const override
+	void display(float scale) const override
 	{
 		try {
-			m_display(m_v);
+			m_display(m_v, scale);
 		} catch(...) {
 			std::cout << "Problem with displaying " << typeid(T).name() << std::endl;
 		}
 	}
 	T m_v;
-	std::function<void(T)>& m_display;
+	std::function<void(T, float)>& m_display;
 };
 
 typedef std::map<std::string, std::unique_ptr<Value>> ValueMap;
@@ -97,7 +97,8 @@ public:
 		std::string key, std::string identifier)
 	{
 		try {
-			std::function<void(T)>& f = std::any_cast<std::function<void(T)>&>(m_funs.at(typeid(T).name()));
+			std::function<void(T, float)>& f = std::any_cast<std::function<void(T, float)>&>(
+				m_funs.at(typeid(T).name()));
 			m_value_map[identifier][key] = std::unique_ptr<Value>(new SubV<T>(value, f));
 		} catch(...) {
 			std::cout << "Problem with display function of " << typeid(T).name() << std::endl;
@@ -111,7 +112,8 @@ public:
 		if(m_time_since_refresh < m_refresh_time)
 			return;
 		try{
-			std::function<void(T)>& f = std::any_cast<std::function<void(T)>&>(m_funs.at(typeid(T).name()));
+			std::function<void(T, float)>& f = std::any_cast<std::function<void(T, float)>&>(
+				m_funs.at(typeid(T).name()));
 			m_value_map[identifier][key] = std::unique_ptr<Value>(new SubV<T>(value, f));
 		} catch(...) {
 			std::cout << "Problem with display function of " << typeid(T).name() << std::endl;
@@ -126,7 +128,7 @@ public:
 	void toggleObjectInspect(std::string identifier);
 
 	template<typename T>
-	void registerDisplayFun(std::function<void(T)> fun)
+	void registerDisplayFun(std::function<void(T, float)> fun)
 	{
 		m_funs[typeid(T).name()] = fun;
 	}

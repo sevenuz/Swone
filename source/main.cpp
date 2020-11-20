@@ -132,6 +132,7 @@ void renderObjectSelector()
 
 void drawObjectViewer()
 {
+	ImGui::SetNextWindowSize(ImVec2(550, 300));
 	ImGui::Begin("Object Viewer", NULL, ImGuiWindowFlags_MenuBar);
 
 	static bool objectSelectorOpen = false;
@@ -154,11 +155,41 @@ void drawObjectViewer()
 	for(const std::string& id : inspected_obj_ids) {
 		bool open = true;
 		if(ImGui::CollapsingHeader(id.c_str(), &open)) {
-			for(auto& pair : value_detail_map.at(id)) {
-				std::string s = pair.first + ": ";
-				ImGui::Text(s.c_str());
-				pair.second->display();
-			}
+			ImGui::BeginChild((id+"information").c_str(), ImVec2(400, 125), true, ImGuiWindowFlags_NoScrollWithMouse);
+			ImGui::Columns(3, "details");
+			ImGui::SetColumnWidth(0, 200);
+			ImGui::SetColumnWidth(1, 100);
+			ImGui::SetColumnWidth(2, 100);
+			ImGui::Separator(); ImGui::NextColumn();
+			ImGui::Text("x"); ImGui::NextColumn();
+			ImGui::Text("y"); ImGui::NextColumn();
+			ImGui::Separator();
+			ImGui::Text("Current Position:"); ImGui::NextColumn();
+			value_detail_map.at(id).at("current_x")->display(); ImGui::NextColumn();
+			value_detail_map.at(id).at("current_y")->display(); ImGui::NextColumn();
+			ImGui::Separator();
+			ImGui::Text("Current Velocity Vector:"); ImGui::NextColumn();
+			value_detail_map.at(id).at("vel_x")->display(); ImGui::NextColumn();
+			value_detail_map.at(id).at("vel_y")->display(); ImGui::NextColumn();
+			ImGui::Columns(1); ImGui::Separator();
+
+			ImGui::Columns(3, "flags");
+			ImGui::SetColumnWidth(0, 100);
+			ImGui::SetColumnWidth(1, 100);
+			ImGui::SetColumnWidth(2, 100);
+			ImGui::Separator();
+			ImGui::Text("isFalling"); ImGui::NextColumn();
+			ImGui::Text("isRising"); ImGui::NextColumn();
+			ImGui::Text("isMoving"); ImGui::NextColumn();
+			ImGui::Separator();
+			value_detail_map.at(id).at("isFalling")->display(); ImGui::NextColumn();
+			value_detail_map.at(id).at("isRising")->display(); ImGui::NextColumn();
+			value_detail_map.at(id).at("isMoving")->display(); ImGui::NextColumn();
+			ImGui::Columns(1); ImGui::Separator();
+			ImGui::EndChild();
+
+			ImGui::SameLine();
+			value_detail_map.at(id).at("animation")->display(3.0);
 		}
 		if(!open) {
 			gameMenu.getGameObjectById(id)->toggleLogging();
@@ -233,20 +264,20 @@ void startMainLoop()
 
 void initLogger()
 {
-	std::function<void(std::string)> imguiDisplayString = [](std::string s) {
+	std::function<void(std::string, float)> imguiDisplayString = [](std::string s, float scale) {
 		ImGui::Text(s.c_str());
 	};
 
-	std::function<void(const sf::Texture*)> imguiDisplayTexture = [](const sf::Texture* t) {
+	std::function<void(const sf::Texture*, float)> imguiDisplayTexture = [](const sf::Texture* t, float scale) {
 		ImGui::Image(*t);
 	};
 
-	std::function<void(const sf::Sprite*)> imguiDisplaySprite = [](const sf::Sprite* t) {
+	std::function<void(const sf::Sprite*, float)> imguiDisplaySprite = [](const sf::Sprite* t, float scale) {
 		ImGui::Image(*t);
 	};
 
-	std::function<void(const AnimatedSprite*)> imguiDisplayAnimatedSprite = [](const AnimatedSprite* t) {
-		Image(*t);
+	std::function<void(const AnimatedSprite*, float)> imguiDisplayAnimatedSprite = [](const AnimatedSprite* t, float scale) {
+		Image(*t, scale);
 	};
 
 	Log::ger().registerDisplayFun<std::string>(imguiDisplayString);

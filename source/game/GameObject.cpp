@@ -86,8 +86,7 @@ sf::Vector2f& GameObject::calculateVel(sf::Time ellapsed, float gravity) {
 	const float s = ellapsed.asSeconds();
 	float fx = m_vel.x;
 
-	float speed = m_vel.y / s;
-	float drag = calculateDrag(m_drag, speed);
+	float drag = calculateDrag(m_drag, m_vel.y);
 	float fy = m_vel.y + (gravity * s);
 	fy = fy > 0 ? std::max(fy - (drag * s), 0.0f) : std::min(fy + (drag * s), 0.0f);
 
@@ -97,9 +96,6 @@ sf::Vector2f& GameObject::calculateVel(sf::Time ellapsed, float gravity) {
 	// or: implement line from oldPos to newPos with collision detection
 	m_nextVel.x = fx < Map::TILE_WIDTH ? fx : Map::TILE_WIDTH;
 	m_nextVel.y = fy < Map::TILE_HEIGHT ? fy : Map::TILE_HEIGHT;
-
-	if (m_log)
-		Log::ger().detailsUpdateValue(std::to_string(speed), "speed", m_identifier);
 
 	return m_nextVel;
 }
@@ -200,7 +196,7 @@ void GameObject::toggleLogging()
 	m_log = !m_log;
 	if(m_log) {
 		Log::ger().detailsPutValue(&m_texture, "gameObject_texture", m_identifier);
-		Log::ger().detailsPutValue(&m_sprite, "ani", m_identifier);
+		Log::ger().detailsPutValue(&m_sprite, "animation", m_identifier);
 	}
 }
 
@@ -212,6 +208,10 @@ void GameObject::updateLog() const
 	log.detailsPutValue(std::to_string(m_isFalling), "isFalling", m_identifier);
 	log.detailsPutValue(std::to_string(m_isMoving), "isMoving", m_identifier);
 	log.detailsPutValue(std::to_string(m_isRising), "isRising", m_identifier);
+	log.detailsUpdateValue(std::to_string(m_pos.x), "current_x", m_identifier);
+	log.detailsUpdateValue(std::to_string(m_pos.y), "current_y", m_identifier);
+	log.detailsUpdateValue(std::to_string(m_vel.x), "vel_x", m_identifier);
+	log.detailsUpdateValue(std::to_string(m_vel.y), "vel_y", m_identifier);
 }
 
 std::string GameObject::getIdentifier() const {

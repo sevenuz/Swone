@@ -78,6 +78,6 @@ private:
 
 // Custom
 
-void Image(const AnimatedSprite&);
+void Image(const AnimatedSprite&, float scale = 1.0);
 
 #endif // ANIMATEDSPRITE_INCLUDE
