@@ -132,7 +132,7 @@ void renderObjectSelector()
 
 void drawObjectViewer()
 {
-	ImGui::SetNextWindowSize(ImVec2(550, 300));
+	ImGui::SetNextWindowSize(ImVec2(550, 350), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Object Viewer", NULL, ImGuiWindowFlags_MenuBar);
 
 	static bool objectSelectorOpen = false;
