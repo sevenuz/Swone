@@ -50,6 +50,13 @@ private:
 	int m_selectedMap = 0;
 	std::vector<Map*> m_maps;
 
+	struct GameObjectSelection {
+		GameObject* obj;
+		bool selected;
+	};
+	std::vector<GameObjectSelection> m_gameObjects;
+	std::vector<GameObjectSelection> m_gamePlayers;
+
 	void readMapsFromDir();
 	void readGameObjectsFromDir();
 	void setMapSelection(int);
@@ -60,6 +67,8 @@ private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 public:
+	void drawImgui();
+
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
 	GameMenu(Controller& c);

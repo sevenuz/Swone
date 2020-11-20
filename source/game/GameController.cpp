@@ -43,6 +43,12 @@ void GameController::pushGameObject(GameObject* game_object) {
 	m_game_objects.push_back(game_object);
 }
 
+void GameController::clearGameObjects()
+{
+	m_game_objects.clear();
+}
+
+
 void GameController::updateMap(sf::Time ellapsed) {
 	getMap()->update(ellapsed);
 }

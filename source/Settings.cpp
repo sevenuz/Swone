@@ -31,13 +31,16 @@ Settings::Settings()
 		Log::ger().log(ia.what(), Log::Label::Error);
 		writeSettings();
 	}
-
+	// set flag to false again to indicate that the settings in the file
+	// are the settings here, the flag will changed on next changes again
+	setChanged(false);
 	loadFont();
 }
 
 Settings::~Settings()
 {
-	//dtor
+	if(isChanged())
+		writeSettings();
 }
 
 size_t Settings::getWidth()
@@ -48,6 +51,7 @@ size_t Settings::getWidth()
 void Settings::setWidth(size_t v)
 {
 	m_width = v;
+	setChanged(true);
 }
 
 size_t Settings::getHeight()
@@ -58,6 +62,7 @@ size_t Settings::getHeight()
 void Settings::setHeight(size_t v)
 {
 	m_height = v;
+	setChanged(true);
 }
 
 size_t Settings::getBitsPerPixel()
@@ -68,6 +73,7 @@ size_t Settings::getBitsPerPixel()
 void Settings::setBitsPerPixel(size_t v)
 {
 	m_bits_per_pixel = v;
+	setChanged(true);
 }
 
 bool Settings::isVerticalSyncEnabled()
@@ -78,6 +84,7 @@ bool Settings::isVerticalSyncEnabled()
 void Settings::setVerticalSyncEnabled(bool v)
 {
 	m_vertical_sync_enabled = v;
+	setChanged(true);
 }
 
 std::string Settings::getMapDirectory()
@@ -88,6 +95,7 @@ std::string Settings::getMapDirectory()
 void Settings::setMapDirectory(std::string s)
 {
 	m_map_directory = s;
+	setChanged(true);
 }
 
 std::string Settings::getGameObjectDirectory()
@@ -98,6 +106,7 @@ std::string Settings::getGameObjectDirectory()
 void Settings::setGameObjectDirectory(std::string s)
 {
 	m_obj_directory = s;
+	setChanged(true);
 }
 
 
@@ -109,6 +118,7 @@ std::string Settings::getFontSource()
 void Settings::setFontSource(std::string s)
 {
 	m_font_src = s;
+	setChanged(true);
 }
 
 sf::Font& Settings::getFont()
@@ -131,6 +141,7 @@ sf::Color Settings::getClearingColor()
 void Settings::setClearingColor(sf::Color c)
 {
 	m_clearing_color = c;
+	setChanged(true);
 }
 
 bool Settings::isChanged()
@@ -162,11 +173,11 @@ void Settings::writeSettings()
 }
 
 int Settings::toW(float w){
-	return (int)(w*STANDARD_WIDTH);
+	return (int)(w*m_width);
 }
 
 int Settings::toH(float h){
-	return (int)(h*STANDARD_HEIGHT);
+	return (int)(h*m_height);
 }
 
 int Settings::toW(int w){

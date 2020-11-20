@@ -25,7 +25,7 @@ typedef std::function<void(close_reason const& reason)> close_listener;
 */
 class Controller {
 public:
-	Controller(Settings settings, sf::RenderWindow& w);
+	Controller(Settings& settings, sf::RenderWindow& w);
 	virtual ~Controller();
 
 	void setActiveWindow(ActiveWindow i);
@@ -44,7 +44,7 @@ public:
 	void setDefaultView();
 protected:
 private:
-	Settings m_settings;
+	Settings& m_settings;
 	sf::RenderWindow& m_window;
 
 	ActiveWindow m_activeWindow = ActiveWindow::AW_FIRST;

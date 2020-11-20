@@ -39,7 +39,10 @@ bool demo_window_activated = false;
 
 void handleAllEvents(sf::Event& event)
 {
-	if(event.type == sf::Event::KeyPressed) {
+	if (event.type == sf::Event::Resized) {
+		settings.setWidth(event.size.width);
+		settings.setHeight(event.size.height);
+	} else if(event.type == sf::Event::KeyPressed) {
 		if(event.key.code == sf::Keyboard::LControl) {
 			key_strg_pressed = true;
 		} else if(event.key.code == sf::Keyboard::L) {
@@ -66,7 +69,7 @@ void drawLog()
 
 		for(Log::LogEntry& s : Log::ger().getLogs()) {
 			if(!s.visible)
-				continue;	
+				continue;
 			switch(s.label) {
 			case Log::Label::Default:
 				ImGui::PushStyleColor(ImGuiCol_Text, ImColor(100, 140, 100).Value);
@@ -240,6 +243,7 @@ void startMainLoop()
 			break;
 		case ActiveWindow::GAME:
 			gameMenu.update(ellapsed);
+			gameMenu.drawImgui();
 			window.draw(gameMenu);
 			break;
 		default:

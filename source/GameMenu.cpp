@@ -78,10 +78,10 @@ void GameMenu::readGameObjectsFromDir() {
 					std::string type = r.getParagraphStringMap(Reader::DEFAULT_PARAGRAPH)[GameObject::GAMEOBJECT_TYPE_NAME];
 					if(type == GameObject::GAMEOBJECT_PLAYER_TYPE) {
 						Player* p = new Player(r.getParagraphMap());
-						m_gameController.pushGameObject(p);
+						m_gamePlayers.push_back({p, false});
 					} else if(type == GameObject::GAMEOBJECT_OBJECT_TYPE) {
 						GameObject* o = new GameObject(r.getParagraphMap());
-						m_gameController.pushGameObject(o);
+						m_gameObjects.push_back({o, false});
 					} else
 						Log::ger().log("Unknown Type of object: " + ss.str(), Log::Label::Warning);
 				}
@@ -126,6 +126,13 @@ void GameMenu::setActionSelection(char i) {
 
 void GameMenu::startGame() {
 	if (m_mapsFound) {
+		m_gameController.clearGameObjects();
+		for(GameObjectSelection& gos : m_gamePlayers)
+			if(gos.selected)
+				m_gameController.pushGameObject(gos.obj);
+		for(GameObjectSelection& gos : m_gameObjects)
+			if(gos.selected)
+				m_gameController.pushGameObject(gos.obj);
 		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
 	}
 	else {
@@ -195,6 +202,43 @@ void GameMenu::update(sf::Time ellapsed) {
 	default:
 		break;
 	}
+}
+
+void GameMenu::drawImgui()
+{
+	if(m_controller.getActiveGameWindow() != ActiveGameWindow::MAPSELECTION)
+		return;
+
+	// imgui.h:595 or imgui_demo.cpp:187
+	int window_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize |
+											ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav;
+	bool* w_open = NULL; // hides close option
+
+	auto player_pos = ImVec2(m_controller.getSettings().toW(0.1f), m_controller.getSettings().toH(0.1f));
+	auto object_pos = ImVec2(m_controller.getSettings().toW(0.7f), m_controller.getSettings().toH(0.1f));
+	auto window_size = ImVec2(m_controller.getSettings().toW(0.2f), m_controller.getSettings().toH(0.8f));
+
+	std::string no_files_found = "No Files of this type in " + m_controller.getSettings().getGameObjectDirectory();
+
+	ImGui::SetNextWindowPos(player_pos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
+	ImGui::Begin("Select Players", w_open, window_flags);
+	if(m_gamePlayers.size() == 0)
+		ImGui::TextColored(ImColor(210, 0, 0), no_files_found.c_str());
+	else
+		for(GameObjectSelection& gos : m_gamePlayers)
+			ImGui::Selectable(gos.obj->getIdentifier().c_str(), &gos.selected);
+	ImGui::End();
+
+	ImGui::SetNextWindowPos(object_pos, ImGuiCond_Always);
+	ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
+	ImGui::Begin("Select Items", w_open, window_flags);
+	if(m_gameObjects.size() == 0)
+		ImGui::TextColored(ImColor(210, 0, 0), no_files_found.c_str());
+	else
+		for(GameObjectSelection& gos : m_gameObjects)
+			ImGui::Selectable(gos.obj->getIdentifier().c_str(), &gos.selected);
+	ImGui::End();
 }
 
 void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {

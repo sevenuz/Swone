@@ -32,6 +32,7 @@ public:
 	void setMap(Map* m);
 
 	void pushGameObject(GameObject* game_object);
+	void clearGameObjects();
 protected:
 private:
 	Controller& m_controller;

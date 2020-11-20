@@ -1,6 +1,6 @@
 #include <Controller.h>
 
-Controller::Controller(Settings settings, sf::RenderWindow& w) : m_settings(settings), m_window(w) {
+Controller::Controller(Settings& settings, sf::RenderWindow& w) : m_settings(settings), m_window(w) {
 	m_window.setVerticalSyncEnabled(m_settings.isVerticalSyncEnabled());
 }
 
