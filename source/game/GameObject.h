@@ -1,6 +1,8 @@
 #ifndef SWONE_GAME_GAMEOBJECT_H
 #define SWONE_GAME_GAMEOBJECT_H
 
+// Activate M_PI define
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
@@ -68,7 +70,7 @@ public:
 	sf::Vector2f getHitboxRightTop(const sf::Vector2f& pos);
 	sf::Vector2f getHitboxLeftBottom(const sf::Vector2f& pos);
 	sf::Vector2f getHitboxRightBottom(const sf::Vector2f& pos);
-	sf::FloatRect getHitboxBounds();
+	sf::FloatRect getHitboxBounds() const;
 	AnimatedSprite* getAnimatedSprite();
 
 	void toggleLogging();
@@ -99,6 +101,10 @@ public:
 	float getDrag();
 	void setDrag(float s);
 
+	sf::Transformable getObjTransform() const;
+	void setAngle(float s);
+	void setScale(float s);
+
 	bool isMoving();
 	bool isFalling();
 	bool isRising();
@@ -121,6 +127,7 @@ public:
 	void updateLog() const;
 protected:
 	bool m_log = false;
+	bool m_showHitbox = true;
 	const std::string m_identifier;
 	std::string m_name;
 
@@ -151,10 +158,14 @@ protected:
 
 	// higher drag means slower falling
 	float m_drag = DEFAULT_DRAG;
+	// represents transformations relative to MapTiles,
+	// not to MapPixel, the inherited Transformable is used for that..
+	sf::Transformable m_objTransform;
 private:
 	void setAnimationFrames(Animation& animation, StringMap& frames);
+
+	static float calculateDrag(const float drag, const float angle, const float speed);
 };
 
-float calculateDrag(const float& drag, const float& speed);
 #endif
 

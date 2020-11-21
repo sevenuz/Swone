@@ -253,7 +253,7 @@ void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		m_controller.setView(view);
 
 		if (m_mapsFound) {
-			target.draw(m_maps[m_selectedMap]->getSprite(), states);
+			target.draw(*m_maps[m_selectedMap], states);
 		}
 
 		m_controller.setDefaultView();

@@ -55,29 +55,29 @@ sf::Vector2f& GameObject::calculatePos(sf::Time ellapsed) {
 }
 
 sf::Vector2f GameObject::getHitboxLeftTop(const sf::Vector2f& pos) {
-	return sf::Vector2f((pos.x + m_hitbox.left), (pos.y + m_hitbox.top));
+	return m_objTransform.getTransform().transformPoint((m_hitbox.left), (m_hitbox.top)) + sf::Vector2f(pos.x, pos.y);
 }
 sf::Vector2f GameObject::getHitboxRightTop(const sf::Vector2f& pos) {
-	return sf::Vector2f((pos.x + m_hitbox.left) + m_hitbox.width, (pos.y + m_hitbox.top));
+	return m_objTransform.getTransform().transformPoint((m_hitbox.left) + m_hitbox.width, (m_hitbox.top)) + sf::Vector2f(pos.x, pos.y);
 }
 sf::Vector2f GameObject::getHitboxLeftBottom(const sf::Vector2f& pos) {
-	return sf::Vector2f((pos.x + m_hitbox.left), (pos.y + m_hitbox.top) + m_hitbox.height);
+	return m_objTransform.getTransform().transformPoint((m_hitbox.left), (m_hitbox.top) + m_hitbox.height) + sf::Vector2f(pos.x, pos.y);
 }
 sf::Vector2f GameObject::getHitboxRightBottom(const sf::Vector2f& pos) {
-	return sf::Vector2f((pos.x + m_hitbox.left) + m_hitbox.width, (pos.y + m_hitbox.top) + m_hitbox.height);
+	return m_objTransform.getTransform().transformPoint((m_hitbox.left) + m_hitbox.width, (m_hitbox.top) + m_hitbox.height) + sf::Vector2f(pos.x, pos.y);
 }
-//Pixel in Map
-sf::FloatRect GameObject::getHitboxBounds() {
-	float x = (m_pos.x + m_hitbox.left) * Map::TILE_WIDTH;
-	float y = (m_pos.y + m_hitbox.top) * Map::TILE_HEIGHT;
+//Pixel in MapPixel relative to Obj
+sf::FloatRect GameObject::getHitboxBounds() const {
+	float x = m_hitbox.left * Map::TILE_WIDTH;
+	float y = m_hitbox.top * Map::TILE_HEIGHT;
 	float w = m_hitbox.width * Map::TILE_WIDTH;
 	float h = m_hitbox.height * Map::TILE_HEIGHT;
 	return sf::FloatRect(x, y, w, h);
 }
 
 // This function should probably be moved sooner or later
-float calculateDrag(const float& drag, const float& speed) {
-	return pow(speed, 2) * drag * SCALE_DRAG_CONST;
+float GameObject::calculateDrag(const float drag, const float angle, const float speed) {
+	return pow(speed, 2) * std::cos(angle * M_PI / 180.0) * drag * SCALE_DRAG_CONST;
 }
 
 sf::Vector2f& GameObject::calculateVel(sf::Time ellapsed, float gravity) {
@@ -86,7 +86,7 @@ sf::Vector2f& GameObject::calculateVel(sf::Time ellapsed, float gravity) {
 	const float s = ellapsed.asSeconds();
 	float fx = m_vel.x;
 
-	float drag = calculateDrag(m_drag, m_vel.y);
+	float drag = calculateDrag(m_drag, m_objTransform.getRotation(), m_vel.y);
 	float fy = m_vel.y + (gravity * s);
 	fy = fy > 0 ? std::max(fy - (drag * s), 0.0f) : std::min(fy + (drag * s), 0.0f);
 
@@ -168,6 +168,7 @@ void GameObject::applyY() {
 }
 
 void GameObject::update(sf::Time ellapsed) {
+	m_objTransform.rotate(20*ellapsed.asSeconds());
 	m_sprite.update(ellapsed);
 }
 
@@ -188,7 +189,21 @@ void GameObject::onOutOfMap() {
 };
 
 void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+	states.transform *= getTransform() * m_objTransform.getTransform();
 	target.draw(m_sprite, states);
+
+	if(!m_showHitbox)
+		return;
+
+	sf::FloatRect h = getHitboxBounds();
+	sf::RectangleShape rectangle;
+	rectangle.setSize(sf::Vector2f(h.width, h.height));
+	rectangle.setOutlineColor(sf::Color::Red);
+	rectangle.setOutlineThickness(1);
+	rectangle.setFillColor(sf::Color::Transparent);
+	rectangle.setPosition(h.left, h.top);
+	target.draw(rectangle, states);
+
 }
 
 void GameObject::toggleLogging()
@@ -282,6 +297,22 @@ void GameObject::setDrag(float s)
 	m_drag = s;
 }
 
+sf::Transformable GameObject::getObjTransform() const
+{
+	return m_objTransform;
+}
+
+
+void GameObject::setAngle(float s)
+{
+	m_objTransform.setRotation(s);
+}
+
+void GameObject::setScale(float s)
+{
+	m_objTransform.setScale(s, s);
+}
+
 sf::Vector2f& GameObject::getVel() {
 	return m_vel;
 }
@@ -307,7 +338,7 @@ bool GameObject::isFalling() {
 
 void GameObject::setPos(sf::Vector2f pos) {
 	m_pos = pos;
-	m_sprite.setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
+	setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
 }
 
 void GameObject::setVel(sf::Vector2f vel) {

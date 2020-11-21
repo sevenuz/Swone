@@ -1,10 +1,9 @@
-
-#include <game/GameController.h>
-
+ #include <game/GameController.h>
 
 GameController::GameController(Controller& c) : m_controller(c) {}
 
 GameController::~GameController() {
+	// TODO move
 	for (size_t i = 0; i < m_game_objects.size(); i++) {
 		delete m_game_objects[i];
 	}
@@ -33,10 +32,10 @@ void GameController::setViewCenter(sf::Vector2f pos) {
 	);
 }
 
-void GameController::setMap(Map* map) {
-	m_map = map;
+void GameController::setMap(Map* m) {
+	m_map = m;
 	m_view = m_controller.getWindow().getView();
-	m_view.zoom(1 / map->getScale());
+	m_view.zoom(1 / m->getScale());
 }
 
 void GameController::pushGameObject(GameObject* game_object) {
@@ -72,8 +71,7 @@ void GameController::eventMap(sf::Event& e) {
 }
 
 void GameController::updateGameObjects(sf::Time ellapsed) {
-	for (size_t i = 0; i < m_game_objects.size(); i++) {
-		GameObject* g = m_game_objects[i];
+	for (GameObject* g : m_game_objects) {
 		sf::Vector2f& pos = g->calculatePos(ellapsed);
 		g->calculateVel(ellapsed, m_map->getGravity());
 
@@ -83,8 +81,8 @@ void GameController::updateGameObjects(sf::Time ellapsed) {
 		else {
 			sf::Vector2f hbrb = g->getHitboxRightBottom(pos);
 			sf::Vector2f hblb = g->getHitboxLeftBottom(pos);
-			sf::Vector2f hbrt = g->getHitboxRightBottom(pos);
-			sf::Vector2f hblt = g->getHitboxLeftBottom(pos);
+			sf::Vector2f hbrt = g->getHitboxRightTop(pos);
+			sf::Vector2f hblt = g->getHitboxLeftTop(pos);
 			MapTile tile_rb = m_map->getMapDataValue(round(hbrb.y), round(hbrb.x));
 			MapTile tile_lb = m_map->getMapDataValue(round(hblb.y), round(hblb.x));
 			MapTile tile_rt = m_map->getMapDataValue(round(hbrt.y), round(hbrt.x));
@@ -97,8 +95,8 @@ void GameController::updateGameObjects(sf::Time ellapsed) {
 	}
 }
 void GameController::eventGameObjects(sf::Event& e) {
-	for (size_t i = 0; i < m_game_objects.size(); i++) {
-		m_game_objects[i]->event(e);
+	for (GameObject* g : m_game_objects) {
+		g->event(e);
 	}
 }
 

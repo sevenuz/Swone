@@ -24,19 +24,10 @@ void GameWindow::event(sf::Event& event) {
 }
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+	states.transform *= getTransform();
 	m_gc.getController().setView(m_gc.getView());
 	target.draw(*m_gc.getMap(), states);
-	for (unsigned int i = 0; i < m_gc.getGameObjects().size(); i++) {
-		GameObject* g = m_gc.getGameObjects()[i];
-		target.draw(*g->getAnimatedSprite(), states);
-
-		sf::FloatRect h = g->getHitboxBounds();
-		sf::RectangleShape rectangle;
-		rectangle.setSize(sf::Vector2f(h.width, h.height));
-		rectangle.setOutlineColor(sf::Color::Red);
-		rectangle.setOutlineThickness(1);
-		rectangle.setFillColor(sf::Color::Transparent);
-		rectangle.setPosition(h.left, h.top);
-		target.draw(rectangle);
+	for (GameObject* g : m_gc.getGameObjects()) {
+		target.draw(*g, states);
 	}
 }
