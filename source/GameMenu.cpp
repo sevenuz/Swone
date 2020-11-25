@@ -77,7 +77,7 @@ void GameMenu::readGameObjectsFromDir() {
 					Reader r(ss.str());
 					std::string type = r.getParagraphStringMap(Reader::DEFAULT_PARAGRAPH)[GameObject::GAMEOBJECT_TYPE_NAME];
 					if(type == GameObject::GAMEOBJECT_PLAYER_TYPE) {
-						Player* p = new Player(r.getParagraphMap());
+						GameObject* p = new GameObject(r.getParagraphMap());
 						m_gamePlayers.push_back({p, false});
 					} else if(type == GameObject::GAMEOBJECT_OBJECT_TYPE) {
 						GameObject* o = new GameObject(r.getParagraphMap());

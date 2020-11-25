@@ -35,6 +35,15 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			setAnimationFrames(m_ani_steady, p.second);
 		}
 	}
+
+	if(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH].size()>0){
+		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_GRAVITY_EXTENSION]))
+			m_extensions.push_back(new Gravity(this));
+		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MOVEMENTX_EXTENSION]))
+			m_extensions.push_back(new MovementX(this, setupMap));
+		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MULTIJUMP_EXTENSION]))
+			m_extensions.push_back(new MultiJump(this, setupMap));
+	}
 }
 
 void GameObject::setAnimationFrames(Animation& animation, StringMap& frames)
@@ -47,11 +56,8 @@ void GameObject::setAnimationFrames(Animation& animation, StringMap& frames)
 	}
 }
 
-sf::Vector2f& GameObject::calculatePos(sf::Time ellapsed) {
-	const float s = ellapsed.asSeconds();
-	m_nextPos.x = m_pos.x + (m_vel.x * SPEED_FACTOR * s);
-	m_nextPos.y = m_pos.y + (m_vel.y * SPEED_FACTOR * s);
-	return m_nextPos;
+void GameObject::calculatePos(sf::Time ellapsed) {
+	for(Extension* e : m_extensions) e->calculatePos(ellapsed);
 }
 
 sf::Vector2f GameObject::getHitboxLeftTop(const sf::Vector2f& pos) {
@@ -80,24 +86,8 @@ float GameObject::calculateDrag(const float drag, const float angle, const float
 	return pow(speed, 2) * std::cos(angle * M_PI / 180.0) * drag * SCALE_DRAG_CONST;
 }
 
-sf::Vector2f& GameObject::calculateVel(sf::Time ellapsed, float gravity) {
-	// x linear, y accelerated
-	// gravity is passed from map obj
-	const float s = ellapsed.asSeconds();
-	float fx = m_vel.x;
-
-	float drag = calculateDrag(m_drag, m_objTransform.getRotation(), m_vel.y);
-	float fy = m_vel.y + (gravity * s);
-	fy = fy > 0 ? std::max(fy - (drag * s), 0.0f) : std::min(fy + (drag * s), 0.0f);
-
-	// speed lock on tile width/height,
-	// to prevent glitching on low frame rates
-	// TODO is maximum useful or still posible to glitch?
-	// or: implement line from oldPos to newPos with collision detection
-	m_nextVel.x = fx < Map::TILE_WIDTH ? fx : Map::TILE_WIDTH;
-	m_nextVel.y = fy < Map::TILE_HEIGHT ? fy : Map::TILE_HEIGHT;
-
-	return m_nextVel;
+void GameObject::calculateVel(sf::Time ellapsed, float gravity) {
+	for(Extension* e : m_extensions) e->calculateVel(ellapsed, gravity);
 }
 
 void GameObject::setAnimation()
@@ -168,24 +158,20 @@ void GameObject::applyY() {
 }
 
 void GameObject::update(sf::Time ellapsed) {
-	m_objTransform.rotate(20*ellapsed.asSeconds());
 	m_sprite.update(ellapsed);
+	for(Extension* e : m_extensions) e->update(ellapsed);
 }
 
-void GameObject::event(sf::Event& e) {}
+void GameObject::event(sf::Event& ev) {
+	for(Extension* e : m_extensions) e->event(ev);
+}
 
 void GameObject::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
-	if (leftBottom != MapTile::SPACE || rightBottom != MapTile::SPACE) {
-		stopFalling();
-		applyX();
-	}
-	else {
-		apply();
-	}
+	for(Extension* e : m_extensions) e->onTiles(leftTop, rightTop, leftBottom, rightBottom);
 }
 
-void GameObject::onOutOfMap() {
-	apply();
+void GameObject::onOutOfMap(MapTile border) {
+	for(Extension* e : m_extensions) e->onOutOfMap(border);
 };
 
 void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -227,6 +213,8 @@ void GameObject::updateLog() const
 	log.detailsUpdateValue(std::to_string(m_pos.y), "current_y", m_identifier);
 	log.detailsUpdateValue(std::to_string(m_vel.x), "vel_x", m_identifier);
 	log.detailsUpdateValue(std::to_string(m_vel.y), "vel_y", m_identifier);
+
+	for(Extension* e : m_extensions) e->updateLog();
 }
 
 std::string GameObject::getIdentifier() const {
@@ -344,6 +332,37 @@ void GameObject::setPos(sf::Vector2f pos) {
 void GameObject::setVel(sf::Vector2f vel) {
 	m_vel = vel;
 }
+
+void GameObject::setVelX(float pos)
+{
+	m_vel.x = pos;
+}
+
+void GameObject::setVelY(float pos)
+{
+	m_vel.y = pos;
+}
+
+sf::Vector2f& GameObject::getNextPos()
+{
+	return m_nextPos;
+}
+
+void GameObject::setNextPos(sf::Vector2f pos)
+{
+	m_nextPos = pos;
+}
+
+sf::Vector2f& GameObject::getNextVel()
+{
+	return m_nextVel;
+}
+
+void GameObject::setNextVel(sf::Vector2f pos)
+{
+	m_nextVel = pos;
+}
+
 
 sf::Vector2f GameObject::getSpritePos() {
 	return m_sprite.getPosition();

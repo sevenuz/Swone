@@ -1,6 +1,6 @@
 width=20
 height=20
-border=#
+border=.
 name=Sweap
 gravity=9.81
 

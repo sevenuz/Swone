@@ -1,36 +1,30 @@
 /*
- * Player.h
+ * MultiJump.h
  *
- *  Created on: 14.09.2018
+ *  Created on: 24.11.2020
  *      Author: julius
  */
 
-#ifndef SWONE_GAME_PLAYER_H_
-#define SWONE_GAME_PLAYER_H_
+#ifndef SWONE_GAME_OBJECT_EXTENSIONS_MULTIJUMP_H
+#define SWONE_GAME_OBJECT_EXTENSIONS_MULTIJUMP_H
 
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "Map.h"
-#include "GameObject.h"
+#include "util/reader/Reader.h"
+#include "game/object/Extension.h"
 
-class Player : public GameObject {
+class MultiJump : public Extension {
 public:
 	// controls
 	static constexpr const char* GAMEOBJECT_CONTROLS_PARAGRAPH = "controls";
-	static constexpr const char* GAMEOBJECT_CONTROLS_LEFT_NAME = "left";
-	static constexpr const char* GAMEOBJECT_CONTROLS_RIGHT_NAME = "right";
 	static constexpr const char* GAMEOBJECT_CONTROLS_JUMP_NAME = "jump";
 
-	Player(std::map<std::string, StringMap>& setupMap);
-	virtual ~Player();
-
-	void update(sf::Time ellapsed) override;
+	MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap);
 	void event(sf::Event& e) override;
+	void update(sf::Time ellapsed) override;
 
 	void jump();
-	void move(float fx);
-
 	void refreshJump(sf::Time ellapsed);
 	void resetJump();
 private:
@@ -45,4 +39,4 @@ private:
 	sf::Keyboard::Key m_key_up = sf::Keyboard::Up;
 };
 
-#endif /* SOURCE_GAME_PLAYER_H_ */
+#endif /* SWONE_GAME_OBJECT_EXTENSIONS_MULTIJUMP_H */

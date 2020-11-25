@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "game/Map.h"
-#include "game/Player.h"
+#include "game/object/GameObject.h"
 #include "Controller.h"
 #include "util/Log.h"
 

@@ -42,10 +42,12 @@ controls
 left=71
 right=72
 jump=73
-skills
+extensions
+gravity=true
+movementx=true
 multijump=true
 hook=false
 aguatransform=false
-paraglide=true
+paraglide=false
 teleport=false
 boost=true

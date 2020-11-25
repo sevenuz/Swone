@@ -1,19 +1,25 @@
-#ifndef SWONE_GAME_GAMEOBJECT_H
-#define SWONE_GAME_GAMEOBJECT_H
+#ifndef SWONE_GAME_OBJECT_GAMEOBJECT_H
+#define SWONE_GAME_OBJECT_GAMEOBJECT_H
 
 // Activate M_PI define
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <vector>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 
 #include "Handleable.h"
-#include "Map.h"
+#include "game/Map.h"
 #include "graphics/Animation.h"
 #include "graphics/AnimatedSprite.h"
 #include "util/reader/Reader.h"
 #include "util/Helper.h"
+
+#include "Extension.h"
+#include "game/object/extensions/Gravity.h"
+#include "game/object/extensions/MovementX.h"
+#include "game/object/extensions/MultiJump.h"
 
 #define SPEED_FACTOR 0.5
 #define DEFAULT_DRAG 100
@@ -48,6 +54,11 @@ public:
 	static constexpr const char* GAMEOBJECT_ANI_RIGHT_PARAGRAPH = "ani_right";
 	static constexpr const char* GAMEOBJECT_ANI_DOWN_PARAGRAPH = "ani_down";
 	static constexpr const char* GAMEOBJECT_ANI_STEADY_PARAGRAPH = "ani_steady";
+	// extensions
+	static constexpr const char* GAMEOBJECT_EXTENSIONS_PARAGRAPH = "extensions";
+	static constexpr const char* GAMEOBJECT_GRAVITY_EXTENSION = "gravity";
+	static constexpr const char* GAMEOBJECT_MOVEMENTX_EXTENSION = "movementx";
+	static constexpr const char* GAMEOBJECT_MULTIJUMP_EXTENSION = "multijump";
 
 	GameObject(std::map<std::string, StringMap>& setupMap);
 
@@ -57,14 +68,14 @@ public:
 
 	// TODO standard implementation of this functions
 	// calculate the next position of the object and save the result in m_nextPos
-	virtual sf::Vector2f& calculateVel(sf::Time ellapsed, float gravity);
+	virtual void calculateVel(sf::Time ellapsed, float gravity);
 	// calculate the next speed vct of the object and save the result in m_nextVec
-	virtual sf::Vector2f& calculatePos(sf::Time ellapsed);
+	virtual void calculatePos(sf::Time ellapsed);
 	// is called with the tiles which are hitting the corners
 	// of the hitbox of the m_nextPos vector
 	virtual void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom);
 	// if the object is complete out of map, this function is called
-	virtual void onOutOfMap();
+	virtual void onOutOfMap(MapTile border);
 
 	sf::Vector2f getHitboxLeftTop(const sf::Vector2f& pos);
 	sf::Vector2f getHitboxRightTop(const sf::Vector2f& pos);
@@ -91,9 +102,17 @@ public:
 
 	sf::Vector2f& getVel();
 	void setVel(sf::Vector2f pos);
+	void setVelX(float pos);
+	void setVelY(float pos);
 
 	sf::Vector2f& getPos();
 	void setPos(sf::Vector2f pos);
+
+	sf::Vector2f& getNextPos();
+	void setNextPos(sf::Vector2f pos);
+
+	sf::Vector2f& getNextVel();
+	void setNextVel(sf::Vector2f pos);
 
 	sf::FloatRect getHitbox();
 	void setHitbox(sf::FloatRect);
@@ -125,7 +144,9 @@ public:
 
 	// Write all the values that should be updated every tick into this function
 	void updateLog() const;
-protected:
+
+	static float calculateDrag(const float drag, const float angle, const float speed);
+private:
 	bool m_log = false;
 	bool m_showHitbox = true;
 	const std::string m_identifier;
@@ -161,10 +182,10 @@ protected:
 	// represents transformations relative to MapTiles,
 	// not to MapPixel, the inherited Transformable is used for that..
 	sf::Transformable m_objTransform;
-private:
+
 	void setAnimationFrames(Animation& animation, StringMap& frames);
 
-	static float calculateDrag(const float drag, const float angle, const float speed);
+	std::vector<Extension*> m_extensions;
 };
 
 #endif

@@ -72,11 +72,12 @@ void GameController::eventMap(sf::Event& e) {
 
 void GameController::updateGameObjects(sf::Time ellapsed) {
 	for (GameObject* g : m_game_objects) {
-		sf::Vector2f& pos = g->calculatePos(ellapsed);
+		g->calculatePos(ellapsed);
 		g->calculateVel(ellapsed, m_map->getGravity());
+		sf::Vector2f& pos = g->getNextPos();
 
 		if (pos.x > m_map->getWidth() || pos.x < 0 || pos.y > m_map->getHeight() || pos.y < 0) {
-			g->onOutOfMap();
+			g->onOutOfMap(m_map->getBorder());
 		}
 		else {
 			sf::Vector2f hbrb = g->getHitboxRightBottom(pos);
