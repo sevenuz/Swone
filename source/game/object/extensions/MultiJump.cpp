@@ -9,15 +9,11 @@
 
 MultiJump::MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {
-	for(auto& p: setupMap){
-		std::string paragraph = p.first;
-		if(paragraph == GAMEOBJECT_CONTROLS_PARAGRAPH) {
-			for(auto& s: p.second){
-				if(s.first == GAMEOBJECT_CONTROLS_JUMP_NAME)
-					m_key_up = (sf::Keyboard::Key)Helper::toInt(s.second);
-			}
-		}
+	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_JUMP_NAME))
+			m_key_up = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_JUMP_NAME]);
 	}
+	resetJump();
 }
 
 void MultiJump::jump() {

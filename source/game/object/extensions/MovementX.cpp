@@ -9,18 +9,11 @@
 
 MovementX::MovementX(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {
-	for(auto& p: setupMap){
-		std::string paragraph = p.first;
-		if(paragraph == GAMEOBJECT_CONTROLS_PARAGRAPH) {
-			for(auto& s: p.second){
-				const std::string k = s.first;
-				const std::string v = s.second;
-				if(k == GAMEOBJECT_CONTROLS_LEFT_NAME)
-					m_key_left = (sf::Keyboard::Key)Helper::toInt(v);
-				else if(k == GAMEOBJECT_CONTROLS_RIGHT_NAME)
-					m_key_right = (sf::Keyboard::Key)Helper::toInt(v);
-			}
-		}
+	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_LEFT_NAME))
+			m_key_left = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_LEFT_NAME]);
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_RIGHT_NAME))
+			m_key_right = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_RIGHT_NAME]);
 	}
 }
 

@@ -13,14 +13,18 @@
 #include "util/reader/Reader.h"
 #include "game/object/Extension.h"
 
+#define DEFAULT_DRAG 100
+
+// This scales the drag, so that with a Gravity of 25 and a
+// drag property of 100, a terminal velocity of 50 is reached
+#define SCALE_DRAG_CONST 0.0000000276f
+
+
 class Gravity : public Extension {
 public:
-	// controls
-	static constexpr const char* GAMEOBJECT_CONTROLS_PARAGRAPH = "controls";
-	static constexpr const char* GAMEOBJECT_CONTROLS_LEFT_NAME = "left";
-	static constexpr const char* GAMEOBJECT_CONTROLS_RIGHT_NAME = "right";
+	static constexpr const char* DRAG_NAME = "drag";
 
-	Gravity(GameObject* obj);
+	Gravity(GameObject* obj, std::map<std::string, StringMap>& setupMap);
 	static float calculateDrag(const float drag, const float angle, const float speed);
 
 	void calculateVel(sf::Time ellapsed, float gravity) override;
@@ -28,8 +32,8 @@ public:
 	void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) override;
 	void onOutOfMap(MapTile border) override;
 private:
-	sf::Keyboard::Key m_key_left = sf::Keyboard::Left;
-	sf::Keyboard::Key m_key_right = sf::Keyboard::Right;
+	// higher drag means slower falling
+	float m_drag = DEFAULT_DRAG;
 };
 
 #endif

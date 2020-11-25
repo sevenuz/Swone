@@ -17,14 +17,9 @@
 #include "util/Helper.h"
 
 #define SPEED_FACTOR 0.5
-#define DEFAULT_DRAG 100
 
 #define JUMP_FORCE 16
 #define MOVE_FORCE 7
-
-// This scales the drag, so that with a Gravity of 25 and a
-// drag property of 100, a terminal velocity of 50 is reached
-#define SCALE_DRAG_CONST 0.0000000276f
 
 // forward declaration to avoid dependency cyclus
 class Extension;
@@ -45,7 +40,6 @@ public:
 	static constexpr const char* GAMEOBJECT_COLOR_NAME = "color";
 	static constexpr const char* GAMEOBJECT_TEXTURE_NAME = "texture";
 	static constexpr const char* GAMEOBJECT_HITBOX_NAME = "hitbox";
-	static constexpr const char* GAMEOBJECT_DRAG_NAME = "drag";
 	// animation paragraphs (keys are irrelevant)
 	static constexpr const char* GAMEOBJECT_ANI_UP_PARAGRAPH = "ani_up";
 	static constexpr const char* GAMEOBJECT_ANI_LEFT_PARAGRAPH = "ani_left";
@@ -115,12 +109,15 @@ public:
 	sf::FloatRect getHitbox();
 	void setHitbox(sf::FloatRect);
 
-	float getDrag();
-	void setDrag(float s);
-
 	sf::Transformable getObjTransform() const;
 	void setAngle(float s);
 	void setScale(float s);
+
+	bool isVisible();
+	void setVisible(bool s);
+
+	bool isVisibleHitbox();
+	void setVisibleHitbox(bool s);
 
 	bool isMoving();
 	bool isFalling();
@@ -144,7 +141,8 @@ public:
 	void updateLog() const;
 private:
 	bool m_log = false;
-	bool m_showHitbox = true;
+	bool m_visibleHitbox = true;
+	bool m_visible = true;
 	const std::string m_identifier;
 	std::string m_name;
 
@@ -173,8 +171,6 @@ private:
 	// TODO
 	sf::FloatRect m_hitbox = sf::FloatRect(0.1875, 0.0, 0.1094, 0.5);
 
-	// higher drag means slower falling
-	float m_drag = DEFAULT_DRAG;
 	// represents transformations relative to MapTiles,
 	// not to MapPixel, the inherited Transformable is used for that..
 	sf::Transformable m_objTransform;

@@ -15,10 +15,9 @@
 
 class MovementX : public Extension {
 public:
-	// controls
-	static constexpr const char* GAMEOBJECT_CONTROLS_PARAGRAPH = "controls";
-	static constexpr const char* GAMEOBJECT_CONTROLS_LEFT_NAME = "left";
-	static constexpr const char* GAMEOBJECT_CONTROLS_RIGHT_NAME = "right";
+	// in controls paragraph
+	static constexpr const char* CONTROLS_LEFT_NAME = "left";
+	static constexpr const char* CONTROLS_RIGHT_NAME = "right";
 
 	MovementX(GameObject* obj, std::map<std::string, StringMap>& setupMap);
 	void event(sf::Event& e) override;

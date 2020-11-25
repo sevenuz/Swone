@@ -16,9 +16,8 @@
 
 class MultiJump : public Extension {
 public:
-	// controls
-	static constexpr const char* GAMEOBJECT_CONTROLS_PARAGRAPH = "controls";
-	static constexpr const char* GAMEOBJECT_CONTROLS_JUMP_NAME = "jump";
+	// in controls paragraph
+	static constexpr const char* CONTROLS_JUMP_NAME = "jump";
 
 	MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap);
 	void event(sf::Event& e) override;

@@ -8,6 +8,7 @@
 GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	: m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_ID_NAME])
 {
+	// TODO remove loop?
 	for(auto& s: setupMap[Reader::DEFAULT_PARAGRAPH]){
 		const std::string k = s.first;
 		const std::string v = s.second;
@@ -23,8 +24,6 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			setTexturePath(v);
 		else if(k == GAMEOBJECT_HITBOX_NAME)
 			setHitbox(Helper::toFloatRect(v));
-		else if(k == GAMEOBJECT_DRAG_NAME)
-			setDrag(Helper::toFloat(v));
 	}
 	for(auto& p: setupMap){
 		std::string paragraph = p.first;
@@ -40,10 +39,9 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			setAnimationFrames(m_ani_steady, p.second);
 		}
 	}
-
-	if(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH].size()>0){
+	if(setupMap.count(GAMEOBJECT_EXTENSIONS_PARAGRAPH)){
 		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_GRAVITY_EXTENSION]))
-			m_extensions.push_back(new Gravity(this));
+			m_extensions.push_back(new Gravity(this, setupMap));
 		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MOVEMENTX_EXTENSION]))
 			m_extensions.push_back(new MovementX(this, setupMap));
 		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MULTIJUMP_EXTENSION]))
@@ -175,21 +173,23 @@ void GameObject::onOutOfMap(MapTile border) {
 };
 
 void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	states.transform *= getTransform() * m_objTransform.getTransform();
-	target.draw(m_sprite, states);
+	if(m_visible) {
+		states.transform *= getTransform() * m_objTransform.getTransform();
+		target.draw(m_sprite, states);
+	}
 
-	if(!m_showHitbox)
-		return;
+	if(m_visibleHitbox) {
+		sf::FloatRect h = getHitboxBounds();
+		sf::RectangleShape rectangle;
+		rectangle.setSize(sf::Vector2f(h.width, h.height));
+		rectangle.setOutlineColor(sf::Color::Red);
+		rectangle.setOutlineThickness(1);
+		rectangle.setFillColor(sf::Color::Transparent);
+		rectangle.setPosition(h.left, h.top);
+		target.draw(rectangle, states);
+	}
 
-	sf::FloatRect h = getHitboxBounds();
-	sf::RectangleShape rectangle;
-	rectangle.setSize(sf::Vector2f(h.width, h.height));
-	rectangle.setOutlineColor(sf::Color::Red);
-	rectangle.setOutlineThickness(1);
-	rectangle.setFillColor(sf::Color::Transparent);
-	rectangle.setPosition(h.left, h.top);
-	target.draw(rectangle, states);
-
+	for(Extension* e : m_extensions) e->draw(target, states);
 }
 
 void GameObject::toggleLogging()
@@ -275,16 +275,6 @@ void GameObject::setHitbox(sf::FloatRect f)
 	m_hitbox = f;
 }
 
-float GameObject::getDrag()
-{
-	return m_drag;
-}
-
-void GameObject::setDrag(float s)
-{
-	m_drag = s;
-}
-
 sf::Transformable GameObject::getObjTransform() const
 {
 	return m_objTransform;
@@ -311,6 +301,27 @@ sf::Vector2f& GameObject::getPos() {
 AnimatedSprite* GameObject::getAnimatedSprite() {
 	return &m_sprite;
 }
+
+bool GameObject::isVisible()
+{
+	return m_visible;
+}
+
+void GameObject::setVisible(bool s)
+{
+	m_visible = s;
+}
+
+bool GameObject::isVisibleHitbox()
+{
+	return m_visibleHitbox;
+}
+
+void GameObject::setVisibleHitbox(bool s)
+{
+	m_visibleHitbox = s;
+}
+
 
 bool GameObject::isMoving() {
 	return m_isMoving;
