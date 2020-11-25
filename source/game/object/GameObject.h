@@ -58,7 +58,6 @@ public:
 	virtual void event(sf::Event& e);
 	virtual void update(sf::Time ellapsed);
 
-	// TODO standard implementation of this functions
 	// calculate the next position of the object and save the result in m_nextPos
 	virtual void calculateVel(sf::Time ellapsed, float gravity);
 	// calculate the next speed vct of the object and save the result in m_nextVec
