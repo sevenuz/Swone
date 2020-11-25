@@ -2,8 +2,7 @@
 #define SWONE_GAME_OBJECT_EXTENSION_H
 
 #include "game/Map.h"
-// forward declaration to avoid dependency cyclus
-class GameObject;
+#include "game/object/GameObject.h"
 
 // Interface, defining functionality which can be added to a GameObject
 class Extension {

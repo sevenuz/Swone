@@ -1,5 +1,10 @@
 #include "GameObject.h"
 
+// necessary because of forward declaration in GameObject.h
+#include "game/object/extensions/Gravity.h"
+#include "game/object/extensions/MovementX.h"
+#include "game/object/extensions/MultiJump.h"
+
 GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	: m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_ID_NAME])
 {
@@ -79,11 +84,6 @@ sf::FloatRect GameObject::getHitboxBounds() const {
 	float w = m_hitbox.width * Map::TILE_WIDTH;
 	float h = m_hitbox.height * Map::TILE_HEIGHT;
 	return sf::FloatRect(x, y, w, h);
-}
-
-// This function should probably be moved sooner or later
-float GameObject::calculateDrag(const float drag, const float angle, const float speed) {
-	return pow(speed, 2) * std::cos(angle * M_PI / 180.0) * drag * SCALE_DRAG_CONST;
 }
 
 void GameObject::calculateVel(sf::Time ellapsed, float gravity) {

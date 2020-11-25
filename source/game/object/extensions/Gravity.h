@@ -21,6 +21,8 @@ public:
 	static constexpr const char* GAMEOBJECT_CONTROLS_RIGHT_NAME = "right";
 
 	Gravity(GameObject* obj);
+	static float calculateDrag(const float drag, const float angle, const float speed);
+
 	void calculateVel(sf::Time ellapsed, float gravity) override;
 	void calculatePos(sf::Time ellapsed) override;
 	void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) override;

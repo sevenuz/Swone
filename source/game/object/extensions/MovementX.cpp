@@ -6,8 +6,6 @@
  */
 
 #include "MovementX.h"
-// necessary because of forward declaration in Extension.h
-#include "game/object/GameObject.h"
 
 MovementX::MovementX(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {

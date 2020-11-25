@@ -16,11 +16,6 @@
 #include "util/reader/Reader.h"
 #include "util/Helper.h"
 
-#include "Extension.h"
-#include "game/object/extensions/Gravity.h"
-#include "game/object/extensions/MovementX.h"
-#include "game/object/extensions/MultiJump.h"
-
 #define SPEED_FACTOR 0.5
 #define DEFAULT_DRAG 100
 
@@ -30,6 +25,9 @@
 // This scales the drag, so that with a Gravity of 25 and a
 // drag property of 100, a terminal velocity of 50 is reached
 #define SCALE_DRAG_CONST 0.0000000276f
+
+// forward declaration to avoid dependency cyclus
+class Extension;
 
 class GameObject : public Handleable {
 public:
@@ -144,8 +142,6 @@ public:
 
 	// Write all the values that should be updated every tick into this function
 	void updateLog() const;
-
-	static float calculateDrag(const float drag, const float angle, const float speed);
 private:
 	bool m_log = false;
 	bool m_showHitbox = true;

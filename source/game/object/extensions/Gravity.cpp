@@ -5,11 +5,13 @@
  *      Author: julius
  */
 #include "Gravity.h"
-// necessary because of forward declaration in Extension.h
-#include "game/object/GameObject.h"
 
 Gravity::Gravity(GameObject* obj) : Extension(obj)
 {}
+
+float Gravity::calculateDrag(const float drag, const float angle, const float speed) {
+	return pow(speed, 2) * std::cos(angle * M_PI / 180.0) * drag * SCALE_DRAG_CONST;
+}
 
 void Gravity::calculateVel(sf::Time ellapsed, float gravity)
 {
@@ -18,7 +20,7 @@ void Gravity::calculateVel(sf::Time ellapsed, float gravity)
 	const float s = ellapsed.asSeconds();
 	float fx = m_obj->getVel().x;
 
-	float drag = GameObject::calculateDrag(m_obj->getDrag(), m_obj->getObjTransform().getRotation(), m_obj->getVel().y);
+	float drag = calculateDrag(m_obj->getDrag(), m_obj->getObjTransform().getRotation(), m_obj->getVel().y);
 	float fy = m_obj->getVel().y + (gravity * s);
 	fy = fy > 0 ? std::max(fy - (drag * s), 0.0f) : std::min(fy + (drag * s), 0.0f);
 

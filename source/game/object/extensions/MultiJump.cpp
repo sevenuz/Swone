@@ -6,8 +6,6 @@
  */
 
 #include "MultiJump.h"
-// necessary because of forward declaration in Extension.h
-#include "game/object/GameObject.h"
 
 MultiJump::MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {
