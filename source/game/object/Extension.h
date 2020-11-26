@@ -16,8 +16,8 @@ public:
 	virtual void update(sf::Time ellapsed){};
 	virtual void calculateVel(sf::Time ellapsed, float gravity){};
 	virtual void calculatePos(sf::Time ellapsed){};
-	virtual void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom){};
-	virtual void onOutOfMap(MapTile border){};
+	virtual void onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom){};
+	virtual void onOutOfMap(Tile border){};
 
 	virtual void updateLog(){};
 protected:

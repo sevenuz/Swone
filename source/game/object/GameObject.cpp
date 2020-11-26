@@ -132,9 +132,9 @@ void GameObject::updateFlags() {
 	m_isMoving = m_vel.x != 0;
 }
 
-void GameObject::stopFalling() {
-	m_vel.y = 0;
+void GameObject::stopFalling(float y) {
 	m_nextVel.y = 0;
+	m_nextPos.y = y-m_hitbox.height;
 }
 
 void GameObject::apply() {
@@ -146,7 +146,6 @@ void GameObject::apply() {
 }
 
 void GameObject::applyX() {
-	m_nextPos.y = m_pos.y;
 	apply();
 }
 
@@ -164,11 +163,11 @@ void GameObject::event(sf::Event& ev) {
 	for(Extension* e : m_extensions) e->event(ev);
 }
 
-void GameObject::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) {
+void GameObject::onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom) {
 	for(Extension* e : m_extensions) e->onTiles(leftTop, rightTop, leftBottom, rightBottom);
 }
 
-void GameObject::onOutOfMap(MapTile border) {
+void GameObject::onOutOfMap(Tile border) {
 	for(Extension* e : m_extensions) e->onOutOfMap(border);
 };
 

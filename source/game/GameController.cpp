@@ -76,20 +76,15 @@ void GameController::updateGameObjects(sf::Time ellapsed) {
 		g->calculateVel(ellapsed, m_map->getGravity());
 		sf::Vector2f& pos = g->getNextPos();
 
-		if (pos.x > m_map->getWidth() || pos.x < 0 || pos.y > m_map->getHeight() || pos.y < 0) {
-			g->onOutOfMap(m_map->getBorder());
-		}
-		else {
-			sf::Vector2f hbrb = g->getHitboxRightBottom(pos);
-			sf::Vector2f hblb = g->getHitboxLeftBottom(pos);
-			sf::Vector2f hbrt = g->getHitboxRightTop(pos);
-			sf::Vector2f hblt = g->getHitboxLeftTop(pos);
-			MapTile tile_rb = m_map->getMapDataValue(round(hbrb.y), round(hbrb.x));
-			MapTile tile_lb = m_map->getMapDataValue(round(hblb.y), round(hblb.x));
-			MapTile tile_rt = m_map->getMapDataValue(round(hbrt.y), round(hbrt.x));
-			MapTile tile_lt = m_map->getMapDataValue(round(hblt.y), round(hblt.x));
-			g->onTiles(tile_lt, tile_rt, tile_lb, tile_rb);
-		}
+		sf::Vector2f hbrb = g->getHitboxRightBottom(pos);
+		sf::Vector2f hblb = g->getHitboxLeftBottom(pos);
+		sf::Vector2f hbrt = g->getHitboxRightTop(pos);
+		sf::Vector2f hblt = g->getHitboxLeftTop(pos);
+		const Tile& tile_rb = m_map->getTile(round(hbrb.y), round(hbrb.x));
+		const Tile& tile_lb = m_map->getTile(round(hblb.y), round(hblb.x));
+		const Tile& tile_rt = m_map->getTile(round(hbrt.y), round(hbrt.x));
+		const Tile& tile_lt = m_map->getTile(round(hblt.y), round(hblt.x));
+		g->onTiles(tile_lt, tile_rt, tile_lb, tile_rb);
 
 		setViewCenter(g->getPos());
 		g->update(ellapsed);

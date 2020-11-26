@@ -35,9 +35,6 @@ ani_down
 // here same like ani_up
 ani_steady
 1=(32, 0, 32, 32)
-2=(64, 0, 32, 32)
-3=(32, 0, 32, 32)
-4=(0, 0, 32, 32)
 controls
 left=0
 right=3

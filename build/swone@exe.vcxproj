@@ -121,12 +121,6 @@
       <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)source_game_GameController.cpp.obj</ObjectFileName>
     </CLCompile>
-    <CLCompile Include="..\source/game/GameObject.cpp">
-      <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ObjectFileName>$(IntDir)source_game_GameObject.cpp.obj</ObjectFileName>
-    </CLCompile>
     <CLCompile Include="..\source/game/GameWindow.cpp">
       <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
@@ -139,11 +133,29 @@
       <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)source_game_Map.cpp.obj</ObjectFileName>
     </CLCompile>
-    <CLCompile Include="..\source/game/Player.cpp">
+    <CLCompile Include="..\source/game/object/GameObject.cpp">
       <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ObjectFileName>$(IntDir)source_game_Player.cpp.obj</ObjectFileName>
+      <ObjectFileName>$(IntDir)source_game_object_GameObject.cpp.obj</ObjectFileName>
+    </CLCompile>
+    <CLCompile Include="..\source/game/object/extensions/MovementX.cpp">
+      <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)source_game_object_extensions_MovementX.cpp.obj</ObjectFileName>
+    </CLCompile>
+    <CLCompile Include="..\source/game/object/extensions/MultiJump.cpp">
+      <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)source_game_object_extensions_MultiJump.cpp.obj</ObjectFileName>
+    </CLCompile>
+    <CLCompile Include="..\source/game/object/extensions/Gravity.cpp">
+      <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)source_game_object_extensions_Gravity.cpp.obj</ObjectFileName>
     </CLCompile>
     <CLCompile Include="..\source/util/reader/Reader.cpp">
       <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>

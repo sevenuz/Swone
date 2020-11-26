@@ -13,6 +13,9 @@
 #include "util/reader/Reader.h"
 #include "game/object/Extension.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #define DEFAULT_DRAG 100
 
 // This scales the drag, so that with a Gravity of 25 and a
@@ -29,8 +32,8 @@ public:
 
 	void calculateVel(sf::Time ellapsed, float gravity) override;
 	void calculatePos(sf::Time ellapsed) override;
-	void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom) override;
-	void onOutOfMap(MapTile border) override;
+	void onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom) override;
+	void onOutOfMap(Tile border) override;
 private:
 	// higher drag means slower falling
 	float m_drag = DEFAULT_DRAG;

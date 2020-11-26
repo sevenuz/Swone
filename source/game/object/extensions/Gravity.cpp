@@ -46,10 +46,10 @@ void Gravity::calculatePos(sf::Time ellapsed)
 	m_obj->setNextPos(sf::Vector2f(x,y));
 }
 
-void Gravity::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom)
+void Gravity::onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom)
 {
-	if (leftBottom != MapTile::SPACE || rightBottom != MapTile::SPACE) {
-		m_obj->stopFalling();
+	if (leftBottom.type != MapTile::SPACE || rightBottom.type != MapTile::SPACE) {
+		m_obj->stopFalling(rightBottom.pos.y);
 		m_obj->applyX();
 	}
 	else {
@@ -57,7 +57,7 @@ void Gravity::onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, Map
 	}
 }
 
-void Gravity::onOutOfMap(MapTile border)
+void Gravity::onOutOfMap(Tile border)
 {
 	onTiles(border, border, border, border);
 }

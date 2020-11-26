@@ -64,9 +64,9 @@ public:
 	virtual void calculatePos(sf::Time ellapsed);
 	// is called with the tiles which are hitting the corners
 	// of the hitbox of the m_nextPos vector
-	virtual void onTiles(MapTile leftTop, MapTile rightTop, MapTile leftBottom, MapTile rightBottom);
+	virtual void onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom);
 	// if the object is complete out of map, this function is called
-	virtual void onOutOfMap(MapTile border);
+	virtual void onOutOfMap(Tile border);
 
 	sf::Vector2f getHitboxLeftTop(const sf::Vector2f& pos);
 	sf::Vector2f getHitboxRightTop(const sf::Vector2f& pos);
@@ -124,7 +124,7 @@ public:
 	// changes moving, falling, rising flags
 	void updateFlags();
 	// sets velocity of y to zero
-	void stopFalling();
+	void stopFalling(float y);
 
 	void apply();
 	void applyX();

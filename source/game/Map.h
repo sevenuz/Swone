@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <memory>;
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -17,6 +18,14 @@
 #define GRAVITY 25
 
 enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
+
+struct Tile {
+	sf::Vector2i pos;
+	MapTile type;
+
+	Tile(sf::Vector2i pos = sf::Vector2i(0, 0), MapTile type = MapTile::DEFAULT) : pos(pos), type(type)
+	{}
+};
 
 class Map : public Handleable
 {
@@ -55,10 +64,8 @@ public:
 	float getScale();
 
 	MapTile getBorder();
-	MapTile& getMapData();
-	MapTile getMapDataValue(size_t h, size_t w);
-	void setMapDataValue(size_t h, size_t w, MapTile v);
-	void iniMapData();
+	const Tile& getTile(int h, int w) const;
+	void setMapDataValue(size_t h, size_t w, Tile v);
 
 	void createMapImage();
 protected:
@@ -80,7 +87,7 @@ private:
 
 	float m_scale = 1;
 
-	MapTile* m_mapData;//pointer (2d-array) to Map Infos
+	std::map<int, std::map<int, Tile>> m_mapData;//pointer (2d-array) to Map Infos
 	MapTile m_border;
 
 	sf::Image m_mapTiles;//Img with all tiles

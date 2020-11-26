@@ -90,7 +90,6 @@ void MapReader::startParseMap()
 {
 	m_mapParse = true;
 	m_mapLineCounter = 0;
-	m_map->iniMapData();
 	Log::ger().log("start map parsing",Log::Label::Default,SHOW_LOG_MAPREADER);
 }
 
@@ -126,6 +125,6 @@ MapTile MapReader::charToMapTile(char c)
 
 void MapReader::parseMapChar(char c, size_t h, size_t w)
 {
-	m_map->setMapDataValue(h, w, MapReader::charToMapTile(c));
+	m_map->setMapDataValue(h, w, Tile(sf::Vector2i(w, h), MapReader::charToMapTile(c)));
 }
 
