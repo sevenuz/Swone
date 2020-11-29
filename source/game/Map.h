@@ -3,7 +3,7 @@
 
 #include <string>
 #include <stdexcept>
-#include <memory>;
+#include <memory>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -64,7 +64,7 @@ public:
 	float getScale();
 
 	MapTile getBorder();
-	const Tile& getTile(int h, int w) const;
+	const Tile& getTile(int h, int w);
 	void setMapDataValue(size_t h, size_t w, Tile v);
 
 	void createMapImage();

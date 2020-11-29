@@ -73,9 +73,10 @@ float Map::getScale() {
 	return m_scale;
 }
 
-const Tile& Map::getTile(int h, int w) const {
-	if (h >= m_height || w >= m_width) {
-		return *std::unique_ptr<Tile>(new Tile(sf::Vector2i(w, h)));
+const Tile& Map::getTile(int h, int w) {
+	if (!m_mapData[h].count(w)) {
+		// add border tile to map if coordinate not exists
+		setMapDataValue(h, w, *new Tile(sf::Vector2i(w, h), m_border));
 	}
 	return m_mapData.at(h).at(w);
 }
@@ -103,7 +104,7 @@ void Map::createMapImage() {
 	m_imgWidth = Map::TILE_WIDTH * m_width;
 	m_imgHeight = Map::TILE_HEIGHT * m_height;
 	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Black);
-	for (size_t r = 0; r < m_width; r++) 
+	for (size_t r = 0; r < m_width; r++)
 		for (size_t c = 0; c < m_height; c++)
 			m_mapImage.copy(m_mapTiles, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
 				sf::IntRect(getTile(r, c).type * Map::TILE_WIDTH, 0,
