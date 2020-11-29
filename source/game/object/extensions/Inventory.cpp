@@ -64,6 +64,8 @@ void Inventory::update(sf::Time ellapsed)
 
 void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+	const sf::View gv = target.getView();
+
 	target.setView(target.getDefaultView());
 	states.transform = sf::Transform::Identity;
 	const float rectSize = 25;
@@ -77,4 +79,6 @@ void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		target.draw(rectangle, states);
 	}
 	target.draw(m_ps, states);
+
+	target.setView(gv);
 }
