@@ -8,7 +8,7 @@
 
 int Inventory::Inventory_count = 0;
 
-Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj), m_ps(100)
+Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {
 	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
 		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_1))
@@ -19,47 +19,60 @@ Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap
 			m_key_inv3 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_3]);
 	}
 
-	m_ps.setColor(sf::Color::White);
-	m_ps.setDrawingType(sf::Quads);
-	m_ps.setLifetime(sf::seconds(1));
-	m_ps.setOrigin(10,10,10,10, Origin::ON_BORDER);
-	m_ps.setGravity(15,15);
+	sf::Vector2f sizeVct = sf::Vector2f(INVENTORY_WIDTH, INVENTORY_HEIGHT);
+	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
+		sf::Vector2f posVct = sf::Vector2f(1 + i * INVENTORY_WIDTH, Inventory_count * INVENTORY_SIZE * INVENTORY_HEIGHT);
 
-	m_inventoryIndex = Inventory_count;
+		sf::RectangleShape* r = new sf::RectangleShape(sizeVct);
+		r->setPosition(posVct);
+		r->setOutlineColor(m_obj->getColor());
+		r->setOutlineThickness(2);
+		r->setFillColor(sf::Color::Transparent);
+		m_rectangles[i] = r;
+
+		ParticleSystem* ps = new ParticleSystem(50);
+		ps->setColor(sf::Color::White);
+		ps->setDrawingType(sf::Quads);
+		ps->setLifetime(sf::seconds(1));
+		ps->setOrigin(posVct, sizeVct, Origin::ON_BORDER);
+		m_particleSystems[i] = ps;
+
+			m_items[i] = m_obj;
+	}
+
 	Inventory_count++;
 }
 
 void Inventory::event(sf::Event& e)
 {
-	/*
-	if (event.type == sf::Event::KeyPressed) {
-		if (event.key.code == m_key_inv1) {
-			m_selection |= 0b1;
+	if (e.type == sf::Event::KeyPressed) {
+		if (e.key.code == m_key_inv1) {
+			m_selection[0] = true;
 		}
-		if (event.key.code == m_key_inv2) {
-			m_selection |= 0b10;
+		if (e.key.code == m_key_inv2) {
+			m_selection[1] = true;
 		}
-		if (event.key.code == m_key_inv3) {
-			m_selection |= 0b100;
-		}
-	}
-	else if (event.type == sf::Event::KeyReleased) {
-		if (event.key.code == m_key_inv1) {
-			m_selection &= 0b1;
-		}
-		if (event.key.code == m_key_inv2) {
-			m_selection &= 0b10;
-		}
-		if (event.key.code == m_key_inv3) {
-			m_selection &= 0b100;
+		if (e.key.code == m_key_inv3) {
+			m_selection[2] = true;
 		}
 	}
-	*/
+	else if (e.type == sf::Event::KeyReleased) {
+		if (e.key.code == m_key_inv1) {
+			m_selection[0] = false;
+		}
+		if (e.key.code == m_key_inv2) {
+			m_selection[1] = false;
+		}
+		if (e.key.code == m_key_inv3) {
+			m_selection[2] = false;
+		}
+	}
 }
 
 void Inventory::update(sf::Time ellapsed)
 {
-	m_ps.update(ellapsed);
+	for(ParticleSystem* ps : m_particleSystems)
+		ps->update(ellapsed);
 }
 
 void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -67,18 +80,14 @@ void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	const sf::View gv = target.getView();
 
 	target.setView(target.getDefaultView());
-	states.transform = sf::Transform::Identity;
-	const float rectSize = 25;
-	for(size_t j = 0; j < m_items.size(); j++) {
-		sf::RectangleShape rectangle;
-		rectangle.setPosition(sf::Vector2f(rectSize + m_inventoryIndex*m_items.size()*rectSize, j*rectSize));
-		rectangle.setSize(sf::Vector2f(rectSize, rectSize));
-		rectangle.setOutlineColor(m_obj->getColor());
-		rectangle.setOutlineThickness(2);
-		rectangle.setFillColor(sf::Color::Transparent);
-		target.draw(rectangle, states);
+	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
+		states.transform = sf::Transform::Identity * m_rectangles[i]->getTransform();
+		target.draw(*m_items[i]->getAnimatedSprite(), states);
+		states.transform = sf::Transform::Identity;
+		target.draw(*m_rectangles[i], states);
+		if(m_selection[i])
+			target.draw(*m_particleSystems[i], states);
 	}
-	target.draw(m_ps, states);
 
 	target.setView(gv);
 }

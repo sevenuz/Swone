@@ -16,6 +16,11 @@
 #include "util/reader/Reader.h"
 #include "game/object/Extension.h"
 
+#define INVENTORY_SIZE 3
+
+#define INVENTORY_WIDTH 40
+#define INVENTORY_HEIGHT 40
+
 class Inventory : public Extension {
 public:
 	// in controls paragraph
@@ -34,16 +39,10 @@ private:
 	sf::Keyboard::Key m_key_inv2 = sf::Keyboard::Period;
 	sf::Keyboard::Key m_key_inv3 = sf::Keyboard::Hyphen;
 
-	// used as binaray flags
-	// 1 item1 = 1
-	// 1 item2 = 2
-	// 1 item3 = 4
-	unsigned int m_selection = 0;
-
-	int m_inventoryIndex = 0;
-
-	ParticleSystem m_ps;
-	std::array<GameObject*, 3> m_items;
+	std::array<bool, INVENTORY_SIZE> m_selection = {};
+	std::array<sf::RectangleShape*, INVENTORY_SIZE> m_rectangles;
+	std::array<ParticleSystem*, INVENTORY_SIZE> m_particleSystems;
+	std::array<GameObject*, INVENTORY_SIZE> m_items;
 };
 
 #endif
