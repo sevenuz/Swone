@@ -33,8 +33,6 @@ private:
 	unsigned int m_jumpsPossible = 2; // possible jumps without landing
 	unsigned int m_jumps = 0; // count of current jumps
 
-	sf::Keyboard::Key m_key_left = sf::Keyboard::Left;
-	sf::Keyboard::Key m_key_right = sf::Keyboard::Right;
 	sf::Keyboard::Key m_key_up = sf::Keyboard::Up;
 };
 

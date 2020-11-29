@@ -43,6 +43,7 @@ extensions
 gravity=true
 movementx=true
 multijump=true
+inventory=true
 hook=false
 aguatransform=false
 paraglide=false

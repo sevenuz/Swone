@@ -51,6 +51,7 @@ public:
 	static constexpr const char* GAMEOBJECT_GRAVITY_EXTENSION = "gravity";
 	static constexpr const char* GAMEOBJECT_MOVEMENTX_EXTENSION = "movementx";
 	static constexpr const char* GAMEOBJECT_MULTIJUMP_EXTENSION = "multijump";
+	static constexpr const char* GAMEOBJECT_INVENTORY_EXTENSION = "inventory";
 
 	GameObject(std::map<std::string, StringMap>& setupMap);
 
@@ -98,12 +99,18 @@ public:
 
 	sf::Vector2f& getPos();
 	void setPos(sf::Vector2f pos);
+	void setPosX(float pos);
+	void setPosY(float pos);
 
 	sf::Vector2f& getNextPos();
 	void setNextPos(sf::Vector2f pos);
+	void setNextPosX(float pos);
+	void setNextPosY(float pos);
 
 	sf::Vector2f& getNextVel();
 	void setNextVel(sf::Vector2f pos);
+	void setNextVelX(float pos);
+	void setNextVelY(float pos);
 
 	sf::FloatRect getHitbox();
 	void setHitbox(sf::FloatRect);
@@ -123,8 +130,6 @@ public:
 	bool isRising();
 	// changes moving, falling, rising flags
 	void updateFlags();
-	// sets velocity of y to zero
-	void stopFalling(float y);
 
 	void apply();
 	void applyX();

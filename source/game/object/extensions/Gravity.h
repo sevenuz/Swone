@@ -29,6 +29,8 @@ public:
 
 	Gravity(GameObject* obj, std::map<std::string, StringMap>& setupMap);
 	static float calculateDrag(const float drag, const float angle, const float speed);
+		// sets velocity of y to zero
+	void stopFalling(float y);
 
 	void calculateVel(sf::Time ellapsed, float gravity) override;
 	void calculatePos(sf::Time ellapsed) override;

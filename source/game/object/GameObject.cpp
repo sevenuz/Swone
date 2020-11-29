@@ -4,6 +4,7 @@
 #include "game/object/extensions/Gravity.h"
 #include "game/object/extensions/MovementX.h"
 #include "game/object/extensions/MultiJump.h"
+#include "game/object/extensions/Inventory.h"
 
 GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	: m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_ID_NAME])
@@ -46,6 +47,8 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			m_extensions.push_back(new MovementX(this, setupMap));
 		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MULTIJUMP_EXTENSION]))
 			m_extensions.push_back(new MultiJump(this, setupMap));
+		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_INVENTORY_EXTENSION]))
+			m_extensions.push_back(new Inventory(this, setupMap));
 	}
 }
 
@@ -132,13 +135,7 @@ void GameObject::updateFlags() {
 	m_isMoving = m_vel.x != 0;
 }
 
-void GameObject::stopFalling(float y) {
-	m_nextVel.y = 0;
-	m_nextPos.y = y-m_hitbox.height;
-}
-
 void GameObject::apply() {
-	updateFlags();
 	setPos(m_nextPos);
 	setVel(m_nextVel);
 	updateFlags();
@@ -146,6 +143,7 @@ void GameObject::apply() {
 }
 
 void GameObject::applyX() {
+	m_nextPos.y = m_pos.y;
 	apply();
 }
 
@@ -290,13 +288,6 @@ void GameObject::setScale(float s)
 	m_objTransform.setScale(s, s);
 }
 
-sf::Vector2f& GameObject::getVel() {
-	return m_vel;
-}
-sf::Vector2f& GameObject::getPos() {
-	return m_pos;
-}
-
 AnimatedSprite* GameObject::getAnimatedSprite() {
 	return &m_sprite;
 }
@@ -334,9 +325,27 @@ bool GameObject::isFalling() {
 	return m_isFalling;
 }
 
+sf::Vector2f& GameObject::getPos() {
+	return m_pos;
+}
+
 void GameObject::setPos(sf::Vector2f pos) {
 	m_pos = pos;
 	setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
+}
+
+void GameObject::setPosX(float pos)
+{
+	m_pos.x = pos;
+}
+
+void GameObject::setPosY(float pos)
+{
+	m_pos.y = pos;
+}
+
+sf::Vector2f& GameObject::getVel() {
+	return m_vel;
 }
 
 void GameObject::setVel(sf::Vector2f vel) {
@@ -363,6 +372,16 @@ void GameObject::setNextPos(sf::Vector2f pos)
 	m_nextPos = pos;
 }
 
+void GameObject::setNextPosX(float pos)
+{
+	m_nextPos.x = pos;
+}
+
+void GameObject::setNextPosY(float pos)
+{
+	m_nextPos.y = pos;
+}
+
 sf::Vector2f& GameObject::getNextVel()
 {
 	return m_nextVel;
@@ -371,6 +390,16 @@ sf::Vector2f& GameObject::getNextVel()
 void GameObject::setNextVel(sf::Vector2f pos)
 {
 	m_nextVel = pos;
+}
+
+void GameObject::setNextVelX(float pos)
+{
+	m_nextVel.x = pos;
+}
+
+void GameObject::setNextVelY(float pos)
+{
+	m_nextVel.y = pos;
 }
 
 

@@ -14,6 +14,11 @@ Gravity::Gravity(GameObject* obj, std::map<std::string, StringMap>& setupMap) : 
 	}
 }
 
+void Gravity::stopFalling(float y) {
+	m_obj->setNextVelY(0);
+	m_obj->setNextPosY(y-m_obj->getHitbox().height);
+}
+
 float Gravity::calculateDrag(const float drag, const float angle, const float speed) {
 	return pow(speed, 2) * std::cos(angle * M_PI / 180.0) * drag * SCALE_DRAG_CONST;
 }
@@ -49,8 +54,8 @@ void Gravity::calculatePos(sf::Time ellapsed)
 void Gravity::onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom)
 {
 	if (leftBottom.type != MapTile::SPACE || rightBottom.type != MapTile::SPACE) {
-		m_obj->stopFalling(rightBottom.pos.y);
-		m_obj->applyX();
+		stopFalling(rightBottom.pos.y);
+		m_obj->apply();
 	}
 	else {
 		m_obj->apply();
