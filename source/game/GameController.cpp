@@ -76,16 +76,19 @@ void GameController::updateGameObjects(sf::Time ellapsed) {
 		g->calculateVel(ellapsed, m_map->getGravity());
 		sf::Vector2f& pos = g->getNextPos();
 
-		sf::Vector2f hbrb = g->getHitboxRightBottom(pos);
-		sf::Vector2f hblb = g->getHitboxLeftBottom(pos);
-		sf::Vector2f hbrt = g->getHitboxRightTop(pos);
-		sf::Vector2f hblt = g->getHitboxLeftTop(pos);
-		const Tile& tile_rb = m_map->getTile(round(hbrb.y), round(hbrb.x));
-		const Tile& tile_lb = m_map->getTile(round(hblb.y), round(hblb.x));
-		const Tile& tile_rt = m_map->getTile(round(hbrt.y), round(hbrt.x));
-		const Tile& tile_lt = m_map->getTile(round(hblt.y), round(hblt.x));
-		g->onTiles(tile_lt, tile_rt, tile_lb, tile_rb);
+		sf::Vector2f left = g->getVel().y > 0 ? g->getHitboxLeftBottom(pos) : g->getHitboxLeftTop(pos);
+		sf::Vector2f right = g->getVel().y > 0 ? g->getHitboxRightBottom(pos) : g->getHitboxRightTop(pos);
+		const Tile& tile_left = m_map->getTile(round(left.y), round(left.x));
+		const Tile& tile_right = m_map->getTile(round(right.y), round(right.x));
+		g->onTilesY(tile_left, tile_right);
 
+		sf::Vector2f top = g->getVel().x > 0 ? g->getHitboxRightTop(pos) : g->getHitboxLeftTop(pos);
+		sf::Vector2f bottom = g->getVel().x > 0 ? g->getHitboxRightBottom(pos) : g->getHitboxLeftBottom(pos);
+		const Tile& tile_top = m_map->getTile(round(top.y), round(top.x));
+		const Tile& tile_bottom = m_map->getTile(round(bottom.y-0.001), round(bottom.x));
+		g->onTilesX(tile_top, tile_bottom);
+
+		g->apply();
 		setViewCenter(g->getPos());
 		g->update(ellapsed);
 	}

@@ -66,7 +66,8 @@ public:
 	virtual void calculatePos(sf::Time ellapsed);
 	// is called with the tiles which are hitting the corners
 	// of the hitbox of the m_nextPos vector
-	virtual void onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom);
+	virtual void onTilesY(Tile, Tile);
+	virtual void onTilesX(Tile, Tile);
 	// if the object is complete out of map, this function is called
 	virtual void onOutOfMap(Tile border);
 

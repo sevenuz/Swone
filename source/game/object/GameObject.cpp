@@ -180,8 +180,12 @@ void GameObject::event(sf::Event& ev) {
 	for(Extension* e : m_extensions) e->event(ev);
 }
 
-void GameObject::onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom) {
-	for(Extension* e : m_extensions) e->onTiles(leftTop, rightTop, leftBottom, rightBottom);
+void GameObject::onTilesY(Tile top, Tile bottom) {
+	for(Extension* e : m_extensions) e->onTilesY(top, bottom);
+}
+
+void GameObject::onTilesX(Tile left, Tile right) {
+	for (Extension* e : m_extensions) e->onTilesX(left, right);
 }
 
 void GameObject::onOutOfMap(Tile border) {

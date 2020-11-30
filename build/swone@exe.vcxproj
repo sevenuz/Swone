@@ -157,6 +157,12 @@
       <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)source_game_object_extensions_Gravity.cpp.obj</ObjectFileName>
     </CLCompile>
+    <CLCompile Include="..\source/game/object/extensions/Inventory.cpp">
+      <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>swone@exe;.;..\;..\./include;include;..\./source;source;..\./bib/imgui;bib\imgui;..\./bib/tinydir;bib\tinydir;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)source_game_object_extensions_Inventory.cpp.obj</ObjectFileName>
+    </CLCompile>
     <CLCompile Include="..\source/util/reader/Reader.cpp">
       <AdditionalOptions>"/EHsc" "/std:c++17" "/permissive-" %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>

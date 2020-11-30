@@ -31,10 +31,14 @@ public:
 	static float calculateDrag(const float drag, const float angle, const float speed);
 		// sets velocity of y to zero
 	void stopFalling(float y);
+	void stopRising(float y);
+	void stopRight(float);
+	void stopLeft(float);
 
 	void calculateVel(sf::Time ellapsed, float gravity) override;
 	void calculatePos(sf::Time ellapsed) override;
-	void onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom) override;
+	void onTilesY(Tile, Tile) override;
+	void onTilesX(Tile, Tile) override;
 	void onOutOfMap(Tile border) override;
 private:
 	// higher drag means slower falling

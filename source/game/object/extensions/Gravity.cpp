@@ -19,6 +19,21 @@ void Gravity::stopFalling(float y) {
 	m_obj->setNextPosY(y-m_obj->getHitbox().height);
 }
 
+void Gravity::stopRising(float y) {
+	m_obj->setNextVelY(0);
+	m_obj->setNextPosY(y + 1);
+}
+
+void Gravity::stopRight(float x) {
+	m_obj->setNextVelX(0);
+	m_obj->setNextPosX(x - m_obj->getHitbox().width - m_obj->getHitbox().left - 0.0001);
+}
+
+void Gravity::stopLeft(float x) {
+	m_obj->setNextVelX(0);
+	m_obj->setNextPosX(x + 1.0001 - m_obj->getHitbox().left);
+}
+
 float Gravity::calculateDrag(const float drag, const float angle, const float speed) {
 	return pow(speed, 2) * std::cos(angle * M_PI / 180.0) * drag * SCALE_DRAG_CONST;
 }
@@ -51,19 +66,37 @@ void Gravity::calculatePos(sf::Time ellapsed)
 	m_obj->setNextPos(sf::Vector2f(x,y));
 }
 
-void Gravity::onTiles(Tile leftTop, Tile rightTop, Tile leftBottom, Tile rightBottom)
+void Gravity::onTilesY(Tile left, Tile right)
 {
-	if (leftBottom.type != MapTile::SPACE || rightBottom.type != MapTile::SPACE) {
-		stopFalling(rightBottom.pos.y);
-		m_obj->apply();
+	if (left.isPassable() != right.isPassable() && m_obj->getVel().x!=0.0)
+		return;
+	if (m_obj->getVel().y > 0) {
+		if (!left.isPassable() || !right.isPassable()) {
+			stopFalling(right.pos.y);
+		}
 	}
-	else {
-		m_obj->apply();
+	else if (m_obj->getVel().y < 0) {
+		if (!left.isPassable() || !right.isPassable()) {
+			stopRising(left.pos.y);
+		}
+	}
+}
+
+void Gravity::onTilesX(Tile top, Tile bottom)
+{
+	if (m_obj->getVel().x > 0) {
+		if (!top.isPassable() || !bottom.isPassable()) {
+			stopRight(top.pos.x);
+		}
+	}
+	else if (m_obj->getVel().x < 0) {
+		if (!top.isPassable() || !bottom.isPassable()) {
+			stopLeft(top.pos.x);
+		}
 	}
 }
 
 void Gravity::onOutOfMap(Tile border)
 {
-	onTiles(border, border, border, border);
 }
 

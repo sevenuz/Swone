@@ -25,6 +25,7 @@ struct Tile {
 
 	Tile(sf::Vector2i pos = sf::Vector2i(0, 0), MapTile type = MapTile::DEFAULT) : pos(pos), type(type)
 	{}
+	bool isPassable() const;
 };
 
 class Map : public Handleable

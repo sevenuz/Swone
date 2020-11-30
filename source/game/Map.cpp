@@ -142,3 +142,14 @@ void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		target.draw(m_sprite, states);
 	}
 };
+
+bool Tile::isPassable() const {
+	switch (type) {
+		case MapTile::SHARP:
+		case MapTile::UNDERSCORE:
+		case MapTile::W:
+			return false;
+		default:
+			return true;
+	}
+}
