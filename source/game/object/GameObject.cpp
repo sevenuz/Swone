@@ -54,6 +54,7 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 
 void GameObject::setAnimationFrames(Animation& animation, StringMap& frames)
 {
+	// TODO read frameTime, read Frames in order from 1,...,n
 	if(m_texturePath.empty())
 		throw std::invalid_argument("GameObject Texture is missing.");
 	animation.setSpriteSheet(m_texture);
@@ -91,42 +92,60 @@ void GameObject::calculateVel(sf::Time ellapsed, float gravity) {
 	for(Extension* e : m_extensions) e->calculateVel(ellapsed, gravity);
 }
 
-void GameObject::setAnimation()
+void GameObject::setMovementAnimationAutomatic()
 {
+	if(!m_movementAnimationAutomatic)
+		return;
 	if(isMoving() && m_vel.x < 0)
-		setAnimation(AnimationType::Left);
+		setMovementAnimation(MovementAnimation::Left);
 	else if(isMoving() && m_vel.x > 0)
-		setAnimation(AnimationType::Right);
+		setMovementAnimation(MovementAnimation::Right);
 	else if(isFalling())
-		setAnimation(AnimationType::Down);
+		setMovementAnimation(MovementAnimation::Down);
 	else if(isRising())
-		setAnimation(AnimationType::Up);
+		setMovementAnimation(MovementAnimation::Up);
 	else
-		setAnimation(AnimationType::Steady);
+		setMovementAnimation(MovementAnimation::Steady);
 }
 
-void GameObject::setAnimation(AnimationType ani) {
+void GameObject::setMovementAnimation(MovementAnimation ani) {
 	switch (ani) {
-		case AnimationType::Up:
-			m_ani = &m_ani_up;
+		case MovementAnimation::Up:
+			setAnimation(m_ani_up);
 			break;
-		case AnimationType::Left:
-			m_ani = &m_ani_left;
+		case MovementAnimation::Left:
+			setAnimation(m_ani_left);
 			break;
-		case AnimationType::Right:
-			m_ani = &m_ani_right;
+		case MovementAnimation::Right:
+			setAnimation(m_ani_right);
 			break;
-		case AnimationType::Down:
-			m_ani = &m_ani_down;
+		case MovementAnimation::Down:
+			setAnimation(m_ani_down);
 			break;
-		case AnimationType::Steady:
-			m_ani = &m_ani_steady;
+		case MovementAnimation::Steady:
+			setAnimation(m_ani_steady);
 			break;
 		default:
-			m_ani = &m_ani_steady;
+			setAnimation(m_ani_steady);
 			break;
 	}
-	m_sprite.play(*m_ani);
+}
+
+void GameObject::playAnimationOnce(Animation& animation, std::function<void()> endCb)
+{
+	setMovementAnimationAutomatic(false, false);
+	if(endCb == NULL)
+		endCb = [&](){
+			setMovementAnimationAutomatic(true, true);
+		};
+	m_sprite.setEndCallback(endCb);
+	setAnimation(animation);
+}
+
+void GameObject::setAnimation(Animation& animation)
+{
+	// sets animation automaticly if pointer changed
+	m_sprite.play(animation);
 }
 
 void GameObject::updateFlags() {
@@ -139,7 +158,7 @@ void GameObject::apply() {
 	setPos(m_nextPos);
 	setVel(m_nextVel);
 	updateFlags();
-	setAnimation();
+	setMovementAnimationAutomatic();
 }
 
 void GameObject::applyX() {
@@ -175,7 +194,7 @@ void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		target.draw(m_sprite, states);
 	}
 
-	if(m_visibleHitbox) {
+	if(m_log) {
 		sf::FloatRect h = getHitboxBounds();
 		sf::RectangleShape rectangle;
 		rectangle.setSize(sf::Vector2f(h.width, h.height));
@@ -302,16 +321,16 @@ void GameObject::setVisible(bool s)
 	m_visible = s;
 }
 
-bool GameObject::isVisibleHitbox()
+bool GameObject::isMovementAnimationAutomatic()
 {
-	return m_visibleHitbox;
+	return m_movementAnimationAutomatic;
 }
 
-void GameObject::setVisibleHitbox(bool s)
+void GameObject::setMovementAnimationAutomatic(bool s, bool looped)
 {
-	m_visibleHitbox = s;
+	m_movementAnimationAutomatic = s;
+	m_sprite.setLooped(looped);
 }
-
 
 bool GameObject::isMoving() {
 	return m_isMoving;

@@ -27,6 +27,7 @@
 #include <vector>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Time.hpp>
 
 class Animation
 {
@@ -39,7 +40,10 @@ public:
 	std::size_t getSize() const;
 	const sf::IntRect& getFrame(std::size_t n) const;
 
+	sf::Time getFrameTime() const;
+	void setFrameTime(sf::Time time);
 private:
+	sf::Time m_frameTime = sf::seconds(0.2f);
 	std::vector<sf::IntRect> m_frames;
 	const sf::Texture* m_texture;
 };

@@ -42,7 +42,7 @@ private:
 	std::array<bool, INVENTORY_SIZE> m_selection = {};
 	std::array<sf::RectangleShape*, INVENTORY_SIZE> m_rectangles;
 	std::array<ParticleSystem*, INVENTORY_SIZE> m_particleSystems;
-	std::array<GameObject*, INVENTORY_SIZE> m_items;
+	std::array<GameObject*, INVENTORY_SIZE> m_items = {};
 };
 
 #endif

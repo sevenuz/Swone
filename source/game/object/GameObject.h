@@ -5,6 +5,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <vector>
+#include <functional>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
@@ -26,7 +27,7 @@ class Extension;
 
 class GameObject : public Handleable {
 public:
-	enum AnimationType : char { Up, Left, Right, Down, Steady };
+	enum MovementAnimation : char { Up, Left, Right, Down, Steady };
 	// gameobject property names
 	// global
 	static constexpr const char* GAMEOBJECT_TYPE_NAME = "type";
@@ -122,8 +123,8 @@ public:
 	bool isVisible();
 	void setVisible(bool s);
 
-	bool isVisibleHitbox();
-	void setVisibleHitbox(bool s);
+	bool isMovementAnimationAutomatic();
+	void setMovementAnimationAutomatic(bool s, bool looped = true);
 
 	bool isMoving();
 	bool isFalling();
@@ -138,15 +139,18 @@ public:
 	sf::Vector2f getSpritePos();
 
 	// sets animation depending on obj state
-	void setAnimation();
-	void setAnimation(AnimationType ani);
+	void setMovementAnimationAutomatic();
+	void setMovementAnimation(MovementAnimation ani);
+	void setAnimation(Animation& animation);
+	void playAnimationOnce(Animation& animation, std::function<void()> endCb = NULL);
+	void setAnimationFrames(Animation& animation, StringMap& frames);
 
 	// Write all the values that should be updated every tick into this function
 	void updateLog() const;
 private:
 	bool m_log = false;
-	bool m_visibleHitbox = true;
 	bool m_visible = true;
+	bool m_movementAnimationAutomatic = true;
 	const std::string m_identifier;
 	std::string m_name;
 
@@ -158,7 +162,6 @@ private:
 	Animation m_ani_right;
 	Animation m_ani_down;
 	Animation m_ani_steady;
-	Animation* m_ani;
 	AnimatedSprite m_sprite;
 
 	bool m_isRising = false; // movement to top
@@ -178,8 +181,6 @@ private:
 	// represents transformations relative to MapTiles,
 	// not to MapPixel, the inherited Transformable is used for that..
 	sf::Transformable m_objTransform;
-
-	void setAnimationFrames(Animation& animation, StringMap& frames);
 
 	std::vector<Extension*> m_extensions;
 };

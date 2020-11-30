@@ -23,8 +23,8 @@
 
 #include "AnimatedSprite.h"
 
-AnimatedSprite::AnimatedSprite(sf::Time frameTime, bool paused, bool looped) :
-	m_animation(NULL), m_frameTime(frameTime), m_currentFrame(0), m_isPaused(paused), m_isLooped(looped), m_texture(NULL)
+AnimatedSprite::AnimatedSprite(bool paused, bool looped) :
+	m_animation(NULL), m_currentFrame(0), m_isPaused(paused), m_isLooped(looped), m_texture(NULL)
 {
 
 }
@@ -35,11 +35,6 @@ void AnimatedSprite::setAnimation(const Animation& animation)
 	m_texture = m_animation->getSpriteSheet();
 	m_currentFrame = 0;
 	setFrame(m_currentFrame);
-}
-
-void AnimatedSprite::setFrameTime(sf::Time time)
-{
-	m_frameTime = time;
 }
 
 void AnimatedSprite::play()
@@ -110,11 +105,6 @@ bool AnimatedSprite::isPlaying() const
 	return !m_isPaused;
 }
 
-sf::Time AnimatedSprite::getFrameTime() const
-{
-	return m_frameTime;
-}
-
 void AnimatedSprite::setFrame(std::size_t newFrame, bool resetTime)
 {
 	if (m_animation)
@@ -151,10 +141,10 @@ void AnimatedSprite::update(sf::Time deltaTime)
 		m_currentTime += deltaTime;
 
 		// if current time is bigger then the frame time advance one frame
-		if (m_currentTime >= m_frameTime)
+		if (m_currentTime >= m_animation->getFrameTime())
 		{
 			// reset time, but keep the remainder
-			m_currentTime = sf::microseconds(m_currentTime.asMicroseconds() % m_frameTime.asMicroseconds());
+			m_currentTime = sf::microseconds(m_currentTime.asMicroseconds() % m_animation->getFrameTime().asMicroseconds());
 
 			// get next Frame index
 			if (m_currentFrame + 1 < m_animation->getSize())
@@ -167,6 +157,7 @@ void AnimatedSprite::update(sf::Time deltaTime)
 				if (!m_isLooped)
 				{
 					m_isPaused = true;
+					m_endCallback();
 				}
 
 			}
@@ -210,4 +201,9 @@ void Image(const AnimatedSprite& sprite, float scale) {
 
 	ImGui::Image(*sprite.getTexture(), size*scale, static_cast<sf::FloatRect>(sprite.getTextureRect()),
 		sprite.getColor());
+}
+
+void AnimatedSprite::setEndCallback(std::function<void()>cb)
+{
+	m_endCallback = cb;
 }

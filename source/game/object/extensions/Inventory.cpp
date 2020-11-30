@@ -36,10 +36,10 @@ Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap
 		ps->setLifetime(sf::seconds(1));
 		ps->setOrigin(posVct, sizeVct, Origin::ON_BORDER);
 		m_particleSystems[i] = ps;
-
-			m_items[i] = m_obj;
 	}
 
+	// TODO remove
+	m_items[0] = m_obj;
 	Inventory_count++;
 }
 
@@ -81,8 +81,10 @@ void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 	target.setView(target.getDefaultView());
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
-		states.transform = sf::Transform::Identity * m_rectangles[i]->getTransform();
-		target.draw(*m_items[i]->getAnimatedSprite(), states);
+		if(m_items[i] != NULL) {
+			states.transform = sf::Transform::Identity * m_rectangles[i]->getTransform();
+			target.draw(*m_items[i]->getAnimatedSprite(), states);
+		}
 		states.transform = sf::Transform::Identity;
 		target.draw(*m_rectangles[i], states);
 		if(m_selection[i])

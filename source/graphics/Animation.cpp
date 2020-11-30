@@ -52,3 +52,13 @@ const sf::IntRect& Animation::getFrame(std::size_t n) const
 {
 	return m_frames[n];
 }
+
+sf::Time Animation::getFrameTime() const
+{
+	return m_frameTime;
+}
+
+void Animation::setFrameTime(sf::Time time)
+{
+	m_frameTime = time;
+}
