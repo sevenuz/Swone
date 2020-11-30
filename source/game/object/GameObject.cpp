@@ -161,16 +161,6 @@ void GameObject::apply() {
 	setMovementAnimationAutomatic();
 }
 
-void GameObject::applyX() {
-	m_nextPos.y = m_pos.y;
-	apply();
-}
-
-void GameObject::applyY() {
-	m_nextPos.x = m_pos.x;
-	apply();
-}
-
 void GameObject::update(sf::Time ellapsed) {
 	m_sprite.update(ellapsed);
 	for(Extension* e : m_extensions) e->update(ellapsed);

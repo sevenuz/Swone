@@ -80,6 +80,9 @@ void Gravity::onTilesY(Tile left, Tile right)
 			stopRising(left.pos.y);
 		}
 	}
+	else if (!left.isPassable() || !right.isPassable()) {
+		m_obj->setNextVelY(0.0);
+	}
 }
 
 void Gravity::onTilesX(Tile top, Tile bottom)

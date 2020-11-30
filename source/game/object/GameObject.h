@@ -134,8 +134,6 @@ public:
 	void updateFlags();
 
 	void apply();
-	void applyX();
-	void applyY();
 
 	sf::Vector2f getSpritePos();
 

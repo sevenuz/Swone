@@ -76,8 +76,8 @@ void GameController::updateGameObjects(sf::Time ellapsed) {
 		g->calculateVel(ellapsed, m_map->getGravity());
 		sf::Vector2f& pos = g->getNextPos();
 
-		sf::Vector2f left = g->getVel().y > 0 ? g->getHitboxLeftBottom(pos) : g->getHitboxLeftTop(pos);
-		sf::Vector2f right = g->getVel().y > 0 ? g->getHitboxRightBottom(pos) : g->getHitboxRightTop(pos);
+		sf::Vector2f left = g->getVel().y >= 0 ? g->getHitboxLeftBottom(pos) : g->getHitboxLeftTop(pos);
+		sf::Vector2f right = g->getVel().y >= 0 ? g->getHitboxRightBottom(pos) : g->getHitboxRightTop(pos);
 		const Tile& tile_left = m_map->getTile(round(left.y), round(left.x));
 		const Tile& tile_right = m_map->getTile(round(right.y), round(right.x));
 		g->onTilesY(tile_left, tile_right);
