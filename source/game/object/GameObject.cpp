@@ -52,14 +52,16 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	}
 }
 
-void GameObject::setAnimationFrames(Animation& animation, StringMap& frames)
+void GameObject::setAnimationFrames(Animation& animation, StringMap& m)
 {
-	// TODO read frameTime, read Frames in order from 1,...,n
+	// TODO static map of loaded textures, this fn to Helper.h ?
 	if(m_texturePath.empty())
 		throw std::invalid_argument("GameObject Texture is missing.");
+	if(m.count(GAMEOBJECT_ANI_FRAME_TIME))
+		animation.setFrameTime(sf::seconds(Helper::toFloat(m[GAMEOBJECT_ANI_FRAME_TIME])));
 	animation.setSpriteSheet(m_texture);
-	for(auto& s: frames){
-		animation.addFrame(Helper::toIntRect(s.second));
+	for(int i = 1; m.count(std::to_string(i)); i++){
+		animation.addFrame(Helper::toIntRect(m[std::to_string(i)]));
 	}
 }
 

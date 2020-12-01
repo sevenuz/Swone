@@ -42,6 +42,7 @@ public:
 	static constexpr const char* GAMEOBJECT_TEXTURE_NAME = "texture";
 	static constexpr const char* GAMEOBJECT_HITBOX_NAME = "hitbox";
 	// animation paragraphs (keys are irrelevant)
+	static constexpr const char* GAMEOBJECT_ANI_FRAME_TIME = "frame_time";
 	static constexpr const char* GAMEOBJECT_ANI_UP_PARAGRAPH = "ani_up";
 	static constexpr const char* GAMEOBJECT_ANI_LEFT_PARAGRAPH = "ani_left";
 	static constexpr const char* GAMEOBJECT_ANI_RIGHT_PARAGRAPH = "ani_right";
