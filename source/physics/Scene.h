@@ -21,22 +21,26 @@
 #define SCENE_H
 
 #include "IEMath.h"
+#include "Body.h"
+#include "Manifold.h"
+
+namespace PHY_NS {
 
 // http://gamedev.tutsplus.com/tutorials/implementation/how-to-create-a-custom-2d-physics-engine-friction-scene-and-jump-table/
 struct Scene
 {
-  Scene( uint32 iterations = 10 )
-    : m_iterations( iterations )
-  {
-  }
+  Scene( PHY_NS::uint32 iterations = 10 ) : m_iterations( iterations )
+  {}
 
-  void Step( f32 dt, Vec2 gravity );
-  Body *Add( Shape *shape, uint32 x, uint32 y );
+  void Step( PHY_NS::real dt, PHY_NS::Vec2 gravity );
+  PHY_NS::Body *Add( PHY_NS::Body *body );
   void Clear( void );
 
-  uint32 m_iterations;
-  std::vector<Body *> bodies;
-  std::vector<Manifold> contacts;
+  PHY_NS::uint32 m_iterations;
+  std::vector<PHY_NS::Body *> bodies;
+  std::vector<PHY_NS::Manifold> contacts;
 };
+
+}
 
 #endif // SCENE_H

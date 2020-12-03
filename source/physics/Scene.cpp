@@ -17,7 +17,7 @@
       3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "Precompiled.h"
+#include "Scene.h"
 
 // Acceleration
 //    F = mA
@@ -32,7 +32,7 @@
 // x += v * dt
 
 // see http://www.niksula.hut.fi/~hkankaan/Homepages/gravity.html
-void IntegrateForces( Body *b, real dt, Vec2 gravity )
+void IntegrateForces( PHY_NS::Body *b, PHY_NS::real dt, PHY_NS::Vec2 gravity )
 {
   if(b->im == 0.0f)
     return;
@@ -42,7 +42,7 @@ void IntegrateForces( Body *b, real dt, Vec2 gravity )
   b->angularVelocity += b->torque * b->iI * (dt / 2.0f);
 }
 
-void IntegrateVelocity( Body *b, real dt, Vec2 gravity )
+void IntegrateVelocity( PHY_NS::Body *b, PHY_NS::real dt, PHY_NS::Vec2 gravity )
 {
   if(b->im == 0.0f)
     return;
@@ -53,20 +53,20 @@ void IntegrateVelocity( Body *b, real dt, Vec2 gravity )
   IntegrateForces( b, dt, gravity );
 }
 
-void Scene::Step( f32 dt, Vec2 gravity )
+void PHY_NS::Scene::Step( real dt, PHY_NS::Vec2 gravity )
 {
   // Generate new collision info
   contacts.clear( );
-  for(uint32 i = 0; i < bodies.size( ); ++i)
+  for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
   {
-    Body *A = bodies[i];
+    PHY_NS::Body *A = bodies[i];
 
-    for(uint32 j = i + 1; j < bodies.size( ); ++j)
+    for(PHY_NS::uint32 j = i + 1; j < bodies.size( ); ++j)
     {
-      Body *B = bodies[j];
+      PHY_NS::Body *B = bodies[j];
       if(A->im == 0 && B->im == 0)
         continue;
-      Manifold m( A, B );
+      PHY_NS::Manifold m( A, B );
       m.Solve( );
       if(m.contact_count)
         contacts.emplace_back( m );
@@ -74,39 +74,38 @@ void Scene::Step( f32 dt, Vec2 gravity )
   }
 
   // Integrate forces
-  for(uint32 i = 0; i < bodies.size( ); ++i)
+  for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
     IntegrateForces( bodies[i], dt, gravity );
 
   // Initialize collision
-  for(uint32 i = 0; i < contacts.size( ); ++i)
+  for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
     contacts[i].Initialize( dt, gravity );
 
   // Solve collisions
-  for(uint32 j = 0; j < m_iterations; ++j)
-    for(uint32 i = 0; i < contacts.size( ); ++i)
+  for(PHY_NS::uint32 j = 0; j < m_iterations; ++j)
+    for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
       contacts[i].ApplyImpulse( );
 
   // Integrate velocities
-  for(uint32 i = 0; i < bodies.size( ); ++i)
+  for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
     IntegrateVelocity( bodies[i], dt, gravity );
 
   // Correct positions
-  for(uint32 i = 0; i < contacts.size( ); ++i)
+  for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
     contacts[i].PositionalCorrection( );
 
   // Clear all forces
-  for(uint32 i = 0; i < bodies.size( ); ++i)
+  for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
   {
-    Body *b = bodies[i];
+    PHY_NS::Body *b = bodies[i];
     b->force.Set( 0, 0 );
     b->torque = 0;
   }
 }
 
-Body *Scene::Add( Shape *shape, uint32 x, uint32 y )
+PHY_NS::Body *PHY_NS::Scene::Add( PHY_NS::Body *body )
 {
-  assert( shape );
-  Body *b = new Body( shape, x, y );
-  bodies.push_back( b );
-  return b;
+  assert( body );
+  bodies.push_back( body );
+  return body;
 }

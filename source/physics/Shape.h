@@ -20,9 +20,14 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
+#include <cfloat>
+
+#include "IEMath.h"
 #include "Body.h"
 
 #define MaxPolyVertexCount 64
+
+namespace PHY_NS {
 
 struct Shape
 {
@@ -33,26 +38,28 @@ struct Shape
     eCount
   };
 
-  Shape( ) {}
+  Shape( PHY_NS::real d = 1 ) : density(d) {}
   virtual ~Shape( ) {}
   virtual Shape *Clone( void ) const = 0;
   virtual void Initialize( void ) = 0;
-  virtual void ComputeMass( real density ) = 0;
-  virtual void SetOrient( real radians ) = 0;
+  virtual void ComputeMass( PHY_NS::real density ) = 0;
+  virtual void SetOrient( PHY_NS::real radians ) = 0;
   virtual Type GetType( void ) const = 0;
 
-  Body *body;
+  PHY_NS::Body *body;
 
   // For circle shape
-  real radius;
+  PHY_NS::real radius;
+
+  PHY_NS::real density;
 
   // For Polygon shape
-  Mat2 u; // Orientation matrix from model to world
+  PHY_NS::Mat2 u; // Orientation matrix from model to world
 };
 
 struct Circle : public Shape
 {
-  Circle( real r )
+  Circle( PHY_NS::real r )
   {
     radius = r;
   }
@@ -62,20 +69,20 @@ struct Circle : public Shape
     return new Circle( radius );
   }
 
-  void Initialize( void )
+  void Initialize( )
   {
-    ComputeMass( 1.0f );
+    ComputeMass( density );
   }
 
-  void ComputeMass( real density )
+  void ComputeMass( PHY_NS::real density )
   {
-    body->m = PI * radius * radius * density;
+    body->m = PHY_NS::PI * radius * radius * density;
     body->im = (body->m) ? 1.0f / body->m : 0.0f;
     body->I = body->m * radius * radius;
     body->iI = (body->I) ? 1.0f / body->I : 0.0f;
   }
 
-  void SetOrient( real radians )
+  void SetOrient( PHY_NS::real radians )
   {
   }
 
@@ -87,16 +94,16 @@ struct Circle : public Shape
 
 struct PolygonShape : public Shape
 {
-  void Initialize( void )
+  void Initialize( )
   {
-    ComputeMass( 1.0f );
+    ComputeMass( density );
   }
 
   Shape *Clone( void ) const
   {
     PolygonShape *poly = new PolygonShape( );
     poly->u = u;
-    for(uint32 i = 0; i < m_vertexCount; ++i)
+    for(PHY_NS::uint32 i = 0; i < m_vertexCount; ++i)
     {
       poly->m_vertices[i] = m_vertices[i];
       poly->m_normals[i] = m_normals[i];
@@ -105,31 +112,31 @@ struct PolygonShape : public Shape
     return poly;
   }
 
-  void ComputeMass( real density )
+  void ComputeMass( PHY_NS::real density )
   {
     // Calculate centroid and moment of interia
-    Vec2 c( 0.0f, 0.0f ); // centroid
-    real area = 0.0f;
-    real I = 0.0f;
-    const real k_inv3 = 1.0f / 3.0f;
+    PHY_NS::Vec2 c( 0.0f, 0.0f ); // centroid
+    PHY_NS::real area = 0.0f;
+    PHY_NS::real I = 0.0f;
+    const PHY_NS::real k_inv3 = 1.0f / 3.0f;
 
-    for(uint32 i1 = 0; i1 < m_vertexCount; ++i1)
+    for(PHY_NS::uint32 i1 = 0; i1 < m_vertexCount; ++i1)
     {
       // Triangle vertices, third vertex implied as (0, 0)
-      Vec2 p1( m_vertices[i1] );
-      uint32 i2 = i1 + 1 < m_vertexCount ? i1 + 1 : 0;
-      Vec2 p2( m_vertices[i2] );
+      PHY_NS::Vec2 p1( m_vertices[i1] );
+      PHY_NS::uint32 i2 = i1 + 1 < m_vertexCount ? i1 + 1 : 0;
+      PHY_NS::Vec2 p2( m_vertices[i2] );
 
-      real D = Cross( p1, p2 );
-      real triangleArea = 0.5f * D;
+      PHY_NS::real D = PHY_NS::Cross( p1, p2 );
+      PHY_NS::real triangleArea = 0.5f * D;
 
       area += triangleArea;
 
       // Use area to weight the centroid average, not just vertex position
       c += triangleArea * k_inv3 * (p1 + p2);
 
-      real intx2 = p1.x * p1.x + p2.x * p1.x + p2.x * p2.x;
-      real inty2 = p1.y * p1.y + p2.y * p1.y + p2.y * p2.y;
+      PHY_NS::real intx2 = p1.x * p1.x + p2.x * p1.x + p2.x * p2.x;
+      PHY_NS::real inty2 = p1.y * p1.y + p2.y * p1.y + p2.y * p2.y;
       I += (0.25f * k_inv3 * D) * (intx2 + inty2);
     }
 
@@ -138,7 +145,7 @@ struct PolygonShape : public Shape
     // Translate vertices to centroid (make the centroid (0, 0)
     // for the polygon in model space)
     // Not really necessary, but I like doing this anyway
-    for(uint32 i = 0; i < m_vertexCount; ++i)
+    for(PHY_NS::uint32 i = 0; i < m_vertexCount; ++i)
       m_vertices[i] -= c;
 
     body->m = density * area;
@@ -147,7 +154,7 @@ struct PolygonShape : public Shape
     body->iI = body->I ? 1.0f / body->I : 0.0f;
   }
 
-  void SetOrient( real radians )
+  void SetOrient( PHY_NS::real radians )
   {
     u.Set( radians );
   }
@@ -158,7 +165,7 @@ struct PolygonShape : public Shape
   }
 
   // Half width and half height
-  void SetBox( real hw, real hh )
+  void SetBox( PHY_NS::real hw, PHY_NS::real hh )
   {
     m_vertexCount = 4;
     m_vertices[0].Set( -hw, -hh );
@@ -171,18 +178,18 @@ struct PolygonShape : public Shape
     m_normals[3].Set( -1.0f,   0.0f );
   }
 
-  void Set( Vec2 *vertices, uint32 count )
+  void Set( PHY_NS::Vec2 *vertices, PHY_NS::uint32 count )
   {
     // No hulls with less than 3 vertices (ensure actual polygon)
     assert( count > 2 && count <= MaxPolyVertexCount );
-    count = std::min( (int32)count, MaxPolyVertexCount );
+    count = std::min( (PHY_NS::int32)count, MaxPolyVertexCount );
 
     // Find the right most point on the hull
-    int32 rightMost = 0;
-    real highestXCoord = vertices[0].x;
-    for(uint32 i = 1; i < count; ++i)
+    PHY_NS::int32 rightMost = 0;
+    PHY_NS::real highestXCoord = vertices[0].x;
+    for(PHY_NS::uint32 i = 1; i < count; ++i)
     {
-      real x = vertices[i].x;
+      PHY_NS::real x = vertices[i].x;
       if(x > highestXCoord)
       {
         highestXCoord = x;
@@ -195,9 +202,9 @@ struct PolygonShape : public Shape
           rightMost = i;
     }
 
-    int32 hull[MaxPolyVertexCount];
-    int32 outCount = 0;
-    int32 indexHull = rightMost;
+    PHY_NS::int32 hull[MaxPolyVertexCount];
+    PHY_NS::int32 outCount = 0;
+    PHY_NS::int32 indexHull = rightMost;
 
     for (;;)
     {
@@ -206,8 +213,8 @@ struct PolygonShape : public Shape
       // Search for next index that wraps around the hull
       // by computing cross products to find the most counter-clockwise
       // vertex in the set, given the previos hull index
-      int32 nextHullIndex = 0;
-      for(int32 i = 1; i < (int32)count; ++i)
+      PHY_NS::int32 nextHullIndex = 0;
+      for(PHY_NS::int32 i = 1; i < (PHY_NS::int32)count; ++i)
       {
         // Skip if same coordinate as we need three unique
         // points in the set to perform a cross product
@@ -221,9 +228,9 @@ struct PolygonShape : public Shape
         // Record each counter clockwise third vertex and add
         // to the output hull
         // See : http://www.oocities.org/pcgpe/math2d.html
-        Vec2 e1 = vertices[nextHullIndex] - vertices[hull[outCount]];
-        Vec2 e2 = vertices[i] - vertices[hull[outCount]];
-        real c = Cross( e1, e2 );
+        PHY_NS::Vec2 e1 = vertices[nextHullIndex] - vertices[hull[outCount]];
+        PHY_NS::Vec2 e2 = vertices[i] - vertices[hull[outCount]];
+        PHY_NS::real c = PHY_NS::Cross( e1, e2 );
         if(c < 0.0f)
           nextHullIndex = i;
 
@@ -232,7 +239,7 @@ struct PolygonShape : public Shape
         if(c == 0.0f && e2.LenSqr( ) > e1.LenSqr( ))
           nextHullIndex = i;
       }
-      
+
       ++outCount;
       indexHull = nextHullIndex;
 
@@ -245,34 +252,34 @@ struct PolygonShape : public Shape
     }
 
     // Copy vertices into shape's vertices
-    for(uint32 i = 0; i < m_vertexCount; ++i)
+    for(PHY_NS::uint32 i = 0; i < m_vertexCount; ++i)
       m_vertices[i] = vertices[hull[i]];
 
     // Compute face normals
-    for(uint32 i1 = 0; i1 < m_vertexCount; ++i1)
+    for(PHY_NS::uint32 i1 = 0; i1 < m_vertexCount; ++i1)
     {
-      uint32 i2 = i1 + 1 < m_vertexCount ? i1 + 1 : 0;
-      Vec2 face = m_vertices[i2] - m_vertices[i1];
+      PHY_NS::uint32 i2 = i1 + 1 < m_vertexCount ? i1 + 1 : 0;
+      PHY_NS::Vec2 face = m_vertices[i2] - m_vertices[i1];
 
       // Ensure no zero-length edges, because that's bad
-      assert( face.LenSqr( ) > EPSILON * EPSILON );
+      assert( face.LenSqr( ) > PHY_NS::EPSILON * PHY_NS::EPSILON );
 
       // Calculate normal with 2D cross product between vector and scalar
-      m_normals[i1] = Vec2( face.y, -face.x );
+      m_normals[i1] = PHY_NS::Vec2( face.y, -face.x );
       m_normals[i1].Normalize( );
     }
   }
 
   // The extreme point along a direction within a polygon
-  Vec2 GetSupport( const Vec2& dir )
+  PHY_NS::Vec2 GetSupport( const PHY_NS::Vec2& dir )
   {
-    real bestProjection = -FLT_MAX;
-    Vec2 bestVertex;
+    PHY_NS::real bestProjection = -FLT_MAX;
+    PHY_NS::Vec2 bestVertex;
 
-    for(uint32 i = 0; i < m_vertexCount; ++i)
+    for(PHY_NS::uint32 i = 0; i < m_vertexCount; ++i)
     {
-      Vec2 v = m_vertices[i];
-      real projection = Dot( v, dir );
+      PHY_NS::Vec2 v = m_vertices[i];
+      PHY_NS::real projection = PHY_NS::Dot( v, dir );
 
       if(projection > bestProjection)
       {
@@ -284,9 +291,11 @@ struct PolygonShape : public Shape
     return bestVertex;
   }
 
-  uint32 m_vertexCount;
-  Vec2 m_vertices[MaxPolyVertexCount];
-  Vec2 m_normals[MaxPolyVertexCount];
+  PHY_NS::uint32 m_vertexCount;
+  PHY_NS::Vec2 m_vertices[MaxPolyVertexCount];
+  PHY_NS::Vec2 m_normals[MaxPolyVertexCount];
 };
+
+}
 
 #endif // SHAPE_H

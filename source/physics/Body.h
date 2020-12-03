@@ -20,22 +20,38 @@
 #ifndef BODY_H
 #define BODY_H
 
+#include "IEMath.h"
+
+namespace PHY_NS {
+
 struct Shape;
+
+struct BodyConfig
+{
+  Shape *shape;
+  PHY_NS::real x, y;
+  PHY_NS::real sf = 0.5f;
+  PHY_NS::real df = 0.3f;
+  PHY_NS::real r = 0.2f;
+  PHY_NS::real vx = 0, vy = 0, av = 0;
+  PHY_NS::real o = 0;
+  PHY_NS::real fx = 0, fy = 0, ft = 0;
+};
 
 // http://gamedev.tutsplus.com/tutorials/implementation/how-to-create-a-custom-2d-physics-engine-the-core-engine/
 struct Body
 {
-  Body( Shape *shape_, uint32 x, uint32 y );
+  Body( BodyConfig config );
 
-  void ApplyForce( const Vec2& f )
+  void ApplyForce( const PHY_NS::Vec2& f )
   {
     force += f;
   }
 
-  void ApplyImpulse( const Vec2& impulse, const Vec2& contactVector )
+  void ApplyImpulse( const PHY_NS::Vec2& impulse, const PHY_NS::Vec2& contactVector )
   {
     velocity += im * impulse;
-    angularVelocity += iI * Cross( contactVector, impulse );
+    angularVelocity += iI * PHY_NS::Cross( contactVector, impulse );
   }
 
   void SetStatic( void )
@@ -46,33 +62,32 @@ struct Body
     im = 0.0f;
   }
 
-  void SetOrient( real radians );
+  void SetOrient( PHY_NS::real radians );
 
-  Vec2 position;
-  Vec2 velocity;
+  PHY_NS::Vec2 position;
+  PHY_NS::Vec2 velocity;
 
-  real angularVelocity;
-  real torque;
-  real orient; // radians
+  PHY_NS::real angularVelocity;
+  PHY_NS::real torque;
+  PHY_NS::real orient; // radians
 
-  Vec2 force;
+  PHY_NS::Vec2 force;
 
   // Set by shape
-  real I;  // moment of inertia
-  real iI; // inverse inertia
-  real m;  // mass
-  real im; // inverse masee
+  PHY_NS::real I;  // moment of inertia
+  PHY_NS::real iI; // inverse inertia
+  PHY_NS::real m;  // mass
+  PHY_NS::real im; // inverse masee
 
   // http://gamedev.tutsplus.com/tutorials/implementation/how-to-create-a-custom-2d-physics-engine-friction-scene-and-jump-table/
-  real staticFriction;
-  real dynamicFriction;
-  real restitution;
+  PHY_NS::real staticFriction;
+  PHY_NS::real dynamicFriction;
+  PHY_NS::real restitution;
 
   // Shape interface
-  Shape *shape;
-
-  // Store a color in RGB format
-  real r, g, b;
+  PHY_NS::Shape *shape;
 };
+
+}
 
 #endif // BODY_H

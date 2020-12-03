@@ -20,33 +20,37 @@
 #ifndef MANIFOLD_H
 #define MANIFOLD_H
 
-struct Body;
+#include "Body.h"
+#include "Shape.h"
+
+namespace PHY_NS {
 
 // http://gamedev.tutsplus.com/tutorials/implementation/create-custom-2d-physics-engine-aabb-circle-impulse-resolution/
 struct Manifold
 {
-  Manifold( Body *a, Body *b )
+  Manifold( PHY_NS::Body *a, PHY_NS::Body *b )
     : A( a )
     , B( b )
-  {
-  }
+  {}
 
   void Solve( void );                       // Generate contact information
-  void Initialize( real dt, Vec2 gravity ); // Precalculations for impulse solving
+  void Initialize( PHY_NS::real dt, PHY_NS::Vec2 gravity ); // Precalculations for impulse solving
   void ApplyImpulse( void );                // Solve impulse and apply
   void PositionalCorrection( void );        // Naive correction of positional penetration
   void InfiniteMassCorrection( void );
 
-  Body *A;
-  Body *B;
+  PHY_NS::Body *A;
+  PHY_NS::Body *B;
 
-  real penetration;     // Depth of penetration from collision
-  Vec2 normal;          // From A to B
-  Vec2 contacts[2];     // Points of contact during collision
-  uint32 contact_count; // Number of contacts that occured during collision
-  real e;               // Mixed restitution
-  real df;              // Mixed dynamic friction
-  real sf;              // Mixed static friction
+  PHY_NS::real penetration;     // Depth of penetration from collision
+  PHY_NS::Vec2 normal;          // From A to B
+  PHY_NS::Vec2 contacts[2];     // Points of contact during collision
+  PHY_NS::uint32 contact_count; // Number of contacts that occured during collision
+  PHY_NS::real e;               // Mixed restitution
+  PHY_NS::real df;              // Mixed dynamic friction
+  PHY_NS::real sf;              // Mixed static friction
 };
+
+}
 
 #endif // MANIFOLD_H

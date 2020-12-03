@@ -20,18 +20,22 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
+#include "IEMath.h"
+#include "Body.h"
 #include "Shape.h"
+#include "Manifold.h"
 
-struct Manifold;
-struct Body;
+namespace PHY_NS {
 
-typedef void (*CollisionCallback)( Manifold *m, Body *a, Body *b );
+typedef void (*CollisionCallback)( PHY_NS::Manifold *m, PHY_NS::Body *a, PHY_NS::Body *b );
 
-extern CollisionCallback Dispatch[Shape::eCount][Shape::eCount];
+extern CollisionCallback Dispatch[PHY_NS::Shape::eCount][PHY_NS::Shape::eCount];
 
-void CircletoCircle( Manifold *m, Body *a, Body *b );
-void CircletoPolygon( Manifold *m, Body *a, Body *b );
-void PolygontoCircle( Manifold *m, Body *a, Body *b );
-void PolygontoPolygon( Manifold *m, Body *a, Body *b );
+void CircletoCircle( PHY_NS::Manifold *m, PHY_NS::Body *a, PHY_NS::Body *b );
+void CircletoPolygon( PHY_NS::Manifold *m, PHY_NS::Body *a, PHY_NS::Body *b );
+void PolygontoCircle( PHY_NS::Manifold *m, PHY_NS::Body *a, PHY_NS::Body *b );
+void PolygontoPolygon( PHY_NS::Manifold *m, PHY_NS::Body *a, PHY_NS::Body *b );
+
+}
 
 #endif // COLLISION_H

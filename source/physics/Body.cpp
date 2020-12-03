@@ -17,28 +17,26 @@
       3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "Precompiled.h"
+#include "Body.h"
+#include "Shape.h"
 
-Body::Body( Shape *shape_, uint32 x, uint32 y )
-  : shape( shape_->Clone( ) )
+PHY_NS::Body::Body( BodyConfig config )
+  : shape( config.shape->Clone( ) )
 {
   shape->body = this;
-  position.Set( (real)x, (real)y );
-  velocity.Set( 0, 0 );
-  angularVelocity = 0;
-  torque = 0;
-  orient = Random( -PI, PI );
-  force.Set( 0, 0 );
-  staticFriction = 0.5f;
-  dynamicFriction = 0.3f;
-  restitution = 0.2f;
+  position.Set( config.x, config.y );
+  velocity.Set( config.vx, config.vy );
+  angularVelocity = config.av;
+  torque = config.ft;
+  orient = config.o;
+  force.Set( config.fx, config.fy );
+  staticFriction = config.sf;
+  dynamicFriction = config.df;
+  restitution = config.r;
   shape->Initialize( );
-  r = Random( 0.2f, 1.0f );
-  g = Random( 0.2f, 1.0f );
-  b = Random( 0.2f, 1.0f );
 }
 
-void Body::SetOrient( real radians )
+void PHY_NS::Body::SetOrient( PHY_NS::real radians )
 {
   orient = radians;
   shape->SetOrient( radians );

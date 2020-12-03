@@ -26,20 +26,17 @@
 #include <cassert> // assert
 #include <algorithm> // max, min
 
+#define PHY_NS ph
+
+namespace PHY_NS {
+
 typedef float real;
-typedef double real64;
-typedef signed char	int8;
-typedef signed short int16;
 typedef signed int int32;
-typedef unsigned char uint8;
-typedef unsigned short uint16;
 typedef unsigned int uint32;
 #ifdef WIN32 // these types are not standard, only exist in windows
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
 #endif
-typedef float f32;
-typedef double f64;
 
 const real PI = 3.141592741f;
 const real EPSILON = 0.0001f;
@@ -310,6 +307,8 @@ inline bool BiasGreaterThan( real a, real b )
   const real k_biasRelative = 0.95f;
   const real k_biasAbsolute = 0.01f;
   return a >= b * k_biasRelative + a * k_biasAbsolute;
+}
+
 }
 
 #endif // IEMATH_H
