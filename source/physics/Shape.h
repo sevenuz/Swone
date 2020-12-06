@@ -291,6 +291,11 @@ struct PolygonShape : public Shape
     return bestVertex;
   }
 
+  PHY_NS::Vec2 GetVertexPosition( const PHY_NS::uint32 idx ) const
+  {
+    return body->position + u * m_vertices[idx];
+  }
+
   PHY_NS::uint32 m_vertexCount;
   PHY_NS::Vec2 m_vertices[MaxPolyVertexCount];
   PHY_NS::Vec2 m_normals[MaxPolyVertexCount];

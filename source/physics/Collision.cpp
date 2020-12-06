@@ -167,8 +167,7 @@ void PHY_NS::PolygontoCircle( PHY_NS::Manifold *m, PHY_NS::Body *a, PHY_NS::Body
 PHY_NS::real FindAxisLeastPenetration( PHY_NS::uint32 *faceIndex, PHY_NS::PolygonShape *A, PHY_NS::PolygonShape *B )
 {
   PHY_NS::real bestDistance = -FLT_MAX;
-  PHY_NS::uint32 bestIndex;
-
+  PHY_NS::uint32 bestIndex = 0;
   for(PHY_NS::uint32 i = 0; i < A->m_vertexCount; ++i)
   {
     // Retrieve a face normal from A
@@ -199,7 +198,6 @@ PHY_NS::real FindAxisLeastPenetration( PHY_NS::uint32 *faceIndex, PHY_NS::Polygo
       bestIndex = i;
     }
   }
-
   *faceIndex = bestIndex;
   return bestDistance;
 }
@@ -207,7 +205,6 @@ PHY_NS::real FindAxisLeastPenetration( PHY_NS::uint32 *faceIndex, PHY_NS::Polygo
 void FindIncidentFace( PHY_NS::Vec2 *v, PHY_NS::PolygonShape *RefPoly, PHY_NS::PolygonShape *IncPoly, PHY_NS::uint32 referenceIndex )
 {
   PHY_NS::Vec2 referenceNormal = RefPoly->m_normals[referenceIndex];
-
   // Calculate normal in incident's frame of reference
   referenceNormal = RefPoly->u * referenceNormal; // To world space
   referenceNormal = IncPoly->u.Transpose( ) * referenceNormal; // To incident's model space
@@ -306,11 +303,9 @@ void PHY_NS::PolygontoPolygon( PHY_NS::Manifold *m, PHY_NS::Body *a, PHY_NS::Bod
     referenceIndex = faceB;
     flip = true;
   }
-
   // World space incident face
   PHY_NS::Vec2 incidentFace[2];
   FindIncidentFace( incidentFace, RefPoly, IncPoly, referenceIndex );
-
   //        y
   //        ^  ->n       ^
   //      +---c ------posPlane--

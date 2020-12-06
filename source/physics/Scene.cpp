@@ -53,14 +53,13 @@ void IntegrateVelocity( PHY_NS::Body *b, PHY_NS::real dt, PHY_NS::Vec2 gravity )
   IntegrateForces( b, dt, gravity );
 }
 
-void PHY_NS::Scene::Step( real dt, PHY_NS::Vec2 gravity )
+void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
 {
   // Generate new collision info
   contacts.clear( );
   for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
   {
     PHY_NS::Body *A = bodies[i];
-
     for(PHY_NS::uint32 j = i + 1; j < bodies.size( ); ++j)
     {
       PHY_NS::Body *B = bodies[j];
@@ -108,4 +107,9 @@ PHY_NS::Body *PHY_NS::Scene::Add( PHY_NS::Body *body )
   assert( body );
   bodies.push_back( body );
   return body;
+}
+
+void PHY_NS::Scene::Clear( )
+{
+  bodies.clear();
 }

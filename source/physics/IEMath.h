@@ -170,7 +170,10 @@ struct Mat2
     real v[4];
   };
 
-  Mat2( ) {}
+  Mat2( )
+    : m00( 1 ), m01( 0 )
+    , m10( 0 ), m11( 1 )
+  {}
   Mat2( real radians )
   {
     real c = std::cos( radians );
@@ -183,8 +186,7 @@ struct Mat2
   Mat2( real a, real b, real c, real d )
     : m00( a ), m01( b )
     , m10( c ), m11( d )
-  {
-  }
+  {}
 
   void Set( real radians )
   {
