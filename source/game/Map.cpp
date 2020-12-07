@@ -1,8 +1,7 @@
 #include "Map.h"
 
 Map::Map(Controller& c) : m_controller(c) // @suppress("Class members should be properly initialized")
-{
-}
+{}
 
 Map::~Map() {
 }
@@ -76,13 +75,18 @@ float Map::getScale() {
 const Tile& Map::getTile(int h, int w) {
 	if (!m_mapData[h].count(w)) {
 		// add border tile to map if coordinate not exists
-		setMapDataValue(h, w, *new Tile(sf::Vector2i(w, h), m_border));
+		setMapDataValue(h, w, m_border);
 	}
-	return m_mapData.at(h).at(w);
+	return *m_mapData.at(h).at(w);
 }
 
-void Map::setMapDataValue(size_t h, size_t w, Tile v) {
-	m_mapData[h][w] = v;
+void Map::setMapDataValue(size_t h, size_t w, MapTile t) {
+	m_mapData[h][w] = new Tile(sf::Vector2i(w, h), t);
+}
+
+std::map<int, std::map<int, Tile*>>& Map::getMapData()
+{
+	return m_mapData;
 }
 
 void Map::scaleToFit() {

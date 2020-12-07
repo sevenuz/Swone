@@ -7,6 +7,7 @@
 #include "game/object/GameObject.h"
 #include "Controller.h"
 #include "util/Log.h"
+#include "physics/Scene.h"
 
 class GameController {
 public:
@@ -30,15 +31,21 @@ public:
 	void setViewCenter(sf::Vector2f pos);
 
 	void setMap(Map* m);
+	void startGame();
 
 	void pushGameObject(GameObject* game_object);
 	void clearGameObjects();
+
+	ph::Scene getScene() const;
 protected:
 private:
 	Controller& m_controller;
 	Map* m_map = NULL;
 	sf::Vector2f m_viewDelta = sf::Vector2f(0, 0);
 	sf::View m_view;
+	ph::Scene m_scene;
+	sf::Time m_clock;
+	sf::Time m_sceneDt = sf::seconds(1.0f/60.0f);
 	// TODO multi dimensional -> back/forground
 	std::vector<GameObject*> m_game_objects;
 

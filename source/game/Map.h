@@ -15,16 +15,27 @@
 #include "Handleable.h"
 #include "util/Log.h"
 
+#include "physics/Body.h"
+#include "physics/Shape.h"
+
 #define GRAVITY 25
 
 enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
 
 struct Tile {
+	ph::PolygonShape shape;
+	ph::Body* body;
 	sf::Vector2i pos;
 	MapTile type;
 
-	Tile(sf::Vector2i pos = sf::Vector2i(0, 0), MapTile type = MapTile::DEFAULT) : pos(pos), type(type)
-	{}
+	Tile(sf::Vector2i pos, MapTile type)
+	 : pos(pos), type(type)
+	{
+		shape.SetBox(0.5, 0.5);
+		body = new ph::Body(ph::BodyConfig{&shape, ((float)pos.x)+0.5f, ((float)pos.y)+0.5f});
+		body->SetStatic();
+	}
+
 	bool isPassable() const;
 };
 
@@ -66,7 +77,8 @@ public:
 
 	MapTile getBorder();
 	const Tile& getTile(int h, int w);
-	void setMapDataValue(size_t h, size_t w, Tile v);
+	void setMapDataValue(size_t h, size_t w, MapTile v);
+	std::map<int, std::map<int, Tile*>>& getMapData();
 
 	void createMapImage();
 protected:
@@ -88,7 +100,7 @@ private:
 
 	float m_scale = 1;
 
-	std::map<int, std::map<int, Tile>> m_mapData;//pointer (2d-array) to Map Infos
+	std::map<int, std::map<int, Tile*>> m_mapData;//pointer (2d-array) to Map Infos
 	MapTile m_border;
 
 	sf::Image m_mapTiles;//Img with all tiles

@@ -78,7 +78,7 @@ void GameMenu::readGameObjectsFromDir() {
 					std::string type = r.getParagraphStringMap(Reader::DEFAULT_PARAGRAPH)[GameObject::GAMEOBJECT_TYPE_NAME];
 					if(type == GameObject::GAMEOBJECT_PLAYER_TYPE) {
 						GameObject* p = new GameObject(r.getParagraphMap());
-						m_gamePlayers.push_back({p, false});
+						m_gamePlayers.push_back({p, true});
 					} else if(type == GameObject::GAMEOBJECT_OBJECT_TYPE) {
 						GameObject* o = new GameObject(r.getParagraphMap());
 						m_gameObjects.push_back({o, false});
@@ -133,6 +133,7 @@ void GameMenu::startGame() {
 		for(GameObjectSelection& gos : m_gameObjects)
 			if(gos.selected)
 				m_gameController.pushGameObject(gos.obj);
+		m_gameController.startGame();
 		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
 	}
 	else {

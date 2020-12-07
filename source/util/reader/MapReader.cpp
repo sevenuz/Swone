@@ -125,6 +125,6 @@ MapTile MapReader::charToMapTile(char c)
 
 void MapReader::parseMapChar(char c, size_t h, size_t w)
 {
-	m_map->setMapDataValue(h, w, Tile(sf::Vector2i(w, h), MapReader::charToMapTile(c)));
+	m_map->setMapDataValue(h, w, MapReader::charToMapTile(c));
 }
 

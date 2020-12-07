@@ -26,6 +26,10 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 		else if(k == GAMEOBJECT_HITBOX_NAME)
 			setHitbox(Helper::toFloatRect(v));
 	}
+
+	m_shape.SetBox(0.3, 0.4);
+	m_body = new ph::Body(ph::BodyConfig{&m_shape, m_pos.x, m_pos.y});
+
 	for(auto& p: setupMap){
 		std::string paragraph = p.first;
 		if(paragraph == GAMEOBJECT_ANI_UP_PARAGRAPH) {
@@ -157,8 +161,8 @@ void GameObject::updateFlags() {
 }
 
 void GameObject::apply() {
-	setPos(m_nextPos);
-	setVel(m_nextVel);
+	setPos(sf::Vector2f(m_body->position.x,m_body->position.y));
+	setVel(sf::Vector2f(m_body->velocity.x,m_body->velocity.y));
 	updateFlags();
 	setMovementAnimationAutomatic();
 }
@@ -307,6 +311,11 @@ AnimatedSprite* GameObject::getAnimatedSprite() {
 	return &m_sprite;
 }
 
+ph::Body* GameObject::getBody() const
+{
+	return m_body;
+}
+
 bool GameObject::isVisible()
 {
 	return m_visible;
@@ -370,11 +379,13 @@ void GameObject::setVel(sf::Vector2f vel) {
 void GameObject::setVelX(float pos)
 {
 	m_vel.x = pos;
+		m_body->velocity.x = pos;
 }
 
 void GameObject::setVelY(float pos)
 {
 	m_vel.y = pos;
+	m_body->velocity.y = pos;
 }
 
 sf::Vector2f& GameObject::getNextPos()

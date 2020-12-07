@@ -16,6 +16,8 @@
 #include "graphics/AnimatedSprite.h"
 #include "util/reader/Reader.h"
 #include "util/Helper.h"
+#include "physics/Body.h"
+#include "physics/Shape.h"
 
 #define SPEED_FACTOR 0.5
 
@@ -78,6 +80,7 @@ public:
 	sf::Vector2f getHitboxRightBottom(const sf::Vector2f& pos);
 	sf::FloatRect getHitboxBounds() const;
 	AnimatedSprite* getAnimatedSprite();
+	ph::Body* getBody() const;
 
 	void toggleLogging();
 
@@ -177,6 +180,9 @@ private:
 	sf::Vector2f m_nextVel = sf::Vector2f(0, 0); // direction velocity after next calculation
 	// TODO
 	sf::FloatRect m_hitbox = sf::FloatRect(0.1875, 0.0, 0.1094, 0.5);
+
+	ph::PolygonShape m_shape;
+	ph::Body* m_body;
 
 	// represents transformations relative to MapTiles,
 	// not to MapPixel, the inherited Transformable is used for that..

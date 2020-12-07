@@ -38,6 +38,17 @@ void GameController::setMap(Map* m) {
 	m_view.zoom(1 / m->getScale());
 }
 
+void GameController::startGame()
+{
+	m_scene.Clear();
+	for(auto& mm : m_map->getMapData())
+		for(auto& mmm : mm.second)
+			if(!mmm.second->isPassable())
+				m_scene.Add(mmm.second->body);
+	for(GameObject* game_object : m_game_objects)
+		m_scene.Add(game_object->getBody());
+}
+
 void GameController::pushGameObject(GameObject* game_object) {
 	m_game_objects.push_back(game_object);
 }
@@ -47,8 +58,20 @@ void GameController::clearGameObjects()
 	m_game_objects.clear();
 }
 
+ph::Scene GameController::getScene() const
+{
+	return m_scene;
+}
 
 void GameController::updateMap(sf::Time ellapsed) {
+	m_clock += ellapsed;
+	if(m_clock>=m_sceneDt) {
+		// TODO fps from settings
+		// use steady time for determenistic and to increase steadyness
+		m_scene.Step(m_sceneDt.asSeconds(), ph::Vec2(0, m_map->getGravity()));
+		m_clock = sf::Time::Zero;
+	}
+
 	getMap()->update(ellapsed);
 }
 void GameController::eventMap(sf::Event& e) {
@@ -68,10 +91,38 @@ void GameController::eventMap(sf::Event& e) {
 		m_viewDelta.x = delta.x * 0.1f;
 		m_viewDelta.y = delta.y * 0.1f;
 	}
+	// TODO remove shape spawn
+	if (e.type == sf::Event::MouseButtonPressed)
+	{
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			ph::PolygonShape poly;
+			ph::uint32 count = (ph::uint32)ph::Random( 3, MaxPolyVertexCount );
+			ph::Vec2 *vertices = new ph::Vec2[count];
+			ph::real e = ph::Random( 5*0.05, 10*0.05 );
+			for(ph::uint32 i = 0; i < count; ++i)
+				vertices[i].Set( ph::Random( -e, e ), ph::Random( -e, e ) );
+			poly.Set( vertices, count );
+			ph::Body *b = new ph::Body( ph::BodyConfig{&poly, worldPos.x/64, worldPos.y/64} );
+			b->SetOrient( ph::Random( -ph::PI, ph::PI ) );
+			b->restitution = 0.2f;
+			b->dynamicFriction = 0.2f;
+			b->staticFriction = 0.4f;
+			m_scene.Add(b);
+			delete [] vertices;
+		}
+		else if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+		{
+			ph::Circle c( ph::Random( 0.1f, 1.0f ) );
+			ph::Body *b2 = new ph::Body( ph::BodyConfig{&c, worldPos.x/64, worldPos.y/64} );
+			m_scene.Add(b2);
+		}
+  }
 }
 
 void GameController::updateGameObjects(sf::Time ellapsed) {
 	for (GameObject* g : m_game_objects) {
+		/*
 		g->calculatePos(ellapsed);
 		g->calculateVel(ellapsed, m_map->getGravity());
 		sf::Vector2f& pos = g->getNextPos();
@@ -87,7 +138,7 @@ void GameController::updateGameObjects(sf::Time ellapsed) {
 		const Tile& tile_top = m_map->getTile(round(top.y), round(top.x));
 		const Tile& tile_bottom = m_map->getTile(round(bottom.y-0.001), round(bottom.x));
 		g->onTilesX(tile_top, tile_bottom);
-
+		*/
 		g->apply();
 		setViewCenter(g->getPos());
 		g->update(ellapsed);
