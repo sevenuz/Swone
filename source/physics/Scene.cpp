@@ -93,6 +93,10 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
   for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
     contacts[i].PositionalCorrection( );
 
+  // Collision Callback
+  for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
+    contacts[i].CollisionCallback( );
+
   // Clear all forces
   for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
   {
@@ -105,7 +109,35 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
 PHY_NS::Body *PHY_NS::Scene::Add( PHY_NS::Body *body )
 {
   assert( body );
+  assert( body->shape );
+  if( !(body->scene == this || body->scene == NULL) )
+    throw std::invalid_argument("Body has already another scene.");
+  // check if already exists
+  auto it = bodies.begin();
+  for(;it!=bodies.end();++it)
+    if(*it == body)
+      throw std::invalid_argument("Body is already in this scene.");
+  body->scene = this;
   bodies.push_back( body );
+  return body;
+}
+
+PHY_NS::Body *PHY_NS::Scene::Pop( PHY_NS::Body *body )
+{
+
+  assert( body );
+  if( body->scene != this )
+    throw std::invalid_argument("Body is not in this scene.");
+
+  // TODO double deletion causes segmentation fault in next line
+  auto it = bodies.begin();
+  for(size_t i = 0;it+i!=bodies.end();++i) {
+    if(*(it+i) == body) {
+        bodies.erase(it+i);
+        body->scene = NULL;
+        break;
+    }
+  }
   return body;
 }
 

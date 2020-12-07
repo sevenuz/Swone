@@ -38,6 +38,7 @@ struct Manifold
   void ApplyImpulse( void );                // Solve impulse and apply
   void PositionalCorrection( void );        // Naive correction of positional penetration
   void InfiniteMassCorrection( void );
+  void CollisionCallback( void );
 
   PHY_NS::Body *A;
   PHY_NS::Body *B;

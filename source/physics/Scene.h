@@ -20,6 +20,8 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include <stdexcept>
+
 #include "IEMath.h"
 #include "Body.h"
 #include "Manifold.h"
@@ -34,6 +36,7 @@ struct Scene
 
   void Step( PHY_NS::real dt, PHY_NS::Vec2 gravity );
   PHY_NS::Body *Add( PHY_NS::Body *body );
+  PHY_NS::Body *Pop( PHY_NS::Body *body );
   void Clear( void );
 
   PHY_NS::uint32 m_iterations;

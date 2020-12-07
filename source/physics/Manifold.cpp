@@ -135,3 +135,10 @@ void PHY_NS::Manifold::InfiniteMassCorrection( void )
   A->velocity.Set( 0, 0 );
   B->velocity.Set( 0, 0 );
 }
+
+void PHY_NS::Manifold::CollisionCallback( void )
+{
+  A->cb->onCollision(this);
+  B->cb->onCollision(this);
+}
+

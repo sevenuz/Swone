@@ -20,28 +20,45 @@
 #ifndef BODY_H
 #define BODY_H
 
+#include <string>
 #include "IEMath.h"
+
+#define X_EPSILON 0.01
 
 namespace PHY_NS {
 
 struct Shape;
-
-struct BodyConfig
-{
-  Shape *shape;
-  PHY_NS::real x, y;
-  PHY_NS::real sf = 0.5f;
-  PHY_NS::real df = 0.3f;
-  PHY_NS::real r = 0.2f;
-  PHY_NS::real vx = 0, vy = 0, av = 0;
-  PHY_NS::real o = 0;
-  PHY_NS::real fx = 0, fy = 0, ft = 0;
-};
+struct Scene;
+struct Manifold;
 
 // http://gamedev.tutsplus.com/tutorials/implementation/how-to-create-a-custom-2d-physics-engine-the-core-engine/
 struct Body
 {
-  Body( BodyConfig config );
+  struct Callback {
+    virtual ~Callback() {};
+    virtual void onCollision(Manifold* manifold) {};
+    virtual const std::string getType() const { return "Body"; };
+    static Callback* instance()
+    {
+      static Callback instance;
+      return &instance;
+    }
+  };
+
+  struct Config
+  {
+    Shape *shape;
+    PHY_NS::real x, y;
+    Callback* cb = Callback::instance();
+    PHY_NS::real sf = 0.5f;
+    PHY_NS::real df = 0.3f;
+    PHY_NS::real r = 0.2f;
+    PHY_NS::real vx = 0, vy = 0, av = 0;
+    PHY_NS::real o = 0;
+    PHY_NS::real fx = 0, fy = 0, ft = 0;
+  };
+
+  Body( Config config );
 
   void ApplyForce( const PHY_NS::Vec2& f )
   {
@@ -51,6 +68,9 @@ struct Body
   void ApplyImpulse( const PHY_NS::Vec2& impulse, const PHY_NS::Vec2& contactVector )
   {
     velocity += im * impulse;
+    // TODO speed lock to prevent glitching
+    if(std::abs(velocity.x) < X_EPSILON)
+      velocity.x = 0;
     angularVelocity += iI * PHY_NS::Cross( contactVector, impulse );
   }
 
@@ -84,8 +104,12 @@ struct Body
   PHY_NS::real dynamicFriction;
   PHY_NS::real restitution;
 
+  // can be implemented outside of physics/
+  Callback* cb;
   // Shape interface
   PHY_NS::Shape *shape;
+  // Scene interface
+  PHY_NS::Scene *scene = NULL;
 };
 
 }

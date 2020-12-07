@@ -20,11 +20,12 @@
 #include "Body.h"
 #include "Shape.h"
 
-PHY_NS::Body::Body( BodyConfig config )
+PHY_NS::Body::Body( PHY_NS::Body::Config config )
   : shape( config.shape->Clone( ) )
 {
   shape->body = this;
   position.Set( config.x, config.y );
+  cb = config.cb;
   velocity.Set( config.vx, config.vy );
   angularVelocity = config.av;
   torque = config.ft;
