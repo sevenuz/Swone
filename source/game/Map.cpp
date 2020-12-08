@@ -14,6 +14,11 @@ float Map::toMapPixelY(float y) {
 	return y * Map::TILE_HEIGHT;
 }
 
+sf::Vector2f Map::toMapPixel(sf::Vector2f v)
+{
+	return sf::Vector2f(toMapPixelX(v.x), toMapPixelY(v.y));
+}
+
 sf::Sprite& Map::getSprite() {
 	return m_sprite;
 }
@@ -109,10 +114,12 @@ void Map::createMapImage() {
 	m_imgHeight = Map::TILE_HEIGHT * m_height;
 	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Black);
 	for (size_t r = 0; r < m_width; r++)
-		for (size_t c = 0; c < m_height; c++)
+		for (size_t c = 0; c < m_height; c++) {
+			sf::Vector2i ttp = Map::getTileTexturePosition(getTile(r, c).type);
 			m_mapImage.copy(m_mapTiles, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
-				sf::IntRect(getTile(r, c).type * Map::TILE_WIDTH, 0,
+				sf::IntRect(ttp.x, ttp.y,
 					Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
+		}
 	if (!m_texture.loadFromImage(m_mapImage)) {
 		throw std::invalid_argument("error: convert img to texture.");
 	}
@@ -123,6 +130,12 @@ void Map::createMapImage() {
 
 		m_mapDrawable = true;
 	}
+}
+
+sf::Vector2i Map::getTileTexturePosition(MapTile t)
+{
+	// TODO Map also vertical in textures
+	return sf::Vector2i(t * Map::TILE_WIDTH, 0);
 }
 
 void Map::event(sf::Event& event) {
@@ -144,8 +157,40 @@ void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	if (m_mapDrawable)
 	{
 		target.draw(m_sprite, states);
+		/*
+		// Render Map from Vertexes
+		states.texture = &m_mapTiles;
+		for (size_t r = 0; r < m_width; r++)
+			for (size_t c = 0; c < m_height; c++)
+				target.draw(m_mapData.at(c).at(r)->m_vertices, 4, sf::Quads, states);
+		*/
 	}
 };
+
+Tile::Tile(sf::Vector2i pos, MapTile t)
+	 : pos(pos), type(t)
+	{
+		if(type == MapTile::UNDERSCORE) {
+			shape.SetBox(TILE_SIZE/2, TILE_SIZE/4);
+			body = new ph::Body(ph::Body::Config{&shape, ((float)pos.x)+TILE_SIZE/2, ((float)pos.y)+TILE_SIZE/4, this});
+		} else {
+			shape.SetBox(TILE_SIZE/2, TILE_SIZE/2);
+			body = new ph::Body(ph::Body::Config{&shape, ((float)pos.x)+TILE_SIZE/2, ((float)pos.y)+TILE_SIZE/2, this});
+		}
+		body->SetStatic();
+		/*
+		m_vertices[0].position = Map::toMapPixel(sf::Vector2f(pos.x, pos.y));
+		m_vertices[1].position = Map::toMapPixel(sf::Vector2f(pos.x, pos.y + TILE_SIZE));
+		m_vertices[2].position = Map::toMapPixel(sf::Vector2f(pos.x + TILE_SIZE, pos.y + TILE_SIZE));
+		m_vertices[3].position = Map::toMapPixel(sf::Vector2f(pos.x + TILE_SIZE, pos.y));
+
+		sf::Vector2i ttp = Map::getTileTexturePosition(type);
+		m_vertices[0].texCoords = sf::Vector2f(ttp.x, ttp.y);
+		m_vertices[1].texCoords = sf::Vector2f(ttp.x, ttp.y + Map::TILE_HEIGHT);
+		m_vertices[2].texCoords = sf::Vector2f(ttp.x + Map::TILE_WIDTH, ttp.y + Map::TILE_HEIGHT);
+		m_vertices[3].texCoords = sf::Vector2f(ttp.x + Map::TILE_WIDTH, ttp.y);
+		*/
+}
 
 const std::string Tile::getType() const
 {

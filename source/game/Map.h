@@ -20,30 +20,11 @@
 
 #define GRAVITY 25
 
+#define TILE_SIZE 1.0f
+
 enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
 
-struct Tile : public ph::Body::Callback {
-	static constexpr const char* MAP_TILE_TYPE = "MapTile";
-
-	ph::PolygonShape shape;
-	ph::Body* body;
-	sf::Vector2i pos;
-	MapTile type;
-
-	Tile(sf::Vector2i pos, MapTile type)
-	 : pos(pos), type(type)
-	{
-		shape.SetBox(0.5, 0.5);
-		body = new ph::Body(ph::Body::Config{&shape, ((float)pos.x)+0.5f, ((float)pos.y)+0.5f, this});
-		body->SetStatic();
-	}
-
-	//virtual void onCollision(ph::Manifold* manifold) override;
-	const std::string getType() const override;
-	static Tile* castBodyCallback(ph::Body::Callback* c);
-
-	bool isPassable() const;
-};
+struct Tile;
 
 class Map : public Handleable
 {
@@ -53,6 +34,7 @@ public:
 
 	static float toMapPixelX(float x);
 	static float toMapPixelY(float y);
+	static sf::Vector2f toMapPixel(sf::Vector2f v);
 
 	Map(Controller& c);
 	virtual ~Map();
@@ -87,6 +69,7 @@ public:
 	std::map<int, std::map<int, Tile*>>& getMapData();
 
 	void createMapImage();
+	static sf::Vector2i getTileTexturePosition(MapTile t);
 protected:
 private:
 	Controller& m_controller;
@@ -115,6 +98,24 @@ private:
 	sf::Sprite m_sprite;
 
 	bool m_mapDrawable = false;
+};
+
+struct Tile : public ph::Body::Callback {
+	static constexpr const char* MAP_TILE_TYPE = "MapTile";
+
+	ph::PolygonShape shape;
+	ph::Body* body;
+	sf::Vector2i pos;
+	MapTile type;
+	//sf::Vertex m_vertices[4];
+
+	Tile(sf::Vector2i pos, MapTile type);
+
+	//virtual void onCollision(ph::Manifold* manifold) override;
+	const std::string getType() const override;
+	static Tile* castBodyCallback(ph::Body::Callback* c);
+
+	bool isPassable() const;
 };
 
 #endif // MAP_H
