@@ -110,3 +110,13 @@ bool Helper::toBool(std::string s)
 		throw std::invalid_argument("Bool can be \"true\" or \"false\" only");
 }
 
+// TODO Expression Template (convert at compile time)
+sf::Vector2f Helper::toSfVec(ph::Vec2 v)
+{
+	return sf::Vector2f(v.x, v.y);
+}
+// TODO Expression Template (convert at compile time)
+ph::Vec2 Helper::toPhVec(sf::Vector2f v)
+{
+	return ph::Vec2(v.x, v.y);
+}

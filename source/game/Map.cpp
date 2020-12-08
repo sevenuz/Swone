@@ -147,6 +147,19 @@ void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	}
 };
 
+const std::string Tile::getType() const
+{
+	return MAP_TILE_TYPE;
+}
+
+Tile* Tile::castBodyCallback(ph::Body::Callback* c)
+{
+	if(c->getType() == MAP_TILE_TYPE)
+		return static_cast<Tile*>(c);
+	else
+		return NULL;
+}
+
 bool Tile::isPassable() const {
 	switch (type) {
 		case MapTile::SHARP:

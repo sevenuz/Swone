@@ -36,7 +36,7 @@ public:
 	void pushGameObject(GameObject* game_object);
 	void clearGameObjects();
 
-	ph::Scene getScene() const;
+	const ph::Scene& getScene() const;
 protected:
 private:
 	Controller& m_controller;

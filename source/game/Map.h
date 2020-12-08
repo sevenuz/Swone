@@ -22,7 +22,9 @@
 
 enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
 
-struct Tile {
+struct Tile : public ph::Body::Callback {
+	static constexpr const char* MAP_TILE_TYPE = "MapTile";
+
 	ph::PolygonShape shape;
 	ph::Body* body;
 	sf::Vector2i pos;
@@ -32,9 +34,13 @@ struct Tile {
 	 : pos(pos), type(type)
 	{
 		shape.SetBox(0.5, 0.5);
-		body = new ph::Body(ph::BodyConfig{&shape, ((float)pos.x)+0.5f, ((float)pos.y)+0.5f});
+		body = new ph::Body(ph::Body::Config{&shape, ((float)pos.x)+0.5f, ((float)pos.y)+0.5f, this});
 		body->SetStatic();
 	}
+
+	//virtual void onCollision(ph::Manifold* manifold) override;
+	const std::string getType() const override;
+	static Tile* castBodyCallback(ph::Body::Callback* c);
 
 	bool isPassable() const;
 };

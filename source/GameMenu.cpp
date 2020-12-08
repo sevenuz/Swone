@@ -75,12 +75,11 @@ void GameMenu::readGameObjectsFromDir() {
 					ss << m_controller.getSettings().getGameObjectDirectory() << file.name;
 					// TODO should only once create Reader
 					Reader r(ss.str());
-					std::string type = r.getParagraphStringMap(Reader::DEFAULT_PARAGRAPH)[GameObject::GAMEOBJECT_TYPE_NAME];
+					GameObject* o = new GameObject(r.getParagraphMap());
+					const std::string type = o->getType();
 					if(type == GameObject::GAMEOBJECT_PLAYER_TYPE) {
-						GameObject* p = new GameObject(r.getParagraphMap());
-						m_gamePlayers.push_back({p, true});
+						m_gamePlayers.push_back({o, true});
 					} else if(type == GameObject::GAMEOBJECT_OBJECT_TYPE) {
-						GameObject* o = new GameObject(r.getParagraphMap());
 						m_gameObjects.push_back({o, false});
 					} else
 						Log::ger().log("Unknown Type of object: " + ss.str(), Log::Label::Warning);

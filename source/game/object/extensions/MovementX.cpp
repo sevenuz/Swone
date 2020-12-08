@@ -28,10 +28,10 @@ void MovementX::event(sf::Event& event) {
 	}
 	else if (event.type == sf::Event::KeyReleased) {
 		if (event.key.code == m_key_left) {
-			m_obj->setVelX(0);
+			//m_obj->setVelX(0);
 		}
 		else if (event.key.code == m_key_right) {
-			m_obj->setVelX(0);
+			//m_obj->setVelX(0);
 		}
 	}
 }

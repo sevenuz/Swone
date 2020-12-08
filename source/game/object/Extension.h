@@ -3,6 +3,7 @@
 
 #include "game/Map.h"
 #include "game/object/GameObject.h"
+#include "physics/Manifold.h"
 
 // Interface, defining functionality which can be added to a GameObject
 class Extension {
@@ -14,11 +15,8 @@ public:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const{};
 	virtual void event(sf::Event& e){};
 	virtual void update(sf::Time ellapsed){};
-	virtual void calculateVel(sf::Time ellapsed, float gravity){};
-	virtual void calculatePos(sf::Time ellapsed){};
-	virtual void onTilesY(Tile, Tile) {};
-	virtual void onTilesX(Tile, Tile) {};
-	virtual void onOutOfMap(Tile border){};
+	virtual void onObjectCollision(ph::Manifold* manifold, GameObject* go){};
+	virtual void onTileCollision(ph::Manifold* manifold, Tile* t){};
 
 	virtual void updateLog(){};
 protected:

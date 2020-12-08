@@ -1,13 +1,13 @@
 #include "GameObject.h"
 
 // necessary because of forward declaration in GameObject.h
-#include "game/object/extensions/Gravity.h"
 #include "game/object/extensions/MovementX.h"
 #include "game/object/extensions/MultiJump.h"
 #include "game/object/extensions/Inventory.h"
 
 GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
-	: m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_ID_NAME])
+	: m_type(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_TYPE_NAME]),
+		m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_ID_NAME])
 {
 	// TODO remove loop?
 	for(auto& s: setupMap[Reader::DEFAULT_PARAGRAPH]){
@@ -16,7 +16,7 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 		if(k == GAMEOBJECT_NAME_NAME)
 			setName(v);
 		else if(k == GAMEOBJECT_INITIAL_POS_NAME)
-			setPos(Helper::toVector2f(v));
+			setStartPos(Helper::toVector2f(v));
 		else if(k == GAMEOBJECT_VELOCITY_NAME)
 			setPossibleVel(Helper::toVector2f(v));
 		else if(k == GAMEOBJECT_COLOR_NAME)
@@ -24,11 +24,11 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 		else if(k == GAMEOBJECT_TEXTURE_NAME)
 			setTexturePath(v);
 		else if(k == GAMEOBJECT_HITBOX_NAME)
-			setHitbox(Helper::toFloatRect(v));
+			continue; // TODO read hitbox polygon
 	}
 
 	m_shape.SetBox(0.3, 0.4);
-	m_body = new ph::Body(ph::BodyConfig{&m_shape, m_pos.x, m_pos.y});
+	m_body = new ph::Body(ph::Body::Config{&m_shape, m_startPos.x, m_startPos.y, this});
 
 	for(auto& p: setupMap){
 		std::string paragraph = p.first;
@@ -45,8 +45,6 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 		}
 	}
 	if(setupMap.count(GAMEOBJECT_EXTENSIONS_PARAGRAPH)){
-		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_GRAVITY_EXTENSION]))
-			m_extensions.push_back(new Gravity(this, setupMap));
 		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MOVEMENTX_EXTENSION]))
 			m_extensions.push_back(new MovementX(this, setupMap));
 		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MULTIJUMP_EXTENSION]))
@@ -54,6 +52,42 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_INVENTORY_EXTENSION]))
 			m_extensions.push_back(new Inventory(this, setupMap));
 	}
+}
+
+GameObject* GameObject::castBodyCallback(ph::Body::Callback* c)
+{
+	if(c->getType() == GAMEOBJECT_OBJECT_TYPE || c->getType() == GAMEOBJECT_PLAYER_TYPE)
+		return static_cast<GameObject*>(c);
+	else
+		return NULL;
+}
+
+void GameObject::onCollision(ph::Manifold* manifold)
+{
+	GameObject* g = castBodyCallback(manifold->A->cb);
+	GameObject* g2 = castBodyCallback(manifold->B->cb);
+	Tile* t = Tile::castBodyCallback(manifold->A->cb);
+	Tile* t2 = Tile::castBodyCallback(manifold->B->cb);
+	// t && t2 not possible, at least one is this
+	if(g != NULL && g2 != NULL) {
+		onObjectCollision(manifold, g == this ? g2 : g);
+	} else if(g != NULL && t2 != NULL) {
+		onTileCollision(manifold, t2);
+	} else if(t != NULL && g2 != NULL) {
+		onTileCollision(manifold, t);
+	} else {
+		Log::ger().log("Unhandled Collisions in GameObject", Log::Label::Warning);
+	}
+}
+
+void GameObject::onObjectCollision(ph::Manifold* manifold, GameObject* go)
+{
+	for(Extension* e : m_extensions) e->onObjectCollision(manifold, go);
+}
+
+void GameObject::onTileCollision(ph::Manifold* manifold, Tile* t)
+{
+	for(Extension* e : m_extensions) e->onTileCollision(manifold, t);
 }
 
 void GameObject::setAnimationFrames(Animation& animation, StringMap& m)
@@ -69,42 +103,13 @@ void GameObject::setAnimationFrames(Animation& animation, StringMap& m)
 	}
 }
 
-void GameObject::calculatePos(sf::Time ellapsed) {
-	for(Extension* e : m_extensions) e->calculatePos(ellapsed);
-}
-
-sf::Vector2f GameObject::getHitboxLeftTop(const sf::Vector2f& pos) {
-	return m_objTransform.getTransform().transformPoint((m_hitbox.left), (m_hitbox.top)) + sf::Vector2f(pos.x, pos.y);
-}
-sf::Vector2f GameObject::getHitboxRightTop(const sf::Vector2f& pos) {
-	return m_objTransform.getTransform().transformPoint((m_hitbox.left) + m_hitbox.width, (m_hitbox.top)) + sf::Vector2f(pos.x, pos.y);
-}
-sf::Vector2f GameObject::getHitboxLeftBottom(const sf::Vector2f& pos) {
-	return m_objTransform.getTransform().transformPoint((m_hitbox.left), (m_hitbox.top) + m_hitbox.height) + sf::Vector2f(pos.x, pos.y);
-}
-sf::Vector2f GameObject::getHitboxRightBottom(const sf::Vector2f& pos) {
-	return m_objTransform.getTransform().transformPoint((m_hitbox.left) + m_hitbox.width, (m_hitbox.top) + m_hitbox.height) + sf::Vector2f(pos.x, pos.y);
-}
-//Pixel in MapPixel relative to Obj
-sf::FloatRect GameObject::getHitboxBounds() const {
-	float x = m_hitbox.left * Map::TILE_WIDTH;
-	float y = m_hitbox.top * Map::TILE_HEIGHT;
-	float w = m_hitbox.width * Map::TILE_WIDTH;
-	float h = m_hitbox.height * Map::TILE_HEIGHT;
-	return sf::FloatRect(x, y, w, h);
-}
-
-void GameObject::calculateVel(sf::Time ellapsed, float gravity) {
-	for(Extension* e : m_extensions) e->calculateVel(ellapsed, gravity);
-}
-
 void GameObject::setMovementAnimationAutomatic()
 {
 	if(!m_movementAnimationAutomatic)
 		return;
-	if(isMoving() && m_vel.x < 0)
+	if(isMoving() && getVel().x < 0)
 		setMovementAnimation(MovementAnimation::Left);
-	else if(isMoving() && m_vel.x > 0)
+	else if(isMoving() && getVel().x > 0)
 		setMovementAnimation(MovementAnimation::Right);
 	else if(isFalling())
 		setMovementAnimation(MovementAnimation::Down);
@@ -152,17 +157,19 @@ void GameObject::setAnimation(Animation& animation)
 {
 	// sets animation automaticly if pointer changed
 	m_sprite.play(animation);
+	setOrigin(m_sprite.getLocalBounds().width/2,m_sprite.getLocalBounds().height/2);
 }
 
 void GameObject::updateFlags() {
-	m_isFalling = m_vel.y > 0;
-	m_isRising = m_vel.y < 0;
-	m_isMoving = m_vel.x != 0;
+	const float tolerance = 0.22;
+	m_isFalling = getVel().y > tolerance;
+	m_isRising = getVel().y < -tolerance;
+	m_isMoving = getVel().x != 0;
 }
 
 void GameObject::apply() {
-	setPos(sf::Vector2f(m_body->position.x,m_body->position.y));
-	setVel(sf::Vector2f(m_body->velocity.x,m_body->velocity.y));
+	setPosition(Map::toMapPixelX(getPos().x), Map::toMapPixelY(getPos().y));
+	setRotation(m_body->orient*180/ph::PI);
 	updateFlags();
 	setMovementAnimationAutomatic();
 }
@@ -176,33 +183,10 @@ void GameObject::event(sf::Event& ev) {
 	for(Extension* e : m_extensions) e->event(ev);
 }
 
-void GameObject::onTilesY(Tile top, Tile bottom) {
-	for(Extension* e : m_extensions) e->onTilesY(top, bottom);
-}
-
-void GameObject::onTilesX(Tile left, Tile right) {
-	for (Extension* e : m_extensions) e->onTilesX(left, right);
-}
-
-void GameObject::onOutOfMap(Tile border) {
-	for(Extension* e : m_extensions) e->onOutOfMap(border);
-};
-
 void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	if(m_visible) {
-		states.transform *= getTransform() * m_objTransform.getTransform();
+		states.transform *= getTransform();
 		target.draw(m_sprite, states);
-	}
-
-	if(m_log) {
-		sf::FloatRect h = getHitboxBounds();
-		sf::RectangleShape rectangle;
-		rectangle.setSize(sf::Vector2f(h.width, h.height));
-		rectangle.setOutlineColor(sf::Color::Red);
-		rectangle.setOutlineThickness(1);
-		rectangle.setFillColor(sf::Color::Transparent);
-		rectangle.setPosition(h.left, h.top);
-		target.draw(rectangle, states);
 	}
 
 	for(Extension* e : m_extensions) e->draw(target, states);
@@ -225,15 +209,19 @@ void GameObject::updateLog() const
 	log.detailsPutValue(std::to_string(m_isFalling), "isFalling", m_identifier);
 	log.detailsPutValue(std::to_string(m_isMoving), "isMoving", m_identifier);
 	log.detailsPutValue(std::to_string(m_isRising), "isRising", m_identifier);
-	log.detailsUpdateValue(std::to_string(m_pos.x), "current_x", m_identifier);
-	log.detailsUpdateValue(std::to_string(m_pos.y), "current_y", m_identifier);
-	log.detailsUpdateValue(std::to_string(m_vel.x), "vel_x", m_identifier);
-	log.detailsUpdateValue(std::to_string(m_vel.y), "vel_y", m_identifier);
+	log.detailsUpdateValue(std::to_string(getPos().x), "current_x", m_identifier);
+	log.detailsUpdateValue(std::to_string(getPos().y), "current_y", m_identifier);
+	log.detailsUpdateValue(std::to_string(getVel().x), "vel_x", m_identifier);
+	log.detailsUpdateValue(std::to_string(getVel().y), "vel_y", m_identifier);
 
 	for(Extension* e : m_extensions) e->updateLog();
 }
 
-std::string GameObject::getIdentifier() const {
+const std::string GameObject::getType() const {
+	return m_type;
+}
+
+const std::string GameObject::getIdentifier() const {
 	return m_identifier;
 }
 
@@ -282,29 +270,14 @@ void GameObject::setPossibleVel(sf::Vector2f s)
 	m_possibleVel = s;
 }
 
-sf::FloatRect GameObject::getHitbox() {
-	return m_hitbox;
+sf::Vector2f GameObject::getStartPos()
+{
+	return m_startPos;
 }
 
-void GameObject::setHitbox(sf::FloatRect f)
+void GameObject::setStartPos(sf::Vector2f s)
 {
-	m_hitbox = f;
-}
-
-sf::Transformable GameObject::getObjTransform() const
-{
-	return m_objTransform;
-}
-
-
-void GameObject::setAngle(float s)
-{
-	m_objTransform.setRotation(s);
-}
-
-void GameObject::setScale(float s)
-{
-	m_objTransform.setScale(s, s);
+	m_startPos = s;
 }
 
 AnimatedSprite* GameObject::getAnimatedSprite() {
@@ -349,85 +322,41 @@ bool GameObject::isFalling() {
 	return m_isFalling;
 }
 
-sf::Vector2f& GameObject::getPos() {
-	return m_pos;
+const sf::Vector2f GameObject::getPos() const {
+	return Helper::toSfVec(m_body->position);
 }
 
 void GameObject::setPos(sf::Vector2f pos) {
-	m_pos = pos;
-	setPosition(Map::toMapPixelX(m_pos.x), Map::toMapPixelY(m_pos.y));
+	m_body->position = Helper::toPhVec(pos);
 }
 
 void GameObject::setPosX(float pos)
 {
-	m_pos.x = pos;
+	m_body->position.x = pos;
 }
 
 void GameObject::setPosY(float pos)
 {
-	m_pos.y = pos;
+	m_body->position.y = pos;
 }
 
-sf::Vector2f& GameObject::getVel() {
-	return m_vel;
+const sf::Vector2f GameObject::getVel() const {
+	return Helper::toSfVec(m_body->velocity);
 }
 
 void GameObject::setVel(sf::Vector2f vel) {
-	m_vel = vel;
+	m_body->velocity = Helper::toPhVec(vel);
 }
 
 void GameObject::setVelX(float pos)
 {
-	m_vel.x = pos;
-		m_body->velocity.x = pos;
+	m_body->velocity.x = pos;
 }
 
 void GameObject::setVelY(float pos)
 {
-	m_vel.y = pos;
 	m_body->velocity.y = pos;
 }
-
-sf::Vector2f& GameObject::getNextPos()
-{
-	return m_nextPos;
-}
-
-void GameObject::setNextPos(sf::Vector2f pos)
-{
-	m_nextPos = pos;
-}
-
-void GameObject::setNextPosX(float pos)
-{
-	m_nextPos.x = pos;
-}
-
-void GameObject::setNextPosY(float pos)
-{
-	m_nextPos.y = pos;
-}
-
-sf::Vector2f& GameObject::getNextVel()
-{
-	return m_nextVel;
-}
-
-void GameObject::setNextVel(sf::Vector2f pos)
-{
-	m_nextVel = pos;
-}
-
-void GameObject::setNextVelX(float pos)
-{
-	m_nextVel.x = pos;
-}
-
-void GameObject::setNextVelY(float pos)
-{
-	m_nextVel.y = pos;
-}
-
 
 sf::Vector2f GameObject::getSpritePos() {
 	return m_sprite.getPosition();

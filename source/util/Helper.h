@@ -13,6 +13,8 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "physics/IEMath.h"
+
 class Helper
 {
 public:
@@ -42,6 +44,8 @@ public:
 	// input should be true or false
 	static bool toBool(std::string s);
 
+	static sf::Vector2f toSfVec(ph::Vec2 v);
+	static ph::Vec2 toPhVec(sf::Vector2f v);
 protected:
 
 private:

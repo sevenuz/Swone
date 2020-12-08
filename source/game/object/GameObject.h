@@ -1,9 +1,6 @@
 #ifndef SWONE_GAME_OBJECT_GAMEOBJECT_H
 #define SWONE_GAME_OBJECT_GAMEOBJECT_H
 
-// Activate M_PI define
-#define _USE_MATH_DEFINES
-#include <cmath>
 #include <vector>
 #include <functional>
 #include <SFML/System/Time.hpp>
@@ -18,6 +15,8 @@
 #include "util/Helper.h"
 #include "physics/Body.h"
 #include "physics/Shape.h"
+#include "physics/Manifold.h"
+#include "physics/Scene.h"
 
 #define SPEED_FACTOR 0.5
 
@@ -27,7 +26,7 @@
 // forward declaration to avoid dependency cyclus
 class Extension;
 
-class GameObject : public Handleable {
+class GameObject : public Handleable, public ph::Body::Callback {
 public:
 	enum MovementAnimation : char { Up, Left, Right, Down, Steady };
 	// gameobject property names
@@ -63,28 +62,20 @@ public:
 	virtual void event(sf::Event& e);
 	virtual void update(sf::Time ellapsed);
 
-	// calculate the next position of the object and save the result in m_nextPos
-	virtual void calculateVel(sf::Time ellapsed, float gravity);
-	// calculate the next speed vct of the object and save the result in m_nextVec
-	virtual void calculatePos(sf::Time ellapsed);
-	// is called with the tiles which are hitting the corners
-	// of the hitbox of the m_nextPos vector
-	virtual void onTilesY(Tile, Tile);
-	virtual void onTilesX(Tile, Tile);
-	// if the object is complete out of map, this function is called
-	virtual void onOutOfMap(Tile border);
+	virtual void onObjectCollision(ph::Manifold* manifold, GameObject* go);
+	virtual void onTileCollision(ph::Manifold* manifold, Tile* t);
 
-	sf::Vector2f getHitboxLeftTop(const sf::Vector2f& pos);
-	sf::Vector2f getHitboxRightTop(const sf::Vector2f& pos);
-	sf::Vector2f getHitboxLeftBottom(const sf::Vector2f& pos);
-	sf::Vector2f getHitboxRightBottom(const sf::Vector2f& pos);
-	sf::FloatRect getHitboxBounds() const;
-	AnimatedSprite* getAnimatedSprite();
-	ph::Body* getBody() const;
+	void onCollision(ph::Manifold* manifold) override;
+	const std::string getType() const override;
+
+	static GameObject* castBodyCallback(ph::Body::Callback* c);
 
 	void toggleLogging();
 
-	std::string getIdentifier() const;
+	AnimatedSprite* getAnimatedSprite();
+	ph::Body* getBody() const;
+
+	const std::string getIdentifier() const;
 
 	std::string getName();
 	void setName(std::string s);
@@ -98,32 +89,18 @@ public:
 	sf::Vector2f getPossibleVel();
 	void setPossibleVel(sf::Vector2f s);
 
-	sf::Vector2f& getVel();
+	sf::Vector2f getStartPos();
+	void setStartPos(sf::Vector2f s);
+
+	const sf::Vector2f getVel() const;
 	void setVel(sf::Vector2f pos);
 	void setVelX(float pos);
 	void setVelY(float pos);
 
-	sf::Vector2f& getPos();
+	const sf::Vector2f getPos() const;
 	void setPos(sf::Vector2f pos);
 	void setPosX(float pos);
 	void setPosY(float pos);
-
-	sf::Vector2f& getNextPos();
-	void setNextPos(sf::Vector2f pos);
-	void setNextPosX(float pos);
-	void setNextPosY(float pos);
-
-	sf::Vector2f& getNextVel();
-	void setNextVel(sf::Vector2f pos);
-	void setNextVelX(float pos);
-	void setNextVelY(float pos);
-
-	sf::FloatRect getHitbox();
-	void setHitbox(sf::FloatRect);
-
-	sf::Transformable getObjTransform() const;
-	void setAngle(float s);
-	void setScale(float s);
 
 	bool isVisible();
 	void setVisible(bool s);
@@ -154,6 +131,7 @@ private:
 	bool m_log = false;
 	bool m_visible = true;
 	bool m_movementAnimationAutomatic = true;
+	const std::string m_type;
 	const std::string m_identifier;
 	std::string m_name;
 
@@ -171,22 +149,11 @@ private:
 	bool m_isFalling = false; // movement to bottom
 	bool m_isMoving = false;  // movement on x
 
-	// was move/jump force
 	sf::Vector2f m_possibleVel = sf::Vector2f(MOVE_FORCE, JUMP_FORCE);
-
-	sf::Vector2f m_pos = sf::Vector2f(0, 0); // position in map
-	sf::Vector2f m_vel = sf::Vector2f(0, 0); // direction velocity
-	sf::Vector2f m_nextPos = sf::Vector2f(0, 0); // position in map after next calculation
-	sf::Vector2f m_nextVel = sf::Vector2f(0, 0); // direction velocity after next calculation
-	// TODO
-	sf::FloatRect m_hitbox = sf::FloatRect(0.1875, 0.0, 0.1094, 0.5);
+	sf::Vector2f m_startPos = sf::Vector2f(0.0f, 0.0f);
 
 	ph::PolygonShape m_shape;
 	ph::Body* m_body;
-
-	// represents transformations relative to MapTiles,
-	// not to MapPixel, the inherited Transformable is used for that..
-	sf::Transformable m_objTransform;
 
 	std::vector<Extension*> m_extensions;
 };
