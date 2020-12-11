@@ -161,7 +161,7 @@ void GameObject::setAnimation(Animation& animation)
 }
 
 void GameObject::updateFlags() {
-	const float tolerance = 0.22;
+	const float tolerance = 0.35;
 	m_isFalling = getVel().y > tolerance;
 	m_isRising = getVel().y < -tolerance;
 	m_isMoving = getVel().x != 0;
@@ -169,7 +169,7 @@ void GameObject::updateFlags() {
 
 void GameObject::apply() {
 	setPosition(Map::toMapPixelX(getPos().x), Map::toMapPixelY(getPos().y));
-	setRotation(m_body->orient*180/ph::PI);
+	setRotation(m_body->GetOrientAngle());
 	updateFlags();
 	setMovementAnimationAutomatic();
 }

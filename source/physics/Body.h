@@ -23,7 +23,7 @@
 #include <string>
 #include "IEMath.h"
 
-#define X_EPSILON 0.01
+#define X_EPSILON 0.075
 
 namespace PHY_NS {
 
@@ -53,6 +53,7 @@ struct Body
     PHY_NS::real sf = 0.5f;
     PHY_NS::real df = 0.3f;
     PHY_NS::real r = 0.2f;
+    bool rotating = true;
     PHY_NS::real vx = 0, vy = 0, av = 0;
     PHY_NS::real o = 0;
     PHY_NS::real fx = 0, fy = 0, ft = 0;
@@ -71,7 +72,10 @@ struct Body
     // TODO speed lock to prevent glitching
     if(std::abs(velocity.x) < X_EPSILON)
       velocity.x = 0;
-    angularVelocity += iI * PHY_NS::Cross( contactVector, impulse );
+    if(isRotatingOnCollision)
+      angularVelocity += iI * PHY_NS::Cross( contactVector, impulse );
+    else
+      angularVelocity = 0;
   }
 
   void SetStatic( void )
@@ -83,10 +87,15 @@ struct Body
   }
 
   void SetOrient( PHY_NS::real radians );
+  void SetOrientAngle( PHY_NS::real radians );
+
+  PHY_NS::real GetOrient( void );
+  PHY_NS::real GetOrientAngle( void );
 
   PHY_NS::Vec2 position;
   PHY_NS::Vec2 velocity;
 
+  bool isRotatingOnCollision;
   PHY_NS::real angularVelocity;
   PHY_NS::real torque;
   PHY_NS::real orient; // radians

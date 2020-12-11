@@ -34,6 +34,7 @@ PHY_NS::Body::Body( PHY_NS::Body::Config config )
   staticFriction = config.sf;
   dynamicFriction = config.df;
   restitution = config.r;
+  isRotatingOnCollision = config.rotating;
   shape->Initialize( );
 }
 
@@ -42,3 +43,25 @@ void PHY_NS::Body::SetOrient( PHY_NS::real radians )
   orient = radians;
   shape->SetOrient( radians );
 }
+
+void PHY_NS::Body::SetOrientAngle( ph::real degree )
+{
+  SetOrient(degree*ph::PI/180);
+}
+
+PHY_NS::real PHY_NS::Body::GetOrient()
+{
+  return orient;
+}
+
+// the angle is always in [-180,180]
+PHY_NS::real PHY_NS::Body::GetOrientAngle()
+{
+  int angle = ((int)(orient*180/ph::PI)%360);
+  if(angle > 180)
+    angle -= 360;
+  else if(angle < -180)
+    angle += 360;
+  return (PHY_NS::real)angle;
+}
+

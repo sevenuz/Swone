@@ -38,7 +38,7 @@ struct Shape
     eCount
   };
 
-  Shape( PHY_NS::real d = 1 ) : density(d) {}
+  Shape( PHY_NS::real d ) : density(d) {}
   virtual ~Shape( ) {}
   virtual Shape *Clone( void ) const = 0;
   virtual void Initialize( void ) = 0;
@@ -57,9 +57,9 @@ struct Shape
   PHY_NS::Mat2 u; // Orientation matrix from model to world
 };
 
-struct Circle : public Shape
+struct Circle : public PHY_NS::Shape
 {
-  Circle( PHY_NS::real r )
+  Circle( PHY_NS::real r, PHY_NS::real d = 1 ) : PHY_NS::Shape(d)
   {
     radius = r;
   }
@@ -92,8 +92,11 @@ struct Circle : public Shape
   }
 };
 
-struct PolygonShape : public Shape
+struct PolygonShape : public PHY_NS::Shape
 {
+  PolygonShape( PHY_NS::real d = 1 ) : PHY_NS::Shape(d)
+  {}
+
   void Initialize( )
   {
     ComputeMass( density );
@@ -101,7 +104,7 @@ struct PolygonShape : public Shape
 
   Shape *Clone( void ) const
   {
-    PolygonShape *poly = new PolygonShape( );
+    PolygonShape *poly = new PolygonShape( density );
     poly->u = u;
     for(PHY_NS::uint32 i = 0; i < m_vertexCount; ++i)
     {

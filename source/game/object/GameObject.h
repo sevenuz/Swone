@@ -152,7 +152,7 @@ private:
 	sf::Vector2f m_possibleVel = sf::Vector2f(MOVE_FORCE, JUMP_FORCE);
 	sf::Vector2f m_startPos = sf::Vector2f(0.0f, 0.0f);
 
-	ph::PolygonShape m_shape;
+	ph::PolygonShape m_shape = ph::PolygonShape(100);
 	ph::Body* m_body;
 
 	std::vector<Extension*> m_extensions;

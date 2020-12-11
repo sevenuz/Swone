@@ -69,7 +69,7 @@ void GameController::updateMap(sf::Time ellapsed) {
 		// TODO fps from settings
 		// use steady time for determenistic and to increase steadyness
 		m_scene.Step(m_sceneDt.asSeconds(), ph::Vec2(0, m_map->getGravity()));
-		m_clock = sf::Time::Zero;
+		m_clock -= m_sceneDt;
 	}
 
 	getMap()->update(ellapsed);
