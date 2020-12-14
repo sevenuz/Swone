@@ -22,7 +22,6 @@ public:
 	MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap);
 	void event(sf::Event& e) override;
 	void update(sf::Time ellapsed) override;
-	void onTileCollision(ph::Manifold* manifold, Tile* t) override;
 
 	void jump();
 	void refreshJump(sf::Time ellapsed);
@@ -34,8 +33,6 @@ private:
 	unsigned int m_jumpsPossible = 2; // possible jumps without landing
 	unsigned int m_jumps = 0; // count of current jumps
 
-	bool m_correctOrient = false;
-	float m_correction = 0.8;
 	sf::Keyboard::Key m_key_up = sf::Keyboard::Up;
 };
 

@@ -27,31 +27,13 @@ void MultiJump::jump() {
 void MultiJump::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == m_key_up) {
-			if(!m_correctOrient)
-				jump();
+			jump();
 		}
 	}
 }
 
 void MultiJump::update(sf::Time ellapsed) {
 	refreshJump(ellapsed);
-	if(m_correctOrient) {
-		m_obj->getBody()->SetOrientAngle(m_obj->getBody()->GetOrientAngle() * m_correction);
-	}
-}
-
-void MultiJump::onTileCollision(ph::Manifold* manifold, Tile* t)
-{
-	const float angleTolerance = 20.0f;
-	const float velocityTolerance = 0.0025f;
-	if(std::abs(m_obj->getBody()->angularVelocity) < velocityTolerance &&
-			std::abs(m_obj->getBody()->GetOrientAngle()) > angleTolerance) {
-		m_correctOrient = true;
-		m_obj->getBody()->isRotatingOnCollision = false;
-	} else {
-		m_correctOrient = false;
-		m_obj->getBody()->isRotatingOnCollision = true;
-	}
 }
 
 void MultiJump::refreshJump(sf::Time ellapsed) {

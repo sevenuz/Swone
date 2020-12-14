@@ -29,13 +29,16 @@ PHY_NS::Body::Body( PHY_NS::Body::Config config )
   velocity.Set( config.vx, config.vy );
   angularVelocity = config.av;
   torque = config.ft;
-  orient = config.o;
+  orient = config.orient;
   force.Set( config.fx, config.fy );
-  staticFriction = config.sf;
-  dynamicFriction = config.df;
-  restitution = config.r;
-  isRotatingOnCollision = config.rotating;
+  staticFriction = config.staticFriction;
+  dynamicFriction = config.dynamicFriction;
+  restitution = config.restitution;
+  rotatable = config.rotatable;
+  collidable = config.collidable;
   shape->Initialize( );
+  if(!config.movable)
+    SetStatic();
 }
 
 void PHY_NS::Body::SetOrient( PHY_NS::real radians )

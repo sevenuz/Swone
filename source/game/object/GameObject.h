@@ -29,32 +29,47 @@ class Extension;
 class GameObject : public Handleable, public ph::Body::Callback {
 public:
 	enum MovementAnimation : char { Up, Left, Right, Down, Steady };
+	// S_ for Settings :)
 	// gameobject property names
 	// global
-	static constexpr const char* GAMEOBJECT_TYPE_NAME = "type";
-	static constexpr const char* GAMEOBJECT_PLAYER_TYPE = "player";
-	static constexpr const char* GAMEOBJECT_OBJECT_TYPE = "object";
+	static constexpr const char* S_TYPE = "type";
+	static constexpr const char* S_PLAYER_TYPE = "player";
+	static constexpr const char* S_OBJECT_TYPE = "object";
 
-	static constexpr const char* GAMEOBJECT_NAME_NAME = "name";
-	static constexpr const char* GAMEOBJECT_ID_NAME = "id";
-	static constexpr const char* GAMEOBJECT_INITIAL_POS_NAME = "initial_position";
-	static constexpr const char* GAMEOBJECT_VELOCITY_NAME = "velocity";
-	static constexpr const char* GAMEOBJECT_COLOR_NAME = "color";
-	static constexpr const char* GAMEOBJECT_TEXTURE_NAME = "texture";
-	static constexpr const char* GAMEOBJECT_HITBOX_NAME = "hitbox";
-	// animation paragraphs (keys are irrelevant)
-	static constexpr const char* GAMEOBJECT_ANI_FRAME_TIME = "frame_time";
-	static constexpr const char* GAMEOBJECT_ANI_UP_PARAGRAPH = "ani_up";
-	static constexpr const char* GAMEOBJECT_ANI_LEFT_PARAGRAPH = "ani_left";
-	static constexpr const char* GAMEOBJECT_ANI_RIGHT_PARAGRAPH = "ani_right";
-	static constexpr const char* GAMEOBJECT_ANI_DOWN_PARAGRAPH = "ani_down";
-	static constexpr const char* GAMEOBJECT_ANI_STEADY_PARAGRAPH = "ani_steady";
+	static constexpr const char* S_NAME = "name";
+	static constexpr const char* S_ID = "id";
+	static constexpr const char* S_INITIAL_POS = "initial_position";
+	static constexpr const char* S_VELOCITY = "velocity";
+	static constexpr const char* S_COLOR = "color";
+	static constexpr const char* S_TEXTURE = "texture";
+
+	static constexpr const char* S_HITBOX_PARAGRAPH = "hitbox";
+	// Shape
+	static constexpr const char* S_DENSITY = "density";
+	static constexpr const char* S_CIRCLE_TYPE = "circle";
+	static constexpr const char* S_POLYGON_TYPE = "polygon";
+	// Body
+	static constexpr const char* S_MOVABLE = "movable";
+	static constexpr const char* S_ROTATABLE = "rotatable";
+	static constexpr const char* S_COLLIDABLE = "collidable";
+	static constexpr const char* S_FRICTION = "friction";
+	static constexpr const char* S_RESTITUTION = "restitution";
+	static constexpr const char* S_ORIENT = "orient";
+
+	// animation paragraphs
+	static constexpr const char* S_ANI_FRAME_TIME = "frame_time";
+	static constexpr const char* S_ANI_UP_PARAGRAPH = "ani_up";
+	static constexpr const char* S_ANI_LEFT_PARAGRAPH = "ani_left";
+	static constexpr const char* S_ANI_RIGHT_PARAGRAPH = "ani_right";
+	static constexpr const char* S_ANI_DOWN_PARAGRAPH = "ani_down";
+	static constexpr const char* S_ANI_STEADY_PARAGRAPH = "ani_steady";
 	// extensions
-	static constexpr const char* GAMEOBJECT_EXTENSIONS_PARAGRAPH = "extensions";
-	static constexpr const char* GAMEOBJECT_GRAVITY_EXTENSION = "gravity";
-	static constexpr const char* GAMEOBJECT_MOVEMENTX_EXTENSION = "movementx";
-	static constexpr const char* GAMEOBJECT_MULTIJUMP_EXTENSION = "multijump";
-	static constexpr const char* GAMEOBJECT_INVENTORY_EXTENSION = "inventory";
+	static constexpr const char* S_EXTENSIONS_PARAGRAPH = "extensions";
+	static constexpr const char* S_GRAVITY_EXTENSION = "gravity";
+	static constexpr const char* S_MOVEMENTX_EXTENSION = "movementx";
+	static constexpr const char* S_MULTIJUMP_EXTENSION = "multijump";
+	static constexpr const char* S_INVENTORY_EXTENSION = "inventory";
+	static constexpr const char* S_ORIENT_CORRECTION_EXTENSION = "orientCorrection";
 
 	GameObject(std::map<std::string, StringMap>& setupMap);
 
@@ -105,6 +120,9 @@ public:
 	bool isVisible();
 	void setVisible(bool s);
 
+	bool isCollidable();
+	void setCollidable(bool s);
+
 	bool isMovementAnimationAutomatic();
 	void setMovementAnimationAutomatic(bool s, bool looped = true);
 
@@ -152,8 +170,7 @@ private:
 	sf::Vector2f m_possibleVel = sf::Vector2f(MOVE_FORCE, JUMP_FORCE);
 	sf::Vector2f m_startPos = sf::Vector2f(0.0f, 0.0f);
 
-	ph::PolygonShape m_shape = ph::PolygonShape(100);
-	ph::Body* m_body;
+	ph::Body* m_body = NULL;
 
 	std::vector<Extension*> m_extensions;
 };

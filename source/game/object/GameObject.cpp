@@ -4,59 +4,105 @@
 #include "game/object/extensions/MovementX.h"
 #include "game/object/extensions/MultiJump.h"
 #include "game/object/extensions/Inventory.h"
+#include "game/object/extensions/OrientCorrection.h"
 
 GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
-	: m_type(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_TYPE_NAME]),
-		m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][GAMEOBJECT_ID_NAME])
+	: m_type(setupMap[Reader::DEFAULT_PARAGRAPH][S_TYPE]),
+		m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][S_ID])
 {
 	// TODO remove loop?
 	for(auto& s: setupMap[Reader::DEFAULT_PARAGRAPH]){
 		const std::string k = s.first;
 		const std::string v = s.second;
-		if(k == GAMEOBJECT_NAME_NAME)
+		if(k == S_NAME)
 			setName(v);
-		else if(k == GAMEOBJECT_INITIAL_POS_NAME)
+		else if(k == S_INITIAL_POS)
 			setStartPos(Helper::toVector2f(v));
-		else if(k == GAMEOBJECT_VELOCITY_NAME)
+		else if(k == S_VELOCITY)
 			setPossibleVel(Helper::toVector2f(v));
-		else if(k == GAMEOBJECT_COLOR_NAME)
+		else if(k == S_COLOR)
 			setColor(Helper::toColor(v));
-		else if(k == GAMEOBJECT_TEXTURE_NAME)
+		else if(k == S_TEXTURE)
 			setTexturePath(v);
-		else if(k == GAMEOBJECT_HITBOX_NAME)
-			continue; // TODO read hitbox polygon
 	}
 
-	m_shape.SetBox(0.3, 0.4);
-	m_body = new ph::Body(ph::Body::Config{&m_shape, m_startPos.x, m_startPos.y, this});
+	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
+	// if custom hitbox not exists, obj is static: not collidable, movable, rotatable
+	ph::Body::Config config{NULL, m_startPos.x, m_startPos.y, this, hasHitbox, hasHitbox, hasHitbox};
+	if(hasHitbox){
+		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY]);
+		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
+			// radius of the circle has the key "1"
+			config.shape = new ph::Circle(Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH]["1"]), density);
+		} else if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_POLYGON_TYPE) {
+			ph::PolygonShape* poly = new ph::PolygonShape(density);
+			std::vector<ph::Vec2> vertices;
+			for(int i = 1; setupMap[S_HITBOX_PARAGRAPH].count(std::to_string(i)); i++){
+				sf::Vector2f v = Helper::toVector2f(setupMap[S_HITBOX_PARAGRAPH][std::to_string(i)]);
+				vertices.push_back(ph::Vec2(v.x, v.y));
+			}
+			poly->Set(vertices.data(), vertices.size());
+			config.shape = poly;
+		} else {
+			Log::ger().log("Object has no hitbox type={circle|polygon}", Log::Label::Warning);
+			hasHitbox = false;
+		}
+
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_MOVABLE))
+			config.movable = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_MOVABLE]);
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_ROTATABLE))
+			config.rotatable = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_ROTATABLE]);
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_COLLIDABLE))
+			config.collidable = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_COLLIDABLE]);
+
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_FRICTION)) {
+			sf::Vector2f f = Helper::toVector2f(setupMap[S_HITBOX_PARAGRAPH][S_FRICTION]);
+			config.staticFriction = f.x;
+			config.dynamicFriction = f.y;
+		}
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_RESTITUTION))
+			config.restitution = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_RESTITUTION]);
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_ORIENT))
+			config.orient = (Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_ORIENT]))*ph::PI/180;
+	}
+	if(!hasHitbox) {
+		// GameObject Default Shape
+		Log::ger().log("Default Hitbox", Log::Label::Warning);
+		ph::PolygonShape* poly = new ph::PolygonShape();
+		poly->SetBox(0.1f, 0.1f);
+		config.shape = poly;
+	}
+	m_body = new ph::Body(config);
 
 	for(auto& p: setupMap){
 		std::string paragraph = p.first;
-		if(paragraph == GAMEOBJECT_ANI_UP_PARAGRAPH) {
+		if(paragraph == S_ANI_UP_PARAGRAPH) {
 			setAnimationFrames(m_ani_up, p.second);
-		} else if(paragraph == GAMEOBJECT_ANI_LEFT_PARAGRAPH) {
+		} else if(paragraph == S_ANI_LEFT_PARAGRAPH) {
 			setAnimationFrames(m_ani_left, p.second);
-		} else if(paragraph == GAMEOBJECT_ANI_RIGHT_PARAGRAPH) {
+		} else if(paragraph == S_ANI_RIGHT_PARAGRAPH) {
 			setAnimationFrames(m_ani_right, p.second);
-		} else if(paragraph == GAMEOBJECT_ANI_DOWN_PARAGRAPH) {
+		} else if(paragraph == S_ANI_DOWN_PARAGRAPH) {
 			setAnimationFrames(m_ani_down, p.second);
-		} else if(paragraph == GAMEOBJECT_ANI_STEADY_PARAGRAPH) {
+		} else if(paragraph == S_ANI_STEADY_PARAGRAPH) {
 			setAnimationFrames(m_ani_steady, p.second);
 		}
 	}
-	if(setupMap.count(GAMEOBJECT_EXTENSIONS_PARAGRAPH)){
-		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MOVEMENTX_EXTENSION]))
+	if(setupMap.count(S_EXTENSIONS_PARAGRAPH)){
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_MOVEMENTX_EXTENSION]))
 			m_extensions.push_back(new MovementX(this, setupMap));
-		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_MULTIJUMP_EXTENSION]))
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_MULTIJUMP_EXTENSION]))
 			m_extensions.push_back(new MultiJump(this, setupMap));
-		if(Helper::toBool(setupMap[GAMEOBJECT_EXTENSIONS_PARAGRAPH][GAMEOBJECT_INVENTORY_EXTENSION]))
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_INVENTORY_EXTENSION]))
 			m_extensions.push_back(new Inventory(this, setupMap));
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_ORIENT_CORRECTION_EXTENSION]))
+			m_extensions.push_back(new OrientCorrection(this));
 	}
 }
 
 GameObject* GameObject::castBodyCallback(ph::Body::Callback* c)
 {
-	if(c->getType() == GAMEOBJECT_OBJECT_TYPE || c->getType() == GAMEOBJECT_PLAYER_TYPE)
+	if(c->getType() == S_OBJECT_TYPE || c->getType() == S_PLAYER_TYPE)
 		return static_cast<GameObject*>(c);
 	else
 		return NULL;
@@ -95,8 +141,8 @@ void GameObject::setAnimationFrames(Animation& animation, StringMap& m)
 	// TODO static map of loaded textures, this fn to Helper.h ?
 	if(m_texturePath.empty())
 		throw std::invalid_argument("GameObject Texture is missing.");
-	if(m.count(GAMEOBJECT_ANI_FRAME_TIME))
-		animation.setFrameTime(sf::seconds(Helper::toFloat(m[GAMEOBJECT_ANI_FRAME_TIME])));
+	if(m.count(S_ANI_FRAME_TIME))
+		animation.setFrameTime(sf::seconds(Helper::toFloat(m[S_ANI_FRAME_TIME])));
 	animation.setSpriteSheet(m_texture);
 	for(int i = 1; m.count(std::to_string(i)); i++){
 		animation.addFrame(Helper::toIntRect(m[std::to_string(i)]));
@@ -297,6 +343,16 @@ bool GameObject::isVisible()
 void GameObject::setVisible(bool s)
 {
 	m_visible = s;
+}
+
+bool GameObject::isCollidable()
+{
+	return m_body->collidable;
+}
+
+void GameObject::setCollidable(bool s)
+{
+	m_body->collidable = s;
 }
 
 bool GameObject::isMovementAnimationAutomatic()

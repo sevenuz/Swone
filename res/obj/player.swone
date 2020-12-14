@@ -9,8 +9,19 @@ posible_jumps=2
 // in seconds
 jump_cooldown=3
 color=Color(0,0,200)
-hitbox=(0.1875, 0.0, 0.1094, 0.5)
 texture=../res/sprites/player.png
+hitbox
+type=circle
+density=10.4
+1=0.3
+movable=true
+rotatable=false
+collidable=true
+restitution=12.0
+// (staticFriction, dynamicFriction)
+friction=(0.9,0.9)
+// in degree
+orient=25
 ani_up
 1=(32, 0, 32, 32)
 2=(64, 0, 32, 32)

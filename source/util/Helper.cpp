@@ -104,10 +104,8 @@ bool Helper::toBool(std::string s)
 {
 	if(s=="true")
 		return true;
-	else if(s=="false")
-		return false;
 	else
-		throw std::invalid_argument("Bool can be \"true\" or \"false\" only");
+		return false;
 }
 
 // TODO Expression Template (convert at compile time)

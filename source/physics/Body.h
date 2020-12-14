@@ -50,12 +50,14 @@ struct Body
     Shape *shape;
     PHY_NS::real x, y;
     Callback* cb = Callback::instance();
-    PHY_NS::real sf = 0.5f;
-    PHY_NS::real df = 0.3f;
-    PHY_NS::real r = 0.2f;
-    bool rotating = true;
+    bool collidable = true;
+    bool rotatable = true;
+    bool movable = true;
+    PHY_NS::real staticFriction = 0.5f;
+    PHY_NS::real dynamicFriction = 0.3f;
+    PHY_NS::real restitution = 0.2f;
+    PHY_NS::real orient = 0;
     PHY_NS::real vx = 0, vy = 0, av = 0;
-    PHY_NS::real o = 0;
     PHY_NS::real fx = 0, fy = 0, ft = 0;
   };
 
@@ -72,7 +74,7 @@ struct Body
     // TODO speed lock to prevent glitching
     if(std::abs(velocity.x) < X_EPSILON)
       velocity.x = 0;
-    if(isRotatingOnCollision)
+    if(rotatable)
       angularVelocity += iI * PHY_NS::Cross( contactVector, impulse );
     else
       angularVelocity = 0;
@@ -95,7 +97,8 @@ struct Body
   PHY_NS::Vec2 position;
   PHY_NS::Vec2 velocity;
 
-  bool isRotatingOnCollision;
+  bool rotatable;
+  bool collidable;
   PHY_NS::real angularVelocity;
   PHY_NS::real torque;
   PHY_NS::real orient; // radians

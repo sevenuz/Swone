@@ -77,9 +77,9 @@ void GameMenu::readGameObjectsFromDir() {
 					Reader r(ss.str());
 					GameObject* o = new GameObject(r.getParagraphMap());
 					const std::string type = o->getType();
-					if(type == GameObject::GAMEOBJECT_PLAYER_TYPE) {
+					if(type == GameObject::S_PLAYER_TYPE) {
 						m_gamePlayers.push_back({o, true});
-					} else if(type == GameObject::GAMEOBJECT_OBJECT_TYPE) {
+					} else if(type == GameObject::S_OBJECT_TYPE) {
 						m_gameObjects.push_back({o, false});
 					} else
 						Log::ger().log("Unknown Type of object: " + ss.str(), Log::Label::Warning);
