@@ -27,8 +27,8 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	}
 
 	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
-	// if custom hitbox not exists, obj is static: not collidable, movable, rotatable
-	ph::Body::Config config{NULL, m_startPos.x, m_startPos.y, this, hasHitbox, hasHitbox, hasHitbox};
+	// if custom hitbox not exists, obj is solid: not collidable, rotatable
+	ph::Body::Config config{NULL, m_startPos.x, m_startPos.y, this, hasHitbox, hasHitbox, !hasHitbox};
 	if(hasHitbox){
 		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY]);
 		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
@@ -48,8 +48,8 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			hasHitbox = false;
 		}
 
-		if(setupMap[S_HITBOX_PARAGRAPH].count(S_MOVABLE))
-			config.movable = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_MOVABLE]);
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_SOLID))
+			config.solid = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_SOLID]);
 		if(setupMap[S_HITBOX_PARAGRAPH].count(S_ROTATABLE))
 			config.rotatable = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_ROTATABLE]);
 		if(setupMap[S_HITBOX_PARAGRAPH].count(S_COLLIDABLE))

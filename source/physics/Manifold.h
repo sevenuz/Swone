@@ -39,6 +39,7 @@ struct Manifold
   void PositionalCorrection( void );        // Naive correction of positional penetration
   void InfiniteMassCorrection( void );
   void CollisionCallback( void );
+  bool ShouldComputeCollision( void );
 
   PHY_NS::Body *A;
   PHY_NS::Body *B;

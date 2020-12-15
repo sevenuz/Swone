@@ -83,7 +83,7 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
   // Solve collisions
   for(PHY_NS::uint32 j = 0; j < m_iterations; ++j)
     for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
-      if(contacts[i].A->collidable && contacts[i].B->collidable)
+      if(contacts[i].ShouldComputeCollision())
         contacts[i].ApplyImpulse( );
 
   // Integrate velocities
@@ -92,7 +92,8 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
 
   // Correct positions
   for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
-    contacts[i].PositionalCorrection( );
+    if(contacts[i].ShouldComputeCollision())
+      contacts[i].PositionalCorrection( );
 
   // Collision Callback
   for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)

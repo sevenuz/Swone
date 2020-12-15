@@ -49,7 +49,7 @@ public:
 	static constexpr const char* S_CIRCLE_TYPE = "circle";
 	static constexpr const char* S_POLYGON_TYPE = "polygon";
 	// Body
-	static constexpr const char* S_MOVABLE = "movable";
+	static constexpr const char* S_SOLID = "solid";
 	static constexpr const char* S_ROTATABLE = "rotatable";
 	static constexpr const char* S_COLLIDABLE = "collidable";
 	static constexpr const char* S_FRICTION = "friction";

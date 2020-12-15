@@ -52,7 +52,7 @@ struct Body
     Callback* cb = Callback::instance();
     bool collidable = true;
     bool rotatable = true;
-    bool movable = true;
+    bool solid = false;
     PHY_NS::real staticFriction = 0.5f;
     PHY_NS::real dynamicFriction = 0.3f;
     PHY_NS::real restitution = 0.2f;
@@ -80,13 +80,7 @@ struct Body
       angularVelocity = 0;
   }
 
-  void SetStatic( void )
-  {
-    I = 0.0f;
-    iI = 0.0f;
-    m = 0.0f;
-    im = 0.0f;
-  }
+  void SetSolid( bool s = true );
 
   void SetOrient( PHY_NS::real radians );
   void SetOrientAngle( PHY_NS::real radians );
@@ -97,8 +91,9 @@ struct Body
   PHY_NS::Vec2 position;
   PHY_NS::Vec2 velocity;
 
-  bool rotatable;
-  bool collidable;
+  bool rotatable;   // deactivate rotation on collision
+  bool collidable;  // deactivate collisions with unsolid bodies
+  bool solid;
   PHY_NS::real angularVelocity;
   PHY_NS::real torque;
   PHY_NS::real orient; // radians

@@ -177,7 +177,7 @@ Tile::Tile(sf::Vector2i pos, MapTile t)
 			shape.SetBox(TILE_SIZE/2, TILE_SIZE/2);
 			body = new ph::Body(ph::Body::Config{&shape, ((float)pos.x)+TILE_SIZE/2, ((float)pos.y)+TILE_SIZE/2, this});
 		}
-		body->SetStatic();
+		body->SetSolid();
 		/*
 		m_vertices[0].position = Map::toMapPixel(sf::Vector2f(pos.x, pos.y));
 		m_vertices[1].position = Map::toMapPixel(sf::Vector2f(pos.x, pos.y + TILE_SIZE));

@@ -142,3 +142,8 @@ void PHY_NS::Manifold::CollisionCallback( void )
   B->cb->onCollision(this);
 }
 
+bool PHY_NS::Manifold::ShouldComputeCollision( void )
+{
+  return A->solid || B->solid || (A->collidable && B->collidable);
+}
+

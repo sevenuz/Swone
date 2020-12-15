@@ -36,9 +36,20 @@ PHY_NS::Body::Body( PHY_NS::Body::Config config )
   restitution = config.restitution;
   rotatable = config.rotatable;
   collidable = config.collidable;
-  shape->Initialize( );
-  if(!config.movable)
-    SetStatic();
+  SetSolid(config.solid);
+}
+
+void PHY_NS::Body::SetSolid( bool s )
+{
+  solid = s;
+  if(solid) {
+    I = 0.0f;
+    iI = 0.0f;
+    m = 0.0f;
+    im = 0.0f;
+  } else {
+    shape->Initialize( );
+  }
 }
 
 void PHY_NS::Body::SetOrient( PHY_NS::real radians )
