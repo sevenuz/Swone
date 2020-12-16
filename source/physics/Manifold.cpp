@@ -144,6 +144,17 @@ void PHY_NS::Manifold::CollisionCallback( void )
 
 bool PHY_NS::Manifold::ShouldComputeCollision( void )
 {
-  return A->solid || B->solid || (A->collidable && B->collidable);
+  bool s;
+  if(A->solid && B->solid)
+    s = (A->collidableSolid && B->collidableSolid);
+  else if(!A->solid && !B->solid)
+    s = (A->collidableUnsolid && B->collidableUnsolid);
+  else {
+    if(A->solid && !B->solid)
+      s = (A->collidableUnsolid && B->collidableSolid);
+    if(B->solid && !A->solid)
+      s = (B->collidableUnsolid && A->collidableSolid);
+  }
+  return s;
 }
 

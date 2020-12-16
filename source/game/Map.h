@@ -45,6 +45,9 @@ public:
 	void setName(std::string);
 	std::string getName();
 
+	void setTileTexturePath(std::string);
+	std::string getTileTexturePath();
+
 	void setGravity(float f);
 	float getGravity();
 
@@ -92,7 +95,8 @@ private:
 	std::map<int, std::map<int, Tile*>> m_mapData;//pointer (2d-array) to Map Infos
 	MapTile m_border;
 
-	sf::Image m_mapTiles;//Img with all tiles
+	std::string m_tileTexturePath;
+	sf::Image m_tileTexture;//Img with all tiles
 	sf::Image m_mapImage;//Img with map tiles
 	sf::Texture m_texture;
 	sf::Sprite m_sprite;

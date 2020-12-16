@@ -21,6 +21,7 @@
 #define SCENE_H
 
 #include <stdexcept>
+#include <list>
 
 #include "IEMath.h"
 #include "Body.h"
@@ -35,12 +36,11 @@ struct Scene
   {}
 
   void Step( PHY_NS::real dt, PHY_NS::Vec2 gravity );
-  PHY_NS::Body *Add( PHY_NS::Body *body );
-  PHY_NS::Body *Pop( PHY_NS::Body *body );
+  void Add( PHY_NS::Body *body );
   void Clear( void );
 
   PHY_NS::uint32 m_iterations;
-  std::vector<PHY_NS::Body *> bodies;
+  std::list<PHY_NS::Body *> bodies;
   std::vector<PHY_NS::Manifold> contacts;
 };
 

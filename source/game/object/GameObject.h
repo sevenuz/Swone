@@ -42,6 +42,7 @@ public:
 	static constexpr const char* S_VELOCITY = "velocity";
 	static constexpr const char* S_COLOR = "color";
 	static constexpr const char* S_TEXTURE = "texture";
+	static constexpr const char* S_SCALE = "scale";
 
 	static constexpr const char* S_HITBOX_PARAGRAPH = "hitbox";
 	// Shape
@@ -51,7 +52,8 @@ public:
 	// Body
 	static constexpr const char* S_SOLID = "solid";
 	static constexpr const char* S_ROTATABLE = "rotatable";
-	static constexpr const char* S_COLLIDABLE = "collidable";
+	static constexpr const char* S_COLLIDABLE_SOLID = "collidableSolid";
+	static constexpr const char* S_COLLIDABLE_UNSOLID = "collidableUnsolid";
 	static constexpr const char* S_FRICTION = "friction";
 	static constexpr const char* S_RESTITUTION = "restitution";
 	static constexpr const char* S_ORIENT = "orient";
@@ -119,9 +121,6 @@ public:
 
 	bool isVisible();
 	void setVisible(bool s);
-
-	bool isCollidable();
-	void setCollidable(bool s);
 
 	bool isMovementAnimationAutomatic();
 	void setMovementAnimationAutomatic(bool s, bool looped = true);

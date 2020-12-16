@@ -57,12 +57,12 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
 {
   // Generate new collision info
   contacts.clear( );
-  for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
+  for(auto it = bodies.begin();it!=bodies.end();++it)
   {
-    PHY_NS::Body *A = bodies[i];
-    for(PHY_NS::uint32 j = i + 1; j < bodies.size( ); ++j)
+    PHY_NS::Body *A = *it;
+    for(auto it2 = std::next(it);it2!=bodies.end();++it2)
     {
-      PHY_NS::Body *B = bodies[j];
+      PHY_NS::Body *B = *it2;
       if(A->im == 0 && B->im == 0)
         continue;
       PHY_NS::Manifold m( A, B );
@@ -73,8 +73,8 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
   }
 
   // Integrate forces
-  for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
-    IntegrateForces( bodies[i], dt, gravity );
+  for(Body* b : bodies)
+    IntegrateForces( b, dt, gravity );
 
   // Initialize collision
   for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
@@ -87,8 +87,8 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
         contacts[i].ApplyImpulse( );
 
   // Integrate velocities
-  for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
-    IntegrateVelocity( bodies[i], dt, gravity );
+  for(Body* b : bodies)
+    IntegrateVelocity( b, dt, gravity );
 
   // Correct positions
   for(PHY_NS::uint32 i = 0; i < contacts.size( ); ++i)
@@ -100,44 +100,19 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
     contacts[i].CollisionCallback( );
 
   // Clear all forces
-  for(PHY_NS::uint32 i = 0; i < bodies.size( ); ++i)
+  for(Body* b : bodies)
   {
-    PHY_NS::Body *b = bodies[i];
     b->force.Set( 0, 0 );
     b->torque = 0;
   }
 }
 
-PHY_NS::Body *PHY_NS::Scene::Add( PHY_NS::Body *body )
+void PHY_NS::Scene::Add( PHY_NS::Body *body )
 {
   assert( body );
   assert( body->shape );
-  if(body->scene == this)
-    throw std::invalid_argument("Body is already in this scene.");
-  if(body->scene != NULL)
-    throw std::invalid_argument("Body has already another scene.");
 
-  body->scene = this;
   bodies.push_back( body );
-  return body;
-}
-
-PHY_NS::Body *PHY_NS::Scene::Pop( PHY_NS::Body *body )
-{
-  assert( body );
-  if( body->scene != this )
-    throw std::invalid_argument("Body is not in this scene.");
-
-  // TODO double deletion causes segmentation fault in next line
-  auto it = bodies.begin();
-  for(;it!=bodies.end();++it) {
-    if(*it == body) {
-        bodies.erase(it);
-        body->scene = NULL;
-        break;
-    }
-  }
-  return body;
 }
 
 void PHY_NS::Scene::Clear( )

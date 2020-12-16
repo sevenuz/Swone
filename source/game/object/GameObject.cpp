@@ -24,11 +24,13 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			setColor(Helper::toColor(v));
 		else if(k == S_TEXTURE)
 			setTexturePath(v);
+		else if(k == S_SCALE)
+			setScale(Helper::toVector2f(v));
 	}
 
 	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
 	// if custom hitbox not exists, obj is solid: not collidable, rotatable
-	ph::Body::Config config{NULL, m_startPos.x, m_startPos.y, this, hasHitbox, hasHitbox, !hasHitbox};
+	ph::Body::Config config{NULL, m_startPos.x, m_startPos.y, this, hasHitbox, hasHitbox, hasHitbox, !hasHitbox};
 	if(hasHitbox){
 		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY]);
 		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
@@ -52,8 +54,10 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			config.solid = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_SOLID]);
 		if(setupMap[S_HITBOX_PARAGRAPH].count(S_ROTATABLE))
 			config.rotatable = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_ROTATABLE]);
-		if(setupMap[S_HITBOX_PARAGRAPH].count(S_COLLIDABLE))
-			config.collidable = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_COLLIDABLE]);
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_COLLIDABLE_SOLID))
+			config.collidableSolid = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_COLLIDABLE_SOLID]);
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_COLLIDABLE_UNSOLID))
+			config.collidableUnsolid = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_COLLIDABLE_UNSOLID]);
 
 		if(setupMap[S_HITBOX_PARAGRAPH].count(S_FRICTION)) {
 			sf::Vector2f f = Helper::toVector2f(setupMap[S_HITBOX_PARAGRAPH][S_FRICTION]);
@@ -74,6 +78,7 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	}
 	m_body = new ph::Body(config);
 
+	// TODO use ani_steady as default, invisible if not
 	for(auto& p: setupMap){
 		std::string paragraph = p.first;
 		if(paragraph == S_ANI_UP_PARAGRAPH) {
@@ -343,16 +348,6 @@ bool GameObject::isVisible()
 void GameObject::setVisible(bool s)
 {
 	m_visible = s;
-}
-
-bool GameObject::isCollidable()
-{
-	return m_body->collidable;
-}
-
-void GameObject::setCollidable(bool s)
-{
-	m_body->collidable = s;
 }
 
 bool GameObject::isMovementAnimationAutomatic()

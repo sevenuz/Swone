@@ -16,7 +16,7 @@ public:
 	void update(sf::Time ellapsed) override;
 	void onTileCollision(ph::Manifold* manifold, Tile* t) override;
 private:
-	void checkOrient();
+	bool checkOrient();
 
 	bool m_correctOrient = false;
 	float m_correction = 0.8;

@@ -27,6 +27,7 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	m_gc.getController().setView(m_gc.getView());
 	target.draw(*m_gc.getMap(), states);
+	// TODO sort with z-index
 	for (GameObject* g : m_gc.getGameObjects()) {
 		target.draw(*g, states);
 	}

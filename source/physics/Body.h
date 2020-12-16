@@ -28,7 +28,6 @@
 namespace PHY_NS {
 
 struct Shape;
-struct Scene;
 struct Manifold;
 
 // http://gamedev.tutsplus.com/tutorials/implementation/how-to-create-a-custom-2d-physics-engine-the-core-engine/
@@ -50,7 +49,8 @@ struct Body
     Shape *shape;
     PHY_NS::real x, y;
     Callback* cb = Callback::instance();
-    bool collidable = true;
+    bool collidableSolid = true;
+    bool collidableUnsolid = true;
     bool rotatable = true;
     bool solid = false;
     PHY_NS::real staticFriction = 0.5f;
@@ -91,8 +91,9 @@ struct Body
   PHY_NS::Vec2 position;
   PHY_NS::Vec2 velocity;
 
-  bool rotatable;   // deactivate rotation on collision
-  bool collidable;  // deactivate collisions with unsolid bodies
+  bool rotatable; // deactivate rotation on collision
+  bool collidableSolid; // activates collisions with solid bodies
+  bool collidableUnsolid; // activates collisions with unsolid bodies
   bool solid;
   PHY_NS::real angularVelocity;
   PHY_NS::real torque;
@@ -115,8 +116,6 @@ struct Body
   Callback* cb;
   // Shape interface
   PHY_NS::Shape *shape;
-  // Scene interface
-  PHY_NS::Scene *scene = NULL;
 };
 
 }

@@ -1,0 +1,33 @@
+type=object
+name=Earh
+id=earth_elem
+// depends of the map?
+initial_position=(3,-5)
+// movement velocity (x,y)
+// color=Color(0,0,200)
+texture=../res/sprites/items.png
+scale=(0.4,0.4)
+hitbox
+type=circle
+density=1.1
+1=0.2
+collidableUnsolid=false
+// collidableSolid=true
+// movable=true
+// rotatable=true
+// collidable=true
+// restitution=12.0
+// (staticFriction, dynamicFriction)
+// friction=(0.9,0.9)
+// in degree
+// orient=25
+ani_up
+1=(64, 0, 64, 64)
+ani_left
+1=(64, 0, 64, 64)
+ani_right
+1=(64, 0, 64, 64)
+ani_down
+1=(64, 0, 64, 64)
+ani_steady
+1=(64, 0, 64, 64)

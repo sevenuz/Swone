@@ -46,7 +46,6 @@ private:
 	ph::Scene m_scene;
 	sf::Time m_clock;
 	sf::Time m_sceneDt = sf::seconds(1.0f/60.0f);
-	// TODO multi dimensional -> back/forground
 	std::vector<GameObject*> m_game_objects;
 
 	size_t round(float f) {

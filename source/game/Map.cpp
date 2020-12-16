@@ -30,6 +30,13 @@ std::string Map::getName() {
 	return m_name;
 }
 
+void Map::setTileTexturePath(std::string n) {
+	m_tileTexturePath = n;
+}
+std::string Map::getTileTexturePath() {
+	return m_tileTexturePath;
+}
+
 void Map::setGravity(float f)
 {
 	m_gravity = f;
@@ -107,16 +114,18 @@ void Map::scaleToFit(size_t w, size_t h) {
 }
 
 void Map::createMapImage() {
-	if (!m_mapTiles.loadFromFile("../res/tile.png")) {
-		throw std::invalid_argument("tile.png not found!");
-	}
+	if(m_tileTexturePath.empty())
+		throw std::invalid_argument("Map needs a texture!");
+	if (!m_tileTexture.loadFromFile(m_tileTexturePath))
+		throw std::invalid_argument(m_tileTexturePath + " could not be loaded!");
+
 	m_imgWidth = Map::TILE_WIDTH * m_width;
 	m_imgHeight = Map::TILE_HEIGHT * m_height;
 	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Black);
 	for (size_t r = 0; r < m_width; r++)
 		for (size_t c = 0; c < m_height; c++) {
 			sf::Vector2i ttp = Map::getTileTexturePosition(getTile(r, c).type);
-			m_mapImage.copy(m_mapTiles, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
+			m_mapImage.copy(m_tileTexture, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
 				sf::IntRect(ttp.x, ttp.y,
 					Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
 		}

@@ -20,6 +20,9 @@
 #ifndef IEMATH_H
 #define IEMATH_H
 
+// TODO remove Log.h
+#include "util/Log.h"
+
 // Impulse Engine Math : IEMath
 
 #include <cmath> // abs, sqrt

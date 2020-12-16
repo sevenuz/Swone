@@ -295,13 +295,9 @@ void initLogger()
 
 int main()
 {
-	try {
-		ImGui::SFML::Init(window);
-		initLogger();
-		startMainLoop();
-	} catch(...) {
-		std::cout << "error" << std::endl;
-	}
+	ImGui::SFML::Init(window);
+	initLogger();
+	startMainLoop();
 
 	return 0;
 }

@@ -37,6 +37,8 @@ void MapReader::addParagraphValue(std::string paragraph, StringPair p) {
 		m_map->setName(p.second);
 	else if (p.first == "gravity")
 		m_map->setGravity(Helper::toFloat(p.second));
+	else if (p.first == "texture")
+		m_map->setTileTexturePath(p.second);
 	else
 		Log::ger().log(p.first + " is not a map option", Log::Label::Warning);
 }

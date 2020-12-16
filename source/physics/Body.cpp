@@ -35,7 +35,8 @@ PHY_NS::Body::Body( PHY_NS::Body::Config config )
   dynamicFriction = config.dynamicFriction;
   restitution = config.restitution;
   rotatable = config.rotatable;
-  collidable = config.collidable;
+  collidableSolid = config.collidableSolid;
+  collidableUnsolid = config.collidableUnsolid;
   SetSolid(config.solid);
 }
 

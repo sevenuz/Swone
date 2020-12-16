@@ -38,10 +38,10 @@ GameMenu::~GameMenu() {
 }
 
 void GameMenu::readMapsFromDir() {
-	try {
-		Helper::readDirectory(
-			m_controller.getSettings().getMapDirectory(),
-			[&](tinydir_file& file){
+	Helper::readDirectory(
+		m_controller.getSettings().getMapDirectory(),
+		[&](tinydir_file& file){
+			try {
 				if (!file.is_dir)
 				{
 					Map* map = new Map(m_controller);
@@ -55,20 +55,21 @@ void GameMenu::readMapsFromDir() {
 
 					m_maps.push_back(map);
 				}
+			} catch(const std::invalid_argument& ia) {
+				Log::ger().log(ia.what(), Log::Label::Error);
 			}
-		);
-		m_mapsFound = true;
+		}
+	);
+	m_mapsFound = m_maps.size() > 0;
+	if(m_mapsFound)
 		setMapSelection(0);
-	} catch(const std::invalid_argument& ia) {
-		Log::ger().log(ia.what(), Log::Label::Error);
-	}
 }
 
 void GameMenu::readGameObjectsFromDir() {
-	try {
-		Helper::readDirectory(
-			m_controller.getSettings().getGameObjectDirectory(),
-			[&](tinydir_file& file){
+	Helper::readDirectory(
+		m_controller.getSettings().getGameObjectDirectory(),
+		[&](tinydir_file& file){
+			try {
 				if (!file.is_dir)
 				{
 					std::stringstream ss;
@@ -84,13 +85,11 @@ void GameMenu::readGameObjectsFromDir() {
 					} else
 						Log::ger().log("Unknown Type of object: " + ss.str(), Log::Label::Warning);
 				}
+			} catch(const std::invalid_argument& ia) {
+				Log::ger().log(ia.what(), Log::Label::Error);
 			}
-		);
-		m_mapsFound = true;
-		setMapSelection(0);
-	} catch(const std::invalid_argument& ia) {
-		Log::ger().log(ia.what(), Log::Label::Error);
-	}
+		}
+	);
 }
 
 void GameMenu::setMapSelection(int i) {
@@ -109,8 +108,6 @@ void GameMenu::setMapSelection(int i) {
 	m_selectedMap = i;
 
 	m_mapName.setString(m_maps[m_selectedMap]->getName());
-
-	m_gameController.setMap(m_maps[m_selectedMap]);
 }
 
 void GameMenu::setActionSelection(char i) {
@@ -126,6 +123,7 @@ void GameMenu::setActionSelection(char i) {
 void GameMenu::startGame() {
 	if (m_mapsFound) {
 		m_gameController.clearGameObjects();
+		m_gameController.setMap(m_maps[m_selectedMap]);
 		for(GameObjectSelection& gos : m_gamePlayers)
 			if(gos.selected)
 				m_gameController.pushGameObject(gos.obj);
@@ -244,15 +242,14 @@ void GameMenu::drawImgui()
 void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;
-	sf::View view(sf::FloatRect(0, 0, m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getImageHeight()));
-	view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
 
 	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
-		target.draw(m_ps, states);
-		m_controller.setView(view);
-
 		if (m_mapsFound) {
+			sf::View view(sf::FloatRect(0, 0, m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getImageHeight()));
+			view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
+			target.draw(m_ps, states);
+			m_controller.setView(view);
 			target.draw(*m_maps[m_selectedMap], states);
 		}
 
