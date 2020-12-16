@@ -9,6 +9,10 @@
 
 MultiJump::MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {
+	if(setupMap.count(Reader::DEFAULT_PARAGRAPH))
+		if(setupMap[Reader::DEFAULT_PARAGRAPH].count(Extension::S_VELOCITY))
+			m_posVelY = Helper::toVector2f(setupMap[Reader::DEFAULT_PARAGRAPH][Extension::S_VELOCITY]).y;
+
 	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
 		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_JUMP_NAME))
 			m_key_up = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_JUMP_NAME]);
@@ -20,7 +24,7 @@ void MultiJump::jump() {
 	if (m_jumps > 0) {
 		m_jumps--;
 		// Startkraft nach oben
-		m_obj->setVelY(-(m_obj->getPossibleVel().y));
+		m_obj->setVelY(-m_posVelY);
 	}
 }
 

@@ -1,8 +1,6 @@
 type=player
 name=Kurt
 id=Kurt
-// depends of the map?
-initial_position=(0,0)
 // movement velocity (x,y)
 velocity=(7,16)
 posible_jumps=2
@@ -11,6 +9,7 @@ jump_cooldown=3
 color=Color(0,0,200)
 texture=../res/sprites/player.png
 hitbox
+initial_position=(0,0)
 type=circle
 density=10.4
 1=0.3

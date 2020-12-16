@@ -10,29 +10,23 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	: m_type(setupMap[Reader::DEFAULT_PARAGRAPH][S_TYPE]),
 		m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][S_ID])
 {
-	// TODO remove loop?
-	for(auto& s: setupMap[Reader::DEFAULT_PARAGRAPH]){
-		const std::string k = s.first;
-		const std::string v = s.second;
-		if(k == S_NAME)
-			setName(v);
-		else if(k == S_INITIAL_POS)
-			setStartPos(Helper::toVector2f(v));
-		else if(k == S_VELOCITY)
-			setPossibleVel(Helper::toVector2f(v));
-		else if(k == S_COLOR)
-			setColor(Helper::toColor(v));
-		else if(k == S_TEXTURE)
-			setTexturePath(v);
-		else if(k == S_SCALE)
-			setScale(Helper::toVector2f(v));
-		else if(k == S_ZINDEX)
-			setZindex(Helper::toInt(v));
+	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
+		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
+		if(global.count(S_NAME))
+			setName(global[S_NAME]);
+		if(global.count(S_COLOR))
+			setColor(Helper::toColor(global[S_COLOR]));
+		if(global.count(S_TEXTURE))
+			setTexturePath(global[S_TEXTURE]);
+		if(global.count(S_SCALE))
+			setScale(Helper::toVector2f(global[S_SCALE]));
+		if(global.count(S_ZINDEX))
+			setZindex(Helper::toInt(global[S_ZINDEX]));
 	}
 
 	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
 	// if custom hitbox not exists, obj is solid: not collidable, rotatable
-	ph::Body::Config config{NULL, m_startPos.x, m_startPos.y, this, hasHitbox, hasHitbox, hasHitbox, !hasHitbox};
+	ph::Body::Config config{NULL, 0, 0, this, hasHitbox, hasHitbox, hasHitbox, !hasHitbox};
 	if(hasHitbox){
 		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY]);
 		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
@@ -51,7 +45,11 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			Log::ger().log("Object has no hitbox type={circle|polygon}", Log::Label::Warning);
 			hasHitbox = false;
 		}
-
+		if(setupMap[S_HITBOX_PARAGRAPH].count(S_INITIAL_POS)) {
+			sf::Vector2f f = Helper::toVector2f(setupMap[S_HITBOX_PARAGRAPH][S_INITIAL_POS]);
+			config.x = f.x;
+			config.y = f.y;
+		}
 		if(setupMap[S_HITBOX_PARAGRAPH].count(S_SOLID))
 			config.solid = Helper::toBool(setupMap[S_HITBOX_PARAGRAPH][S_SOLID]);
 		if(setupMap[S_HITBOX_PARAGRAPH].count(S_ROTATABLE))
@@ -80,21 +78,17 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	}
 	m_body = new ph::Body(config);
 
-	// TODO use ani_steady as default, invisible if not
-	for(auto& p: setupMap){
-		std::string paragraph = p.first;
-		if(paragraph == S_ANI_UP_PARAGRAPH) {
-			setAnimationFrames(m_ani_up, p.second);
-		} else if(paragraph == S_ANI_LEFT_PARAGRAPH) {
-			setAnimationFrames(m_ani_left, p.second);
-		} else if(paragraph == S_ANI_RIGHT_PARAGRAPH) {
-			setAnimationFrames(m_ani_right, p.second);
-		} else if(paragraph == S_ANI_DOWN_PARAGRAPH) {
-			setAnimationFrames(m_ani_down, p.second);
-		} else if(paragraph == S_ANI_STEADY_PARAGRAPH) {
-			setAnimationFrames(m_ani_steady, p.second);
-		}
-	}
+	if(setupMap.count(S_ANI_UP_PARAGRAPH))
+		setAnimationFrames(m_ani_up, setupMap[S_ANI_UP_PARAGRAPH]);
+	if(setupMap.count(S_ANI_LEFT_PARAGRAPH))
+		setAnimationFrames(m_ani_left, setupMap[S_ANI_LEFT_PARAGRAPH]);
+	if(setupMap.count(S_ANI_RIGHT_PARAGRAPH))
+		setAnimationFrames(m_ani_right, setupMap[S_ANI_RIGHT_PARAGRAPH]);
+	if(setupMap.count(S_ANI_DOWN_PARAGRAPH))
+		setAnimationFrames(m_ani_down, setupMap[S_ANI_DOWN_PARAGRAPH]);
+	if(setupMap.count(S_ANI_STEADY_PARAGRAPH))
+		setAnimationFrames(m_ani_steady, setupMap[S_ANI_STEADY_PARAGRAPH]);
+
 	if(setupMap.count(S_EXTENSIONS_PARAGRAPH)){
 		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_MOVEMENTX_EXTENSION]))
 			m_extensions.push_back(new MovementX(this, setupMap));
@@ -208,6 +202,15 @@ void GameObject::playAnimationOnce(Animation& animation, std::function<void()> e
 
 void GameObject::setAnimation(Animation& animation)
 {
+	// use ani_steady if animation is not defined
+	// else make invisible
+	if(animation.getSpriteSheet() == NULL) {
+		if(m_ani_steady.getSpriteSheet() == NULL) {
+			setVisible(false);
+			return;
+		}
+		animation = m_ani_steady;
+	}
 	// sets animation automaticly if pointer changed
 	m_sprite.play(animation);
 	setOrigin(m_sprite.getLocalBounds().width/2,m_sprite.getLocalBounds().height/2);
@@ -311,26 +314,6 @@ void GameObject::setTexturePath(std::string s)
 		Log::ger().log(m_identifier + ": Failed to load texture", Log::Label::Error);
 		throw std::invalid_argument("Failed to load texture");
 	}
-}
-
-sf::Vector2f GameObject::getPossibleVel()
-{
-	return m_possibleVel;
-}
-
-void GameObject::setPossibleVel(sf::Vector2f s)
-{
-	m_possibleVel = s;
-}
-
-sf::Vector2f GameObject::getStartPos()
-{
-	return m_startPos;
-}
-
-void GameObject::setStartPos(sf::Vector2f s)
-{
-	m_startPos = s;
 }
 
 AnimatedSprite* GameObject::getAnimatedSprite() {

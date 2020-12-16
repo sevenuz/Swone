@@ -38,8 +38,6 @@ public:
 
 	static constexpr const char* S_NAME = "name";
 	static constexpr const char* S_ID = "id";
-	static constexpr const char* S_INITIAL_POS = "initial_position";
-	static constexpr const char* S_VELOCITY = "velocity";
 	static constexpr const char* S_COLOR = "color";
 	static constexpr const char* S_TEXTURE = "texture";
 	static constexpr const char* S_SCALE = "scale";
@@ -51,6 +49,7 @@ public:
 	static constexpr const char* S_CIRCLE_TYPE = "circle";
 	static constexpr const char* S_POLYGON_TYPE = "polygon";
 	// Body
+	static constexpr const char* S_INITIAL_POS = "initial_position";
 	static constexpr const char* S_SOLID = "solid";
 	static constexpr const char* S_ROTATABLE = "rotatable";
 	static constexpr const char* S_COLLIDABLE_SOLID = "collidableSolid";
@@ -103,12 +102,6 @@ public:
 
 	std::string getTexturePath();
 	void setTexturePath(std::string s);
-
-	sf::Vector2f getPossibleVel();
-	void setPossibleVel(sf::Vector2f s);
-
-	sf::Vector2f getStartPos();
-	void setStartPos(sf::Vector2f s);
 
 	const sf::Vector2f getVel() const;
 	void setVel(sf::Vector2f pos);

@@ -24,6 +24,8 @@ public:
 private:
 	sf::Keyboard::Key m_key_left = sf::Keyboard::Left;
 	sf::Keyboard::Key m_key_right = sf::Keyboard::Right;
+
+	float m_posVelX = 0;
 };
 
 #endif /* SWONE_GAME_OBJECT_EXTENSIONS_MOVEMENTX_H */

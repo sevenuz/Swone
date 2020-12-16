@@ -9,6 +9,7 @@
 class Extension {
 public:
 	static constexpr const char* CONTROLS_PARAGRAPH = "controls";
+	static constexpr const char* S_VELOCITY = "velocity";
 
 	Extension(GameObject* obj) : m_obj(obj){};
 	virtual ~Extension(){};

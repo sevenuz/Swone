@@ -9,6 +9,10 @@
 
 MovementX::MovementX(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {
+	if(setupMap.count(Reader::DEFAULT_PARAGRAPH))
+		if(setupMap[Reader::DEFAULT_PARAGRAPH].count(Extension::S_VELOCITY))
+			m_posVelX = Helper::toVector2f(setupMap[Reader::DEFAULT_PARAGRAPH][Extension::S_VELOCITY]).x;
+
 	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
 		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_LEFT_NAME))
 			m_key_left = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_LEFT_NAME]);
@@ -20,10 +24,10 @@ MovementX::MovementX(GameObject* obj, std::map<std::string, StringMap>& setupMap
 void MovementX::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == m_key_left) {
-			m_obj->setVelX(-(m_obj->getPossibleVel().x));
+			m_obj->setVelX(-m_posVelX);
 		}
 		else if (event.key.code == m_key_right) {
-			m_obj->setVelX(m_obj->getPossibleVel().x);
+			m_obj->setVelX(m_posVelX);
 		}
 	}
 	else if (event.type == sf::Event::KeyReleased) {

@@ -34,6 +34,8 @@ private:
 	unsigned int m_jumps = 0; // count of current jumps
 
 	sf::Keyboard::Key m_key_up = sf::Keyboard::Up;
+
+	float m_posVelY = 0;
 };
 
 #endif /* SWONE_GAME_OBJECT_EXTENSIONS_MULTIJUMP_H */
