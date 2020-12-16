@@ -74,7 +74,7 @@ public:
 	GameMenu(Controller& c);
 	~GameMenu();
 
-	const std::vector<GameObject*>& getGameObjects() const;
+	const GameController& getGameController() const;
 	GameObject* getGameObjectById(const std::string& id) const;
 
 	void updateLog() const;

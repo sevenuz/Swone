@@ -268,8 +268,8 @@ void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	}
 };
 
-const std::vector<GameObject*>& GameMenu::getGameObjects() const {
-	return m_gameController.getGameObjects();
+const GameController& GameMenu::getGameController() const {
+	return m_gameController;
 }
 
 GameObject* GameMenu::getGameObjectById(const std::string& id) const

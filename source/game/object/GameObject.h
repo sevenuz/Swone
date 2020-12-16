@@ -43,6 +43,7 @@ public:
 	static constexpr const char* S_COLOR = "color";
 	static constexpr const char* S_TEXTURE = "texture";
 	static constexpr const char* S_SCALE = "scale";
+	static constexpr const char* S_ZINDEX = "z-index";
 
 	static constexpr const char* S_HITBOX_PARAGRAPH = "hitbox";
 	// Shape
@@ -122,6 +123,9 @@ public:
 	bool isVisible();
 	void setVisible(bool s);
 
+	int getZindex();
+	void setZindex(int s);
+
 	bool isMovementAnimationAutomatic();
 	void setMovementAnimationAutomatic(bool s, bool looped = true);
 
@@ -165,6 +169,8 @@ private:
 	bool m_isRising = false; // movement to top
 	bool m_isFalling = false; // movement to bottom
 	bool m_isMoving = false;  // movement on x
+
+	int m_zindex = 1;
 
 	sf::Vector2f m_possibleVel = sf::Vector2f(MOVE_FORCE, JUMP_FORCE);
 	sf::Vector2f m_startPos = sf::Vector2f(0.0f, 0.0f);

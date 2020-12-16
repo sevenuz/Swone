@@ -26,11 +26,18 @@ void GameWindow::event(sf::Event& event) {
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	m_gc.getController().setView(m_gc.getView());
-	target.draw(*m_gc.getMap(), states);
-	// TODO sort with z-index
+
+	bool drawMap = true;
 	for (GameObject* g : m_gc.getGameObjects()) {
+		if(g->getZindex() >= 0 && drawMap) {
+			target.draw(*m_gc.getMap(), states);
+			drawMap = false;
+		}
 		target.draw(*g, states);
 	}
+	if(drawMap)
+		target.draw(*m_gc.getMap(), states);
+
 	// TODO toggle hitboxes
 	for (ph::Body* g : m_gc.getScene().bodies) {
 		if(g->shape->GetType() == ph::Shape::Type::ePoly) {

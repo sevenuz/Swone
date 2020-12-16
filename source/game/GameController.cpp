@@ -2,12 +2,7 @@
 
 GameController::GameController(Controller& c) : m_controller(c) {}
 
-GameController::~GameController() {
-	// TODO move
-	for (size_t i = 0; i < m_game_objects.size(); i++) {
-		delete m_game_objects[i];
-	}
-}
+GameController::~GameController() {}
 
 Controller& GameController::getController() {
 	return m_controller;
@@ -21,7 +16,7 @@ sf::View GameController::getView() {
 	return m_view;
 }
 
-const std::vector<GameObject*>& GameController::getGameObjects() const{
+const std::list<GameObject*>& GameController::getGameObjects() const{
 	return m_game_objects;
 }
 
@@ -30,6 +25,21 @@ void GameController::setViewCenter(sf::Vector2f pos) {
 		Map::toMapPixelX(pos.x) + m_viewDelta.x,
 		Map::toMapPixelY(pos.y) + m_viewDelta.y
 	);
+}
+
+sf::Vector2f GameController::getPlayerCenter()
+{
+	sf::Vector2f ppos = sf::Vector2f(0,0);
+	size_t pcount = 0;
+	for (GameObject* g : m_game_objects) {
+		if(g->getType() == GameObject::S_PLAYER_TYPE) {
+			ppos += g->getPos();
+			pcount++;
+		}
+	}
+	ppos.x /= pcount;
+	ppos.y /= pcount;
+	return ppos;
 }
 
 void GameController::setMap(Map* m) {
@@ -71,6 +81,8 @@ void GameController::updateMap(sf::Time ellapsed) {
 		m_scene.Step(m_sceneDt.asSeconds(), ph::Vec2(0, m_map->getGravity()));
 		m_clock -= m_sceneDt;
 	}
+	setViewCenter(getPlayerCenter());
+	// TODO set View Zoom if player are far away from each other
 
 	getMap()->update(ellapsed);
 }
@@ -87,7 +99,7 @@ void GameController::eventMap(sf::Event& e) {
 	}
 	if (e.type == sf::Event::MouseMoved) // Move view
 	{
-		sf::Vector2f delta = worldPos - m_game_objects[0]->getPos();
+		sf::Vector2f delta = worldPos - getPlayerCenter();
 		m_viewDelta.x = delta.x * 0.1f;
 		m_viewDelta.y = delta.y * 0.1f;
 	}
@@ -123,9 +135,12 @@ void GameController::eventMap(sf::Event& e) {
 void GameController::updateGameObjects(sf::Time ellapsed) {
 	for (GameObject* g : m_game_objects) {
 		g->apply();
-		setViewCenter(g->getPos());
 		g->update(ellapsed);
 	}
+	// sort list with z-index
+	m_game_objects.sort([](GameObject* a, GameObject* b) -> bool {
+		return a->getZindex() < b->getZindex();
+	});
 }
 void GameController::eventGameObjects(sf::Event& e) {
 	for (GameObject* g : m_game_objects) {

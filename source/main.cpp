@@ -111,7 +111,7 @@ void drawLog()
 
 void renderObjectSelector()
 {
-	const static std::vector<GameObject*>& gameObjects = gameMenu.getGameObjects();
+	const static std::list<GameObject*>& gameObjects = gameMenu.getGameController().getGameObjects();
 
 	if(ImGui::TreeNode("GameObjects")) {
 		if(ImGui::TreeNode("all")) {

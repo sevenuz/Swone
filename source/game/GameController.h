@@ -1,7 +1,7 @@
 #ifndef SWONE_GAME_GAMECONTROLLER_H
 #define SWONE_GAME_GAMECONTROLLER_H
 
-#include <vector>
+#include <list>
 
 #include "game/Map.h"
 #include "game/object/GameObject.h"
@@ -17,7 +17,7 @@ public:
 
 	Map* getMap();
 	sf::View getView();
-	const std::vector<GameObject*>& getGameObjects() const;
+	const std::list<GameObject*>& getGameObjects() const;
 	GameObject* getGameObjectById(const std::string& id) const;
 
 	void updateLog() const;
@@ -29,6 +29,8 @@ public:
 	void eventGameObjects(sf::Event& e);
 
 	void setViewCenter(sf::Vector2f pos);
+
+	sf::Vector2f getPlayerCenter();
 
 	void setMap(Map* m);
 	void startGame();
@@ -46,7 +48,7 @@ private:
 	ph::Scene m_scene;
 	sf::Time m_clock;
 	sf::Time m_sceneDt = sf::seconds(1.0f/60.0f);
-	std::vector<GameObject*> m_game_objects;
+	std::list<GameObject*> m_game_objects;
 
 	size_t round(float f) {
 		return static_cast<size_t> (f);

@@ -26,6 +26,8 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			setTexturePath(v);
 		else if(k == S_SCALE)
 			setScale(Helper::toVector2f(v));
+		else if(k == S_ZINDEX)
+			setZindex(Helper::toInt(v));
 	}
 
 	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
@@ -348,6 +350,16 @@ bool GameObject::isVisible()
 void GameObject::setVisible(bool s)
 {
 	m_visible = s;
+}
+
+int GameObject::getZindex()
+{
+	return m_zindex;
+}
+
+void GameObject::setZindex(int s)
+{
+	m_zindex = s;
 }
 
 bool GameObject::isMovementAnimationAutomatic()
