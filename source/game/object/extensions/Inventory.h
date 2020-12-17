@@ -32,6 +32,9 @@ public:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 	void event(sf::Event& e) override;
 	void update(sf::Time ellapsed) override;
+	void onObjectCollision(ph::Manifold* manifold, GameObject* go) override;
+
+	void addObject(GameObject* g);
 
 	static int Inventory_count;
 private:

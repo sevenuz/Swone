@@ -34,7 +34,7 @@
 // see http://www.niksula.hut.fi/~hkankaan/Homepages/gravity.html
 void IntegrateForces( PHY_NS::Body *b, PHY_NS::real dt, PHY_NS::Vec2 gravity )
 {
-  if(b->im == 0.0f)
+  if(b->im == 0.0f || b->skip)
     return;
 
   // divide dt by 2 because its called twice in one step
@@ -44,7 +44,7 @@ void IntegrateForces( PHY_NS::Body *b, PHY_NS::real dt, PHY_NS::Vec2 gravity )
 
 void IntegrateVelocity( PHY_NS::Body *b, PHY_NS::real dt, PHY_NS::Vec2 gravity )
 {
-  if(b->im == 0.0f)
+  if(b->im == 0.0f || b->skip)
     return;
 
   b->position += b->velocity * dt;
@@ -60,9 +60,13 @@ void PHY_NS::Scene::Step( PHY_NS::real dt, PHY_NS::Vec2 gravity )
   for(auto it = bodies.begin();it!=bodies.end();++it)
   {
     PHY_NS::Body *A = *it;
+    if(A->skip)
+      continue;
     for(auto it2 = std::next(it);it2!=bodies.end();++it2)
     {
       PHY_NS::Body *B = *it2;
+      if(B->skip)
+        continue;
       if(A->im == 0 && B->im == 0)
         continue;
       PHY_NS::Manifold m( A, B );

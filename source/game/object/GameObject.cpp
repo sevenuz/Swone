@@ -25,8 +25,8 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	}
 
 	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
-	// if custom hitbox not exists, obj is solid: not collidable, rotatable
-	ph::Body::Config config{NULL, 0, 0, this, hasHitbox, hasHitbox, hasHitbox, !hasHitbox};
+	// hasHitbox - Flag: collidableSolid, collidableUnsolid, rotatable, solid, skip
+	ph::Body::Config config{NULL, 0, 0, this, hasHitbox, hasHitbox, hasHitbox, !hasHitbox, !hasHitbox};
 	if(hasHitbox){
 		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY]);
 		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
@@ -313,6 +313,14 @@ void GameObject::setTexturePath(std::string s)
 
 AnimatedSprite* GameObject::getAnimatedSprite() {
 	return &m_sprite;
+}
+
+sf::Vector2f GameObject::getSpriteScaleTo(sf::Vector2f v)
+{
+	return sf::Vector2f(
+		v.x / getAnimatedSprite()->getLocalBounds().width,
+		v.y / getAnimatedSprite()->getLocalBounds().height
+	);
 }
 
 ph::Body* GameObject::getBody() const

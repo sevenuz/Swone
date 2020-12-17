@@ -37,6 +37,7 @@ PHY_NS::Body::Body( PHY_NS::Body::Config config )
   rotatable = config.rotatable;
   collidableSolid = config.collidableSolid;
   collidableUnsolid = config.collidableUnsolid;
+  skip = config.skip;
   SetSolid(config.solid);
 }
 

@@ -53,6 +53,7 @@ struct Body
     bool collidableUnsolid = true;
     bool rotatable = true;
     bool solid = false;
+    bool skip = false;
     PHY_NS::real staticFriction = 0.5f;
     PHY_NS::real dynamicFriction = 0.3f;
     PHY_NS::real restitution = 0.2f;
@@ -95,6 +96,7 @@ struct Body
   bool collidableSolid; // activates collisions with solid bodies
   bool collidableUnsolid; // activates collisions with unsolid bodies
   bool solid;
+  bool skip;
   PHY_NS::real angularVelocity;
   PHY_NS::real torque;
   PHY_NS::real orient; // radians

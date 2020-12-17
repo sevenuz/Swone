@@ -40,6 +40,8 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
 	// TODO toggle hitboxes
 	for (ph::Body* g : m_gc.getScene().bodies) {
+		if(g->skip)
+			continue;
 		if(g->shape->GetType() == ph::Shape::Type::ePoly) {
 			ph::PolygonShape* shape = reinterpret_cast<PHY_NS::PolygonShape*>(g->shape);
 			size_t points = shape->m_vertexCount + 1;

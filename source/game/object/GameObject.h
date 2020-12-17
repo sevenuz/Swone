@@ -90,6 +90,7 @@ public:
 	void toggleLogging();
 
 	AnimatedSprite* getAnimatedSprite();
+	sf::Vector2f getSpriteScaleTo(sf::Vector2f v);
 	ph::Body* getBody() const;
 
 	const std::string getIdentifier() const;

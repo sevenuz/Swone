@@ -38,8 +38,6 @@ Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap
 		m_particleSystems[i] = ps;
 	}
 
-	// TODO remove
-	m_items[0] = m_obj;
 	Inventory_count++;
 }
 
@@ -48,12 +46,18 @@ void Inventory::event(sf::Event& e)
 	if (e.type == sf::Event::KeyPressed) {
 		if (e.key.code == m_key_inv1) {
 			m_selection[0] = true;
+			if(m_items[0])
+				Log::ger().log("activate " + m_items[0]->getName());
 		}
 		if (e.key.code == m_key_inv2) {
 			m_selection[1] = true;
+			if(m_items[1])
+				Log::ger().log("activate " + m_items[1]->getName());
 		}
 		if (e.key.code == m_key_inv3) {
 			m_selection[2] = true;
+			if(m_items[2])
+				Log::ger().log("activate " + m_items[2]->getName());
 		}
 	}
 	else if (e.type == sf::Event::KeyReleased) {
@@ -83,6 +87,7 @@ void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
 		if(m_items[i] != NULL) {
 			states.transform = sf::Transform::Identity * m_rectangles[i]->getTransform();
+			states.transform.scale(m_items[i]->getSpriteScaleTo(sf::Vector2f(INVENTORY_WIDTH, INVENTORY_HEIGHT)));
 			target.draw(*m_items[i]->getAnimatedSprite(), states);
 		}
 		states.transform = sf::Transform::Identity;
@@ -92,4 +97,24 @@ void Inventory::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 
 	target.setView(gv);
+}
+
+void Inventory::addObject(GameObject* g)
+{
+	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
+		if(m_items[i] == NULL) {
+			m_items[i] = g;
+			return;
+		}
+	}
+	Log::ger().log("inventory is full");
+}
+
+void Inventory::onObjectCollision(ph::Manifold* manifold, GameObject* go)
+{
+	if(go->getType() == GameObject::S_PLAYER_TYPE)
+		return;
+	go->getBody()->skip = true;
+	go->setVisible(false);
+	addObject(go);
 }
