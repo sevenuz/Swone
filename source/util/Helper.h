@@ -2,6 +2,7 @@
 #define SWONE_UTIL_HELPER_H
 
 #include <vector>
+#include <map>
 #include <functional>
 #include <string>
 #include <sstream>
@@ -12,6 +13,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 
 #include "physics/IEMath.h"
 
@@ -46,9 +48,22 @@ public:
 
 	static sf::Vector2f toSfVec(ph::Vec2 v);
 	static ph::Vec2 toPhVec(sf::Vector2f v);
+
+	static const sf::Texture* loadTexture(std::string path);
+	static const sf::Image* loadImage(std::string path);
 protected:
 
 private:
+	// TODO Improve Texture Cache to Prevent Loading same Image multiple times
+	// is only once created and will be destroyed on termination
+	static std::map<std::string, sf::Texture*>& getTextureMap() {
+		static auto* map = new std::map<std::string, sf::Texture*>;
+		return *map;
+	};
+	static std::map<std::string, sf::Image*>& getImageMap() {
+		static auto* map = new std::map<std::string, sf::Image*>;
+		return *map;
+	};
 };
 
 #endif // SWONE_UTIL_HELPER_H

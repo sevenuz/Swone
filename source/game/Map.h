@@ -96,7 +96,6 @@ private:
 	MapTile m_border;
 
 	std::string m_tileTexturePath;
-	sf::Image m_tileTexture;//Img with all tiles
 	sf::Image m_mapImage;//Img with map tiles
 	sf::Texture m_texture;
 	sf::Sprite m_sprite;

@@ -118,3 +118,33 @@ ph::Vec2 Helper::toPhVec(sf::Vector2f v)
 {
 	return ph::Vec2(v.x, v.y);
 }
+
+const sf::Texture* Helper::loadTexture(std::string path)
+{
+	if(Helper::getTextureMap().count(path)){
+		return Helper::getTextureMap()[path];
+	} else {
+		sf::Texture* t = new sf::Texture();
+		if (!t->loadFromFile(path)) {
+			Log::ger().log(path + ": Failed to load texture", Log::Label::Error);
+			throw std::invalid_argument("Failed to load texture");
+		}
+		Helper::getTextureMap()[path] = t;
+		return t;
+	}
+}
+
+const sf::Image* Helper::loadImage(std::string path)
+{
+	if(Helper::getImageMap().count(path)){
+		return Helper::getImageMap()[path];
+	} else {
+		sf::Image* t = new sf::Image();
+		if (!t->loadFromFile(path)) {
+			Log::ger().log(path + ": Failed to load texture", Log::Label::Error);
+			throw std::invalid_argument("Failed to load texture");
+		}
+		Helper::getImageMap()[path] = t;
+		return t;
+	}
+}

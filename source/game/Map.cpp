@@ -116,8 +116,7 @@ void Map::scaleToFit(size_t w, size_t h) {
 void Map::createMapImage() {
 	if(m_tileTexturePath.empty())
 		throw std::invalid_argument("Map needs a texture!");
-	if (!m_tileTexture.loadFromFile(m_tileTexturePath))
-		throw std::invalid_argument(m_tileTexturePath + " could not be loaded!");
+	const sf::Image tileTexture = *Helper::loadImage(m_tileTexturePath);
 
 	m_imgWidth = Map::TILE_WIDTH * m_width;
 	m_imgHeight = Map::TILE_HEIGHT * m_height;
@@ -125,14 +124,13 @@ void Map::createMapImage() {
 	for (size_t r = 0; r < m_width; r++)
 		for (size_t c = 0; c < m_height; c++) {
 			sf::Vector2i ttp = Map::getTileTexturePosition(getTile(r, c).type);
-			m_mapImage.copy(m_tileTexture, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
+			m_mapImage.copy(tileTexture, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
 				sf::IntRect(ttp.x, ttp.y,
 					Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
 		}
 	if (!m_texture.loadFromImage(m_mapImage)) {
 		throw std::invalid_argument("error: convert img to texture.");
-	}
-	else {
+	} else {
 		m_sprite.setTexture(m_texture);
 		m_sprite.setPosition(sf::Vector2f(0, 0));
 		scaleToFit();
@@ -167,6 +165,7 @@ void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	{
 		target.draw(m_sprite, states);
 		/*
+		// TODO try Map Vertex Rendering with sf::RenderTexture
 		// Render Map from Vertexes
 		states.texture = &m_mapTiles;
 		for (size_t r = 0; r < m_width; r++)

@@ -139,12 +139,11 @@ void GameObject::onTileCollision(ph::Manifold* manifold, Tile* t)
 
 void GameObject::setAnimationFrames(Animation& animation, StringMap& m)
 {
-	// TODO static map of loaded textures, this fn to Helper.h ?
 	if(m_texturePath.empty())
 		throw std::invalid_argument("GameObject Texture is missing.");
 	if(m.count(S_ANI_FRAME_TIME))
 		animation.setFrameTime(sf::seconds(Helper::toFloat(m[S_ANI_FRAME_TIME])));
-	animation.setSpriteSheet(m_texture);
+	animation.setSpriteSheet(*Helper::loadTexture(m_texturePath));
 	for(int i = 1; m.count(std::to_string(i)); i++){
 		animation.addFrame(Helper::toIntRect(m[std::to_string(i)]));
 	}
@@ -252,7 +251,7 @@ void GameObject::toggleLogging()
 {
 	m_log = !m_log;
 	if(m_log) {
-		Log::ger().detailsPutValue(&m_texture, "gameObject_texture", m_identifier);
+		Log::ger().detailsPutValue(m_sprite.getTexture(), "gameObject_texture", m_identifier);
 		Log::ger().detailsPutValue(&m_sprite, "animation", m_identifier);
 	}
 }
@@ -310,10 +309,6 @@ std::string GameObject::getTexturePath()
 void GameObject::setTexturePath(std::string s)
 {
 	m_texturePath = s;
-	if (!m_texture.loadFromFile(m_texturePath)) {
-		Log::ger().log(m_identifier + ": Failed to load texture", Log::Label::Error);
-		throw std::invalid_argument("Failed to load texture");
-	}
 }
 
 AnimatedSprite* GameObject::getAnimatedSprite() {

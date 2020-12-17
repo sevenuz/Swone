@@ -151,7 +151,6 @@ private:
 
 	sf::Color m_color;
 	std::string m_texturePath;
-	sf::Texture m_texture;
 	Animation m_ani_up;
 	Animation m_ani_left;
 	Animation m_ani_right;
