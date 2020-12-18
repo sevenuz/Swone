@@ -5,18 +5,15 @@
 
 #include "game/Map.h"
 #include "game/object/GameObject.h"
-#include "Controller.h"
 #include "util/Log.h"
 #include "physics/Scene.h"
 
 class GameController {
 public:
-	GameController(Controller& c);
+	GameController();
 	virtual ~GameController();
-	Controller& getController();
 
 	Map* getMap();
-	sf::View getView();
 	const std::list<GameObject*>& getGameObjects() const;
 	GameObject* getGameObjectById(const std::string& id) const;
 
@@ -28,10 +25,6 @@ public:
 	void updateGameObjects(sf::Time ellapsed);
 	void eventGameObjects(sf::Event& e);
 
-	void setViewCenter(sf::Vector2f pos);
-
-	sf::Vector2f getPlayerCenter();
-
 	void setMap(Map* m);
 	void startGame();
 
@@ -39,12 +32,10 @@ public:
 	void clearGameObjects();
 
 	const ph::Scene& getScene() const;
+	ph::Scene& getScene();
 protected:
 private:
-	Controller& m_controller;
 	Map* m_map = NULL;
-	sf::Vector2f m_viewDelta = sf::Vector2f(0, 0);
-	sf::View m_view;
 	ph::Scene m_scene;
 	sf::Time m_clock;
 	sf::Time m_sceneDt = sf::seconds(1.0f/60.0f);

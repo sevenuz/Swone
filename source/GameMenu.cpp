@@ -1,6 +1,6 @@
 #include <GameMenu.h>
 
-GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameController(c), m_gameWindow(m_gameController) {
+GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameWindow(c, m_gameController) {
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
 	m_ps.setLifetime(sf::seconds(3));
@@ -124,6 +124,7 @@ void GameMenu::startGame() {
 	if (m_mapsFound) {
 		m_gameController.clearGameObjects();
 		m_gameController.setMap(m_maps[m_selectedMap]);
+		m_gameWindow.setViewZoom();
 		for(GameObjectSelection& gos : m_gamePlayers)
 			if(gos.selected)
 				m_gameController.pushGameObject(gos.obj);
