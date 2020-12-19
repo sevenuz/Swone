@@ -23,7 +23,7 @@
 #include <string>
 #include "IEMath.h"
 
-#define X_EPSILON 0.075
+#define X_EPSILON 0.1
 
 namespace PHY_NS {
 

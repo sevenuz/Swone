@@ -11,9 +11,9 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-#include "Controller.h"
 #include "Handleable.h"
 #include "util/Log.h"
+#include "util/Helper.h"
 
 #include "physics/Body.h"
 #include "physics/Shape.h"
@@ -36,7 +36,7 @@ public:
 	static float toMapPixelY(float y);
 	static sf::Vector2f toMapPixel(sf::Vector2f v);
 
-	Map(Controller& c);
+	Map();
 	virtual ~Map();
 
 	void update(sf::Time ellapsed);
@@ -52,9 +52,6 @@ public:
 	float getGravity();
 
 	sf::Sprite& getSprite();
-
-	void scaleToFit();
-	void scaleToFit(size_t w, size_t h);
 
 	void setWidth(size_t);
 	void setHeight(size_t);
@@ -75,8 +72,6 @@ public:
 	static sf::Vector2i getTileTexturePosition(MapTile t);
 protected:
 private:
-	Controller& m_controller;
-
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 	std::string m_name = "";

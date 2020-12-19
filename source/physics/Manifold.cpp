@@ -123,7 +123,7 @@ void PHY_NS::Manifold::ApplyImpulse( void )
 
 void PHY_NS::Manifold::PositionalCorrection( void )
 {
-  const PHY_NS::real k_slop = 0.0f; // TODO Penetration allowance
+  const PHY_NS::real k_slop = 0.01f; // TODO Penetration allowance
   const PHY_NS::real percent = 0.4f; // Penetration percentage to correct
   PHY_NS::Vec2 correction = (std::max( penetration - k_slop, (PHY_NS::real)0.0 ) / (A->im + B->im)) * normal * percent;
   A->position -= correction * A->im;

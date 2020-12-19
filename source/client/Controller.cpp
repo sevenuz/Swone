@@ -1,4 +1,4 @@
-#include <Controller.h>
+#include <client/Controller.h>
 
 Controller::Controller(Settings& settings, sf::RenderWindow& w) : m_settings(settings), m_window(w) {
 	m_window.setVerticalSyncEnabled(m_settings.isVerticalSyncEnabled());
@@ -30,24 +30,12 @@ ActiveGameWindow Controller::getActiveGameWindow() {
 	return m_activeGameWindow;
 }
 
-sf::Vector2f Controller::getScale() {
-	return m_scale;
-}
-
-void Controller::setScale(sf::Vector2f scale) {
-	m_scale = scale;
-}
-
 Settings& Controller::getSettings() {
 	return m_settings;
 }
 
 sf::RenderWindow& Controller::getWindow() {
 	return m_window;
-}
-
-void Controller::setView(sf::View view) {
-	getWindow().setView(view);
 }
 
 void Controller::setDefaultView() {

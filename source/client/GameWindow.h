@@ -7,14 +7,6 @@
 #include "Controller.h"
 
 class GameWindow : public Handleable {
-
-private:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	Controller& m_controller;
-	GameController& m_gc;
-	sf::View m_view;
-	sf::Vector2f m_viewDelta = sf::Vector2f(0, 0);
-protected:
 public:
 	GameWindow(Controller& c, GameController& gc);
 	virtual ~GameWindow();
@@ -26,7 +18,12 @@ public:
 
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
-
+private:
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	Controller& m_controller;
+	GameController& m_gc;
+	sf::View m_view;
+	sf::Vector2f m_viewDelta = sf::Vector2f(0, 0);
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include <MainMenu.h>
+#include <client/MainMenu.h>
 
 MainMenu::MainMenu(Controller& c) : m_ps(100), m_controller(c) {
 	m_ps.setColor(sf::Color::White);

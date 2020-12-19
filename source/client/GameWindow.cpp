@@ -1,6 +1,8 @@
-#include <game/GameWindow.h>
+#include <client/GameWindow.h>
 
-GameWindow::GameWindow(Controller& c, GameController& gc) : m_controller(c), m_gc(gc) {}
+GameWindow::GameWindow(Controller& c, GameController& gc) : m_controller(c), m_gc(gc) {
+	m_view = m_controller.getWindow().getView();
+}
 
 GameWindow::~GameWindow() {}
 
@@ -9,8 +11,11 @@ sf::View GameWindow::getView() {
 }
 
 void GameWindow::setViewZoom() {
-	m_view = m_controller.getWindow().getView();
-	m_view.zoom(1 / m_gc.getMap()->getScale());
+	float scaleW = (float)(m_controller.getSettings().getWidth()) / (float)(m_gc.getMap()->getImageWidth());
+	float scaleH = (float)(m_controller.getSettings().getHeight()) / (float)(m_gc.getMap()->getImageHeight());
+
+	float scale = (scaleW > scaleH) ? scaleH : scaleW;
+	m_view.zoom(1 / scale);
 }
 
 void GameWindow::setViewCenter(sf::Vector2f pos) {
@@ -98,7 +103,7 @@ void GameWindow::event(sf::Event& event) {
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
-	m_controller.setView(m_view);
+	target.setView(m_view);
 
 	bool drawMap = true;
 	for (GameObject* g : m_gc.getGameObjects()) {

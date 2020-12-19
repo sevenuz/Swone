@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "util/Log.h"
-#include "Settings.h"
+#include "client/Settings.h"
 
 // Prefix in front of First and Last is necessary to avoid name clash of the both enums
 enum ActiveWindow : char { MAINMENU, SETTINGS, GAME, AW_FIRST = MAINMENU, AW_LAST = GAME };
@@ -34,13 +34,9 @@ public:
 	void setActiveGameWindow(ActiveGameWindow i);
 	ActiveGameWindow getActiveGameWindow();
 
-	sf::Vector2f getScale();
-	void setScale(sf::Vector2f scale);
-
 	Settings& getSettings();
 	sf::RenderWindow& getWindow();
 
-	void setView(sf::View view);
 	void setDefaultView();
 protected:
 private:
@@ -49,8 +45,6 @@ private:
 
 	ActiveWindow m_activeWindow = ActiveWindow::AW_FIRST;
 	ActiveGameWindow m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
-
-	sf::Vector2f m_scale = sf::Vector2f(1, 1);
 };
 
 #endif // SWONE_CONTROLLER_H

@@ -19,10 +19,10 @@
 
 #include "graphics/ParticleSystem.h"
 #include "game/GameController.h"
-#include "game/GameWindow.h"
 #include "Handleable.h"
-#include "Settings.h"
-#include "Controller.h"
+#include "client/GameWindow.h"
+#include "client/Settings.h"
+#include "client/Controller.h"
 #include "util/reader/MapReader.h"
 #include "util/Log.h"
 #include "util/Helper.h"

@@ -12,8 +12,8 @@
 
 #include "graphics/ParticleSystem.h"
 #include "Handleable.h"
-#include "Controller.h"
-#include "Settings.h"
+#include "client/Controller.h"
+#include "client/Settings.h"
 #include "util/Log.h"
 
 class MainMenu : public Handleable {

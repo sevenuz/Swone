@@ -1,4 +1,4 @@
-#include <GameMenu.h>
+#include <client/GameMenu.h>
 
 GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameWindow(c, m_gameController) {
 	m_ps.setColor(sf::Color::White);
@@ -44,7 +44,7 @@ void GameMenu::readMapsFromDir() {
 			try {
 				if (!file.is_dir)
 				{
-					Map* map = new Map(m_controller);
+					Map* map = new Map();
 
 					std::stringstream ss;
 					ss << m_controller.getSettings().getMapDirectory() << file.name;
@@ -250,7 +250,7 @@ void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 			sf::View view(sf::FloatRect(0, 0, m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getImageHeight()));
 			view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
 			target.draw(m_ps, states);
-			m_controller.setView(view);
+			target.setView(view);
 			target.draw(*m_maps[m_selectedMap], states);
 		}
 

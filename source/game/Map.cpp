@@ -1,10 +1,8 @@
 #include "Map.h"
 
-Map::Map(Controller& c) : m_controller(c) // @suppress("Class members should be properly initialized")
-{}
+Map::Map() {}
 
-Map::~Map() {
-}
+Map::~Map() {}
 
 float Map::toMapPixelX(float x) {
 	return x * Map::TILE_WIDTH;
@@ -101,18 +99,6 @@ std::map<int, std::map<int, Tile*>>& Map::getMapData()
 	return m_mapData;
 }
 
-void Map::scaleToFit() {
-	scaleToFit(m_controller.getSettings().getWidth(), m_controller.getSettings().getHeight());
-}
-
-void Map::scaleToFit(size_t w, size_t h) {
-	float scaleW = (float)(w) / (float)(m_imgWidth);
-	float scaleH = (float)(h) / (float)(m_imgHeight);
-
-	m_scale = (scaleW > scaleH) ? scaleH : scaleW;
-	m_controller.setScale(sf::Vector2f(m_scale, m_scale));
-}
-
 void Map::createMapImage() {
 	if(m_tileTexturePath.empty())
 		throw std::invalid_argument("Map needs a texture!");
@@ -133,7 +119,6 @@ void Map::createMapImage() {
 	} else {
 		m_sprite.setTexture(m_texture);
 		m_sprite.setPosition(sf::Vector2f(0, 0));
-		scaleToFit();
 
 		m_mapDrawable = true;
 	}
