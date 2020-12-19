@@ -1,5 +1,5 @@
-#ifndef SWONE_CONTROLLER_H
-#define SWONE_CONTROLLER_H
+#ifndef SWONE_CLIENT_CONTROLLER_H
+#define SWONE_CLIENT_CONTROLLER_H
 
 #include <string>
 #include <vector>
@@ -47,4 +47,4 @@ private:
 	ActiveGameWindow m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
 };
 
-#endif // SWONE_CONTROLLER_H
+#endif

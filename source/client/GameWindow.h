@@ -1,5 +1,5 @@
-#ifndef SWONE_GAME_GAMEWINDOW_H
-#define SWONE_GAME_GAMEWINDOW_H
+#ifndef SWONE_CLIENT_GAMEWINDOW_H
+#define SWONE_CLIENT_GAMEWINDOW_H
 
 #include <SFML/Graphics/Drawable.hpp>
 #include "Handleable.h"

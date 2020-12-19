@@ -1,5 +1,5 @@
-#ifndef SWONE_GAMEMENU_H
-#define SWONE_GAMEMENU_H
+#ifndef SWONE_CLIENT_GAMEMENU_H
+#define SWONE_CLIENT_GAMEMENU_H
 
 #include "imgui.h"
 #include "imgui-SFML.h"

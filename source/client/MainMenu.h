@@ -1,5 +1,5 @@
-#ifndef SWONE_MAINMENU_H
-#define SWONE_MAINMENU_H
+#ifndef SWONE_CLIENT_MAINMENU_H
+#define SWONE_CLIENT_MAINMENU_H
 
 #include <string>
 #include <SFML/Graphics/RenderWindow.hpp>

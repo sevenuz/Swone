@@ -1,5 +1,5 @@
-#ifndef SWONE_SETTINGS_H
-#define SWONE_SETTINGS_H
+#ifndef SWONE_CLIENT_SETTINGS_H
+#define SWONE_CLIENT_SETTINGS_H
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics.hpp>
