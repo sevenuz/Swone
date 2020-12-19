@@ -5,6 +5,7 @@ GL = dependency('GL')
 sfmlGraphics = dependency('sfml-graphics')
 sfmlSystem = dependency('sfml-system')
 sfmlWindow = dependency('sfml-window')
+sfmlNetwork = dependency('sfml-network')
 
 incdir = include_directories('include')
 
@@ -28,6 +29,8 @@ src = [	'bib/imgui/imgui-SFML.cpp',
 	'source/client/MainMenu.cpp',
 	'source/client/Settings.cpp',
 	'source/client/GameWindow.cpp',
+	'source/server/SrvSettings.cpp',
+	'source/server/Server.cpp',
 	'source/game/GameController.cpp',
 	'source/game/Map.cpp',
 	'source/game/object/GameObject.cpp',
@@ -43,4 +46,4 @@ src = [	'bib/imgui/imgui-SFML.cpp',
 	'source/graphics/Animation.cpp',
 	'source/graphics/AnimatedSprite.cpp']
 
-executable('swone', src, cpp_args : ['-DNOMINMAX'], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow])
+executable('swone', src, cpp_args : ['-DNOMINMAX'], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow, sfmlNetwork])

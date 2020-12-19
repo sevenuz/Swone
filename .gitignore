@@ -11,3 +11,4 @@ swone.layout
 !/build/swone.sln
 winbuild.txt
 res/settings.ini
+res/srvsettings.ini

@@ -236,6 +236,25 @@ void Client::startMainLoop()
 	}
 }
 
+void Client::initSocket()
+{
+	unsigned short port = 61006;
+	if (socket.bind(port) != sf::Socket::Done)
+	{
+		Log::ger().log("Failed to bind Port " + std::to_string(port), Log::Label::Error);
+	}
+	//socket.setBlocking(false);
+	// TODO where and how many sockets are used?
+	sf::IpAddress srvAddress = sf::IpAddress::LocalHost;
+	unsigned short srvPort = 61007;
+	sf::Packet packet;
+	packet << "Moin vom Client :)";
+	socket.send(packet, srvAddress, 61007);
+	socket.receive(packet, srvAddress, srvPort);
+	Log::ger().log("Packet from " + srvAddress.toString() + ":" + std::to_string(srvPort));
+	std::cout << packet << std::endl;
+}
+
 void Client::initLogger()
 {
 	std::function<void(std::string, float)> imguiDisplayString = [](std::string s, float scale) {
@@ -266,6 +285,7 @@ void Client::initLogger()
 int Client::start()
 {
 	ImGui::SFML::Init(window);
+	initSocket();
 	initLogger();
 	startMainLoop();
 
