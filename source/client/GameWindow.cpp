@@ -41,8 +41,7 @@ sf::Vector2f GameWindow::getPlayerCenter()
 }
 
 void GameWindow::update(sf::Time ellapsed) {
-	m_gc.updateMap(ellapsed);
-	m_gc.updateGameObjects(ellapsed);
+	m_gc.update(ellapsed);
 
 	setViewCenter(getPlayerCenter());
 	// TODO set View Zoom if player are far away from each other

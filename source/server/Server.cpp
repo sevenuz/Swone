@@ -1,6 +1,6 @@
 #include "server/Server.h"
 
-Server::Server() {
+Server::Server() : lobby("Swonsch", socket) {
 	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
 }
 
@@ -10,38 +10,31 @@ void Server::startMainLoop()
 {
 	while(m_run) {
 		sf::Time ellapsed = clock.restart();
-		m_sceneT += ellapsed;
 		m_tickT += ellapsed;
 
 		sf::Packet packet;
-		Client client;
-		if(socket.receive(packet, client.address, client.port) == sf::Socket::Done)
+		Player::Connection conncetion;
+		if(socket.receive(packet, conncetion.address, conncetion.port) == sf::Socket::Done)
 		{
-				// not error or not received (sf::Socket::NotReady)
-				Log::ger().log("Packet from " + client.address.toString() + ":" + std::to_string(client.port));
-				std::cout << packet << std::endl;
-				// TODO improve client registration
-				for(Client c : clients) {
-					if(c.address == client.address && c.port == client.port)
-						break;
-				}
-				clients.push_back(client);
+			// not error or not received (sf::Socket::NotReady)
+			Log::ger().log("Packet from " + conncetion.address.toString() + ":" + std::to_string(conncetion.port));
+			std::string msg;
+			packet >> msg;
+			std::cout << msg << std::endl;
+			lobby.registerClient(conncetion);
 		}
 
-		if(m_sceneT>=m_sceneDt) {
-			m_sceneT -= m_sceneDt;
-			// TODO srvscene fps from settings
-			// use steady time for determenistic and to increase steadyness
-			// m_scene.Step(m_sceneDt.asSeconds(), ph::Vec2(0, m_map->getGravity()));
-		}
+		//lobby.update();
 
 		if(m_tickT>=m_tickDt) {
 			m_tickT -= m_tickDt;
 
+			//lobby.sendState();
+
 			sf::Packet packet;
 			packet << "Moin vom Server :)";
-			for(Client c : clients) {
-				socket.send(packet, c.address, c.port);
+			for(Player* c : lobby.getPlayers()) {
+				socket.send(packet, c->getConnection().address, c->getConnection().port);
 			}
 		}
 	}
@@ -55,4 +48,5 @@ int Server::start()
 	}
 	socket.setBlocking(false);
 	startMainLoop();
+	return 0;
 }

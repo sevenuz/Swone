@@ -252,7 +252,9 @@ void Client::initSocket()
 	socket.send(packet, srvAddress, 61007);
 	socket.receive(packet, srvAddress, srvPort);
 	Log::ger().log("Packet from " + srvAddress.toString() + ":" + std::to_string(srvPort));
-	std::cout << packet << std::endl;
+	std::string msg;
+	packet >> msg;
+	std::cout << msg << std::endl;
 }
 
 void Client::initLogger()

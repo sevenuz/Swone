@@ -19,6 +19,8 @@ public:
 
 	void updateLog() const;
 
+	void update(sf::Time ellapsed);
+
 	void updateMap(sf::Time ellapsed);
 	void eventMap(sf::Event& e);
 

@@ -46,7 +46,7 @@ ph::Scene& GameController::getScene()
 	return m_scene;
 }
 
-void GameController::updateMap(sf::Time ellapsed) {
+void GameController::update(sf::Time ellapsed) {
 	m_clock += ellapsed;
 	if(m_clock>=m_sceneDt) {
 		// TODO fps from settings
@@ -55,6 +55,11 @@ void GameController::updateMap(sf::Time ellapsed) {
 		m_clock -= m_sceneDt;
 	}
 
+	updateMap(ellapsed);
+	updateGameObjects(ellapsed);
+}
+
+void GameController::updateMap(sf::Time ellapsed) {
 	getMap()->update(ellapsed);
 }
 
