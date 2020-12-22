@@ -165,10 +165,10 @@ Tile::Tile(sf::Vector2i pos, MapTile t)
 	{
 		if(type == MapTile::UNDERSCORE) {
 			shape.SetBox(TILE_SIZE/2, TILE_SIZE/4);
-			body = new ph::Body(ph::Body::Config{&shape, ((float)pos.x)+TILE_SIZE/2, ((float)pos.y)+TILE_SIZE/4, this});
+			body = new ph::Body(ph::Body::Config{x : ((float)pos.x)+TILE_SIZE/2, y : ((float)pos.y)+TILE_SIZE/4}, &shape, this);
 		} else {
 			shape.SetBox(TILE_SIZE/2, TILE_SIZE/2);
-			body = new ph::Body(ph::Body::Config{&shape, ((float)pos.x)+TILE_SIZE/2, ((float)pos.y)+TILE_SIZE/2, this});
+			body = new ph::Body(ph::Body::Config{x : ((float)pos.x)+TILE_SIZE/2, y : ((float)pos.y)+TILE_SIZE/2}, &shape, this);
 		}
 		body->SetSolid();
 		/*

@@ -29,6 +29,10 @@ public:
 	static constexpr const char* CONTROLS_INVENTORY_3 = "inventory3";
 
 	Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap);
+
+	void applyConfig(std::map<std::string, StringMap>& setupMap);
+	void getConfig(std::map<std::string, StringMap>& setupMap);
+
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 	void event(sf::Event& e) override;
 	void update(sf::Time ellapsed) override;

@@ -37,7 +37,6 @@ public:
 	static constexpr const char* S_OBJECT_TYPE = "object";
 
 	static constexpr const char* S_NAME = "name";
-	static constexpr const char* S_ID = "id";
 	static constexpr const char* S_COLOR = "color";
 	static constexpr const char* S_TEXTURE = "texture";
 	static constexpr const char* S_SCALE = "scale";
@@ -73,7 +72,30 @@ public:
 	static constexpr const char* S_INVENTORY_EXTENSION = "inventory";
 	static constexpr const char* S_ORIENT_CORRECTION_EXTENSION = "orientCorrection";
 
+	static int Identifier_count;
+	static std::string generateIdentifier(std::string name);
+
+	struct Config {
+		std::string name = S_OBJECT_TYPE;
+
+		bool visible = true;
+		sf::Color color = sf::Color::Transparent;
+		int zindex = 1;
+
+		ph::Body::Config body;
+		std::map<std::string, StringMap> extensionMap; // TODO improve data exchange with extensions
+	};
+	typedef Config Package;
+
+	GameObject(std::string type, Config config, ph::Shape* shape);
+	GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density);
+	GameObject(std::string type, Config config, float radius, float density);
 	GameObject(std::map<std::string, StringMap>& setupMap);
+
+	void applySetupMap(std::map<std::string, StringMap>& setupMap);
+
+	void applyConfig(Config config);
+	Config getConfig();
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	virtual void event(sf::Event& e);
@@ -143,14 +165,23 @@ public:
 	// Write all the values that should be updated every tick into this function
 	void updateLog() const;
 private:
+	ph::Shape* createPolyShape(std::vector<ph::Vec2>& vertices, float density = 1);
+	ph::Shape* createCircleShape(float radius, float density = 1);
+	void initBody(ph::Body::Config config, ph::Shape* shape);
+	void initSetupMap(std::map<std::string, StringMap>& setupMap);
+	void initExtension(std::string extensionName, std::map<std::string, StringMap>& setupMap);
+
 	bool m_log = false;
 	bool m_visible = true;
 	bool m_movementAnimationAutomatic = true;
 	const std::string m_type;
 	const std::string m_identifier;
 	std::string m_name;
-
 	sf::Color m_color;
+	int m_zindex = 1;
+
+	ph::Body* m_body = NULL;
+
 	std::string m_texturePath;
 	Animation m_ani_up;
 	Animation m_ani_left;
@@ -163,14 +194,7 @@ private:
 	bool m_isFalling = false; // movement to bottom
 	bool m_isMoving = false;  // movement on x
 
-	int m_zindex = 1;
-
-	sf::Vector2f m_possibleVel = sf::Vector2f(MOVE_FORCE, JUMP_FORCE);
-	sf::Vector2f m_startPos = sf::Vector2f(0.0f, 0.0f);
-
-	ph::Body* m_body = NULL;
-
-	std::vector<Extension*> m_extensions;
+	std::map<std::string, Extension*> m_extensions;
 };
 
 #endif

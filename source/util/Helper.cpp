@@ -42,7 +42,7 @@ template<typename T>
 std::vector<T> Helper::toTupel(std::string str, T (*conv)(std::string), size_t length)
 {
 	if(str[0]!='(' && str[str.length()-1]!=')')
-		throw std::invalid_argument("Tupel needs format (a,b,c,...)" + str);
+		throw std::invalid_argument("Tupel needs format (a,b,c,...) but is " + str);
 	// replace bracets
 	str = str.replace(0,1,"").replace(str.length()-1,1,"");
 	std::vector<std::string> v = split(str, ',');

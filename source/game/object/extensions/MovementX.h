@@ -20,6 +20,8 @@ public:
 	static constexpr const char* CONTROLS_RIGHT_NAME = "right";
 
 	MovementX(GameObject* obj, std::map<std::string, StringMap>& setupMap);
+	void applyConfig(std::map<std::string, StringMap>& setupMap);
+
 	void event(sf::Event& e) override;
 private:
 	sf::Keyboard::Key m_key_left = sf::Keyboard::Left;

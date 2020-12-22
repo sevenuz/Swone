@@ -46,14 +46,12 @@ struct Body
 
   struct Config
   {
-    Shape *shape;
-    PHY_NS::real x, y;
-    Callback* cb = Callback::instance();
     bool collidableSolid = true;
     bool collidableUnsolid = true;
     bool rotatable = true;
     bool solid = false;
     bool skip = false;
+    PHY_NS::real x = 0, y = 0;
     PHY_NS::real staticFriction = 0.5f;
     PHY_NS::real dynamicFriction = 0.3f;
     PHY_NS::real restitution = 0.2f;
@@ -62,7 +60,7 @@ struct Body
     PHY_NS::real fx = 0, fy = 0, ft = 0;
   };
 
-  Body( Config config );
+  Body( Config config, Shape *shape, Callback* cb = Callback::instance() );
 
   void ApplyForce( const PHY_NS::Vec2& f )
   {
@@ -80,6 +78,9 @@ struct Body
     else
       angularVelocity = 0;
   }
+
+  void ApplyConfig( Config c );
+  Config GetConfig( void );
 
   void SetSolid( bool s = true );
 
@@ -115,7 +116,7 @@ struct Body
   PHY_NS::real restitution;
 
   // can be implemented outside of physics/
-  Callback* cb;
+  Callback* callback;
   // Shape interface
   PHY_NS::Shape *shape;
 };

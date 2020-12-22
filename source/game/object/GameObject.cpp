@@ -6,9 +6,113 @@
 #include "game/object/extensions/Inventory.h"
 #include "game/object/extensions/OrientCorrection.h"
 
+// TODO generate Id of GO differently
+int GameObject::Identifier_count = 0;
+std::string GameObject::generateIdentifier(std::string name)
+{
+	Identifier_count++;
+	return name + "#" + std::to_string(GameObject::Identifier_count);
+}
+
+GameObject::GameObject(std::string type, GameObject::Config config, ph::Shape* shape)
+	: m_type(type),
+		m_identifier(generateIdentifier(config.name))
+{
+	initBody(config.body, shape);
+	applyConfig(config);
+}
+
+GameObject::GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density)
+	: GameObject(type, config, createPolyShape(vertices, density))
+{}
+
+GameObject::GameObject(std::string type, Config config, float radius, float density)
+	: GameObject(type, config, createCircleShape(radius, density))
+{}
+
 GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	: m_type(setupMap[Reader::DEFAULT_PARAGRAPH][S_TYPE]),
-		m_identifier(setupMap[Reader::DEFAULT_PARAGRAPH][S_ID])
+		m_identifier(generateIdentifier(setupMap[Reader::DEFAULT_PARAGRAPH][S_NAME]))
+{
+	initSetupMap(setupMap);
+	applySetupMap(setupMap);
+}
+
+ph::Shape* GameObject::createPolyShape(std::vector<ph::Vec2>& vertices, float density)
+{
+	ph::PolygonShape* poly = new ph::PolygonShape(density);
+	poly->Set(vertices.data(), vertices.size());
+	return poly;
+}
+
+ph::Shape* GameObject::createCircleShape(float radius, float density)
+{
+	assert(radius);
+	return new ph::Circle(radius, density);
+}
+
+void GameObject::initBody(ph::Body::Config config, ph::Shape* shape)
+{
+	if(shape == NULL) {
+		// GameObject Default Shape
+		Log::ger().log("Default Hitbox", Log::Label::Warning);
+		ph::PolygonShape* poly = new ph::PolygonShape();
+		poly->SetBox(0.1f, 0.1f);
+		shape = poly;
+	}
+	m_body = new ph::Body(config, shape, this);
+}
+
+void GameObject::initSetupMap(std::map<std::string, StringMap>& setupMap)
+{
+	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
+	// hasHitbox - Flag: collidableSolid, collidableUnsolid, rotatable, solid, skip
+	ph::Body::Config config{hasHitbox, hasHitbox, hasHitbox, !hasHitbox, !hasHitbox};
+	if(hasHitbox) {
+		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY]);
+		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
+			float radius = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH]["1"]);
+			initBody(config, createCircleShape(radius, density));
+		} else if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_POLYGON_TYPE) {
+			std::vector<ph::Vec2> vertices;
+			for(int i = 1; setupMap[S_HITBOX_PARAGRAPH].count(std::to_string(i)); i++){
+				sf::Vector2f v = Helper::toVector2f(setupMap[S_HITBOX_PARAGRAPH][std::to_string(i)]);
+				vertices.push_back(ph::Vec2(v.x, v.y));
+			}
+			initBody(config, createPolyShape(vertices, density));
+		} else {
+			Log::ger().log("Object has no hitbox type={circle|polygon}", Log::Label::Warning);
+			hasHitbox = false;
+		}
+	}
+	if(!hasHitbox)
+		initBody(config, NULL); // Default Hitbox
+
+	if(setupMap.count(S_EXTENSIONS_PARAGRAPH)){
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_MOVEMENTX_EXTENSION]))
+			initExtension(S_MOVEMENTX_EXTENSION, setupMap);
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_MULTIJUMP_EXTENSION]))
+			initExtension(S_MULTIJUMP_EXTENSION, setupMap);
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_INVENTORY_EXTENSION]))
+			initExtension(S_INVENTORY_EXTENSION, setupMap);
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_ORIENT_CORRECTION_EXTENSION]))
+			initExtension(S_ORIENT_CORRECTION_EXTENSION, setupMap);
+	}
+}
+
+void GameObject::initExtension(std::string extensionName, std::map<std::string, StringMap>& setupMap)
+{
+	if(extensionName == S_MOVEMENTX_EXTENSION)
+		m_extensions[S_MOVEMENTX_EXTENSION] = new MovementX(this, setupMap);
+	if(extensionName == S_MULTIJUMP_EXTENSION)
+		m_extensions[S_MULTIJUMP_EXTENSION] = new MultiJump(this, setupMap);
+	if(extensionName == S_INVENTORY_EXTENSION)
+		m_extensions[S_INVENTORY_EXTENSION] = new Inventory(this, setupMap);
+	if(extensionName == S_ORIENT_CORRECTION_EXTENSION)
+		m_extensions[S_ORIENT_CORRECTION_EXTENSION] = new OrientCorrection(this);
+}
+
+void GameObject::applySetupMap(std::map<std::string, StringMap>& setupMap)
 {
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
 		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
@@ -24,27 +128,9 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			setZindex(Helper::toInt(global[S_ZINDEX]));
 	}
 
-	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
-	// hasHitbox - Flag: collidableSolid, collidableUnsolid, rotatable, solid, skip
-	ph::Body::Config config{NULL, 0, 0, this, hasHitbox, hasHitbox, hasHitbox, !hasHitbox, !hasHitbox};
-	if(hasHitbox){
-		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY]);
-		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
-			// radius of the circle has the key "1"
-			config.shape = new ph::Circle(Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH]["1"]), density);
-		} else if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_POLYGON_TYPE) {
-			ph::PolygonShape* poly = new ph::PolygonShape(density);
-			std::vector<ph::Vec2> vertices;
-			for(int i = 1; setupMap[S_HITBOX_PARAGRAPH].count(std::to_string(i)); i++){
-				sf::Vector2f v = Helper::toVector2f(setupMap[S_HITBOX_PARAGRAPH][std::to_string(i)]);
-				vertices.push_back(ph::Vec2(v.x, v.y));
-			}
-			poly->Set(vertices.data(), vertices.size());
-			config.shape = poly;
-		} else {
-			Log::ger().log("Object has no hitbox type={circle|polygon}", Log::Label::Warning);
-			hasHitbox = false;
-		}
+	if(setupMap.count(S_HITBOX_PARAGRAPH)){
+		ph::Body::Config config = m_body->GetConfig();
+
 		if(setupMap[S_HITBOX_PARAGRAPH].count(S_INITIAL_POS)) {
 			sf::Vector2f f = Helper::toVector2f(setupMap[S_HITBOX_PARAGRAPH][S_INITIAL_POS]);
 			config.x = f.x;
@@ -68,15 +154,9 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 			config.restitution = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_RESTITUTION]);
 		if(setupMap[S_HITBOX_PARAGRAPH].count(S_ORIENT))
 			config.orient = (Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_ORIENT]))*ph::PI/180;
+
+		m_body->ApplyConfig(config);
 	}
-	if(!hasHitbox) {
-		// GameObject Default Shape
-		Log::ger().log("Default Hitbox", Log::Label::Warning);
-		ph::PolygonShape* poly = new ph::PolygonShape();
-		poly->SetBox(0.1f, 0.1f);
-		config.shape = poly;
-	}
-	m_body = new ph::Body(config);
 
 	if(setupMap.count(S_ANI_UP_PARAGRAPH))
 		setAnimationFrames(m_ani_up, setupMap[S_ANI_UP_PARAGRAPH]);
@@ -89,16 +169,37 @@ GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
 	if(setupMap.count(S_ANI_STEADY_PARAGRAPH))
 		setAnimationFrames(m_ani_steady, setupMap[S_ANI_STEADY_PARAGRAPH]);
 
-	if(setupMap.count(S_EXTENSIONS_PARAGRAPH)){
-		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_MOVEMENTX_EXTENSION]))
-			m_extensions.push_back(new MovementX(this, setupMap));
-		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_MULTIJUMP_EXTENSION]))
-			m_extensions.push_back(new MultiJump(this, setupMap));
-		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_INVENTORY_EXTENSION]))
-			m_extensions.push_back(new Inventory(this, setupMap));
-		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_ORIENT_CORRECTION_EXTENSION]))
-			m_extensions.push_back(new OrientCorrection(this));
+	for(auto& e : m_extensions) e.second->applyConfig(setupMap);
+}
+
+void GameObject::applyConfig(GameObject::Config config)
+{
+	setName(config.name);
+	setVisible(config.visible);
+	setColor(config.color);
+	setZindex(config.zindex);
+	m_body->ApplyConfig(config.body);
+
+	for(auto& e : config.extensionMap) {
+		if(!m_extensions.count(e.first))
+			initExtension(e.first, config.extensionMap);
+		else
+			m_extensions[e.first]->applyConfig(config.extensionMap);
 	}
+}
+
+GameObject::Config GameObject::getConfig()
+{
+	GameObject::Config config;
+	config.name = getName();
+	config.visible = isVisible();
+	config.color = getColor();
+	config.zindex = getZindex();
+	config.body = m_body->GetConfig();
+
+	for(auto& e : m_extensions) e.second->getConfig(config.extensionMap);
+
+	return config;
 }
 
 GameObject* GameObject::castBodyCallback(ph::Body::Callback* c)
@@ -111,10 +212,10 @@ GameObject* GameObject::castBodyCallback(ph::Body::Callback* c)
 
 void GameObject::onCollision(ph::Manifold* manifold)
 {
-	GameObject* g = castBodyCallback(manifold->A->cb);
-	GameObject* g2 = castBodyCallback(manifold->B->cb);
-	Tile* t = Tile::castBodyCallback(manifold->A->cb);
-	Tile* t2 = Tile::castBodyCallback(manifold->B->cb);
+	GameObject* g = castBodyCallback(manifold->A->callback);
+	GameObject* g2 = castBodyCallback(manifold->B->callback);
+	Tile* t = Tile::castBodyCallback(manifold->A->callback);
+	Tile* t2 = Tile::castBodyCallback(manifold->B->callback);
 	// t && t2 not possible, at least one is this
 	if(g != NULL && g2 != NULL) {
 		onObjectCollision(manifold, g == this ? g2 : g);
@@ -129,12 +230,12 @@ void GameObject::onCollision(ph::Manifold* manifold)
 
 void GameObject::onObjectCollision(ph::Manifold* manifold, GameObject* go)
 {
-	for(Extension* e : m_extensions) e->onObjectCollision(manifold, go);
+	for(auto& e : m_extensions) e.second->onObjectCollision(manifold, go);
 }
 
 void GameObject::onTileCollision(ph::Manifold* manifold, Tile* t)
 {
-	for(Extension* e : m_extensions) e->onTileCollision(manifold, t);
+	for(auto& e : m_extensions) e.second->onTileCollision(manifold, t);
 }
 
 void GameObject::setAnimationFrames(Animation& animation, StringMap& m)
@@ -231,11 +332,11 @@ void GameObject::apply() {
 
 void GameObject::update(sf::Time ellapsed) {
 	m_sprite.update(ellapsed);
-	for(Extension* e : m_extensions) e->update(ellapsed);
+	for(auto& e : m_extensions) e.second->update(ellapsed);
 }
 
 void GameObject::event(sf::Event& ev) {
-	for(Extension* e : m_extensions) e->event(ev);
+	for(auto& e : m_extensions) e.second->event(ev);
 }
 
 void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -244,7 +345,7 @@ void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		target.draw(m_sprite, states);
 	}
 
-	for(Extension* e : m_extensions) e->draw(target, states);
+	for(auto& e : m_extensions) e.second->draw(target, states);
 }
 
 void GameObject::toggleLogging()
@@ -269,7 +370,7 @@ void GameObject::updateLog() const
 	log.detailsUpdateValue(std::to_string(getVel().x), "vel_x", m_identifier);
 	log.detailsUpdateValue(std::to_string(getVel().y), "vel_y", m_identifier);
 
-	for(Extension* e : m_extensions) e->updateLog();
+	for(auto& e : m_extensions) e.second->updateLog();
 }
 
 const std::string GameObject::getType() const {

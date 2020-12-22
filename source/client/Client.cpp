@@ -250,7 +250,7 @@ void Client::initSocket()
 	sf::Packet packet;
 	packet << "Moin vom Client :)";
 	socket.send(packet, srvAddress, 61007);
-	socket.receive(packet, srvAddress, srvPort);
+	//socket.receive(packet, srvAddress, srvPort);
 	Log::ger().log("Packet from " + srvAddress.toString() + ":" + std::to_string(srvPort));
 	std::string msg;
 	packet >> msg;

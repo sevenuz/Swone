@@ -9,6 +9,11 @@
 
 MovementX::MovementX(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {
+	applyConfig(setupMap);
+}
+
+void MovementX::applyConfig(std::map<std::string, StringMap>& setupMap)
+{
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH))
 		if(setupMap[Reader::DEFAULT_PARAGRAPH].count(Extension::S_VELOCITY))
 			m_posVelX = Helper::toVector2f(setupMap[Reader::DEFAULT_PARAGRAPH][Extension::S_VELOCITY]).x;

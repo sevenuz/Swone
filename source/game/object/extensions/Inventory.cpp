@@ -10,14 +10,7 @@ int Inventory::Inventory_count = 0;
 
 Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
 {
-	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_1))
-			m_key_inv1 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_1]);
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_2))
-			m_key_inv2 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_2]);
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_3))
-			m_key_inv3 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_3]);
-	}
+	Inventory_count++;
 
 	sf::Vector2f sizeVct = sf::Vector2f(INVENTORY_WIDTH, INVENTORY_HEIGHT);
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
@@ -25,7 +18,6 @@ Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap
 
 		sf::RectangleShape* r = new sf::RectangleShape(sizeVct);
 		r->setPosition(posVct);
-		r->setOutlineColor(m_obj->getColor());
 		r->setOutlineThickness(2);
 		r->setFillColor(sf::Color::Transparent);
 		m_rectangles[i] = r;
@@ -38,7 +30,27 @@ Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap
 		m_particleSystems[i] = ps;
 	}
 
-	Inventory_count++;
+	applyConfig(setupMap);
+}
+
+void Inventory::applyConfig(std::map<std::string, StringMap>& setupMap)
+{
+	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_1))
+			m_key_inv1 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_1]);
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_2))
+			m_key_inv2 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_2]);
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_3))
+			m_key_inv3 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_3]);
+	}
+
+	for(size_t i = 0; i < INVENTORY_SIZE; ++i)
+		m_rectangles[i]->setOutlineColor(m_obj->getColor());
+}
+
+void Inventory::getConfig(std::map<std::string, StringMap>& extensionMap)
+{
+	// TODO write inventory to extensionMap?
 }
 
 void Inventory::event(sf::Event& e)

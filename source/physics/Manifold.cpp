@@ -138,8 +138,8 @@ void PHY_NS::Manifold::InfiniteMassCorrection( void )
 
 void PHY_NS::Manifold::CollisionCallback( void )
 {
-  A->cb->onCollision(this);
-  B->cb->onCollision(this);
+  A->callback->onCollision(this);
+  B->callback->onCollision(this);
 }
 
 bool PHY_NS::Manifold::ShouldComputeCollision( void )

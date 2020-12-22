@@ -20,12 +20,17 @@
 #include "Body.h"
 #include "Shape.h"
 
-PHY_NS::Body::Body( PHY_NS::Body::Config config )
-  : shape( config.shape->Clone( ) )
+PHY_NS::Body::Body( PHY_NS::Body::Config config, PHY_NS::Shape *s, PHY_NS::Body::Callback* cb )
+  : shape( s->Clone( ) )
 {
   shape->body = this;
+  callback = cb;
+  ApplyConfig(config);
+}
+
+void PHY_NS::Body::ApplyConfig(PHY_NS::Body::Config config)
+{
   position.Set( config.x, config.y );
-  cb = config.cb;
   velocity.Set( config.vx, config.vy );
   angularVelocity = config.av;
   torque = config.ft;
@@ -39,6 +44,32 @@ PHY_NS::Body::Body( PHY_NS::Body::Config config )
   collidableUnsolid = config.collidableUnsolid;
   skip = config.skip;
   SetSolid(config.solid);
+}
+
+PHY_NS::Body::Config PHY_NS::Body::GetConfig(void)
+{
+  // TODO use config as value of body?
+  PHY_NS::Body::Config config;
+  config.x = position.x;
+  config.y = position.y;
+  config.vx = velocity.x;
+  config.vy = velocity.y;
+  config.av = angularVelocity;
+  config.ft = torque;
+  config.orient = orient;
+  config.fx = force.x;
+  config.fy = force.y;
+  force.Set( config.fx, config.fy );
+  config.staticFriction = staticFriction;
+  config.dynamicFriction = dynamicFriction;
+  config.restitution = restitution;
+  config.rotatable = rotatable;
+  config.collidableSolid = collidableSolid;
+  config.collidableUnsolid = collidableUnsolid;
+  config.skip = skip;
+  config.solid = solid;
+  return config;
+
 }
 
 void PHY_NS::Body::SetSolid( bool s )

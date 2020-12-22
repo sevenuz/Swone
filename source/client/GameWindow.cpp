@@ -80,7 +80,7 @@ void GameWindow::event(sf::Event& event) {
 			for(ph::uint32 i = 0; i < count; ++i)
 				vertices[i].Set( ph::Random( -e, e ), ph::Random( -e, e ) );
 			poly.Set( vertices, count );
-			ph::Body *b = new ph::Body( ph::Body::Config{&poly, worldPos.x/64, worldPos.y/64} );
+			ph::Body *b = new ph::Body( ph::Body::Config{x : worldPos.x/64, y : worldPos.y/64}, &poly );
 			b->SetOrient( ph::Random( -ph::PI, ph::PI ) );
 			b->restitution = 0.2f;
 			b->dynamicFriction = 0.2f;
@@ -91,7 +91,7 @@ void GameWindow::event(sf::Event& event) {
 		else if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 		{
 			ph::Circle c( ph::Random( 0.1f, 1.0f ) );
-			ph::Body *b2 = new ph::Body( ph::Body::Config{&c, worldPos.x/64, worldPos.y/64} );
+			ph::Body *b2 = new ph::Body( ph::Body::Config{x : worldPos.x/64, y : worldPos.y/64}, &c );
 			m_gc.getScene().Add(b2);
 		}
 	}

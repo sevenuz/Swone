@@ -20,6 +20,8 @@ public:
 	static constexpr const char* CONTROLS_JUMP_NAME = "jump";
 
 	MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap);
+	void applyConfig(std::map<std::string, StringMap>& setupMap);
+
 	void event(sf::Event& e) override;
 	void update(sf::Time ellapsed) override;
 
