@@ -19,11 +19,11 @@
 
 #include "graphics/ParticleSystem.h"
 #include "game/GameController.h"
+#include "game/GameReader.h"
 #include "Handleable.h"
 #include "client/GameWindow.h"
 #include "client/Settings.h"
 #include "client/Controller.h"
-#include "util/reader/MapReader.h"
 #include "util/Log.h"
 #include "util/Helper.h"
 
@@ -33,8 +33,9 @@ private:
 
 	ParticleSystem m_ps;
 	Controller& m_controller;
-	GameController m_gameController;
 	GameWindow m_gameWindow;
+	GameController m_gameController;
+	GameReader m_gameReader;
 
 	sf::Text m_play;
 
@@ -42,13 +43,10 @@ private:
 	sf::Text m_switchLeft;
 	sf::Text m_switchRight;
 
-	MapReader m_mapReader;
-
-	bool m_mapsFound = false;
 	// GamePanelMenuPoint type, but char to perform de/increment
 	char m_selectedAction = FIRST;
 	int m_selectedMap = 0;
-	std::vector<Map*> m_maps;
+	bool m_mapsFound = false;
 
 	struct GameObjectSelection {
 		GameObject* obj;
@@ -57,8 +55,6 @@ private:
 	std::vector<GameObjectSelection> m_gameObjects;
 	std::vector<GameObjectSelection> m_gamePlayers;
 
-	void readMapsFromDir();
-	void readGameObjectsFromDir();
 	void setMapSelection(int);
 	void setActionSelection(char);
 

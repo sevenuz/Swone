@@ -15,10 +15,8 @@ Settings::Settings()
 				setBitsPerPixel(Helper::toLong(v));
 			else if(k==SETTINGS_VERTICAL_SYNC_ENABLED_NAME)
 				setVerticalSyncEnabled(Helper::toBool(v));
-			else if(k==SETTINGS_MAP_DIRECTORY_NAME)
-				setMapDirectory(v);
-			else if(k==SETTINGS_OBJ_DIRECTORY_NAME)
-				setGameObjectDirectory(v);
+			else if(k==SETTINGS_RESOURCE_DIRECTORY_NAME)
+				setResourceDirectory(v);
 			else if(k==SETTINGS_FONT_SOURCE_NAME)
 				setFontSource(v);
 			else if(k==SETTINGS_CLEARING_COLOR_NAME)
@@ -87,28 +85,16 @@ void Settings::setVerticalSyncEnabled(bool v)
 	setChanged(true);
 }
 
-std::string Settings::getMapDirectory()
+std::string Settings::getResourceDirectory()
 {
-	return m_map_directory;
+	return m_resource_directory;
 }
 
-void Settings::setMapDirectory(std::string s)
+void Settings::setResourceDirectory(std::string s)
 {
-	m_map_directory = s;
+	m_resource_directory = s;
 	setChanged(true);
 }
-
-std::string Settings::getGameObjectDirectory()
-{
-	return m_obj_directory;
-}
-
-void Settings::setGameObjectDirectory(std::string s)
-{
-	m_obj_directory = s;
-	setChanged(true);
-}
-
 
 std::string Settings::getFontSource()
 {
@@ -161,8 +147,7 @@ void Settings::writeSettings()
 		StringPair(SETTINGS_HEIGHT_NAME, std::to_string(getHeight())),
 		StringPair(SETTINGS_BITS_PER_PIXEL_NAME, std::to_string(getBitsPerPixel())),
 		StringPair(SETTINGS_VERTICAL_SYNC_ENABLED_NAME, isVerticalSyncEnabled()?"true":"false"),
-		StringPair(SETTINGS_MAP_DIRECTORY_NAME, getMapDirectory()),
-		StringPair(SETTINGS_OBJ_DIRECTORY_NAME, getGameObjectDirectory()),
+		StringPair(SETTINGS_RESOURCE_DIRECTORY_NAME, getResourceDirectory()),
 		StringPair(SETTINGS_FONT_SOURCE_NAME, getFontSource()),
 		StringPair(SETTINGS_CLEARING_COLOR_NAME, "Color(" +
 			std::to_string(getClearingColor().r) + "," +

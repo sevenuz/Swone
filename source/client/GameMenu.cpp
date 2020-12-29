@@ -29,68 +29,23 @@ GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameWindow(c, m
 	m_switchRight.setFillColor(sf::Color::Yellow);
 	m_switchRight.setCharacterSize(m_controller.getSettings().toF(50));
 
-	readMapsFromDir();
-	readGameObjectsFromDir();
-}
-
-GameMenu::~GameMenu() {
-	// TODO delete Map vector
-}
-
-void GameMenu::readMapsFromDir() {
-	Helper::readDirectory(
-		m_controller.getSettings().getMapDirectory(),
-		[&](tinydir_file& file){
-			try {
-				if (!file.is_dir)
-				{
-					Map* map = new Map();
-
-					std::stringstream ss;
-					ss << m_controller.getSettings().getMapDirectory() << file.name;
-					m_mapReader.setPath(ss.str());
-
-					m_mapReader.setMap(map);
-					m_mapReader.read();
-
-					m_maps.push_back(map);
-				}
-			} catch(const std::invalid_argument& ia) {
-				Log::ger().log(ia.what(), Log::Label::Error);
-			}
-		}
-	);
-	m_mapsFound = m_maps.size() > 0;
+	m_gameReader.read(m_controller.getSettings().getResourceDirectory());
+	m_mapsFound = m_gameReader.getMaps().size() > 0;
 	if(m_mapsFound)
 		setMapSelection(0);
+
+	for(GameObject* o : m_gameReader.getGameObjects()) {
+		const std::string type = o->getType();
+		if(type == GameObject::S_PLAYER_TYPE) {
+			m_gamePlayers.push_back({o, true});
+		} else if(type == GameObject::S_OBJECT_TYPE) {
+			m_gameObjects.push_back({o, false});
+		} else
+			Log::ger().log("Unknown Type of object: " + o->getIdentifier(), Log::Label::Warning);
+	}
 }
 
-void GameMenu::readGameObjectsFromDir() {
-	Helper::readDirectory(
-		m_controller.getSettings().getGameObjectDirectory(),
-		[&](tinydir_file& file){
-			try {
-				if (!file.is_dir)
-				{
-					std::stringstream ss;
-					ss << m_controller.getSettings().getGameObjectDirectory() << file.name;
-					// TODO should only once create Reader
-					Reader r(ss.str());
-					GameObject* o = new GameObject(r.getParagraphMap());
-					const std::string type = o->getType();
-					if(type == GameObject::S_PLAYER_TYPE) {
-						m_gamePlayers.push_back({o, true});
-					} else if(type == GameObject::S_OBJECT_TYPE) {
-						m_gameObjects.push_back({o, false});
-					} else
-						Log::ger().log("Unknown Type of object: " + ss.str(), Log::Label::Warning);
-				}
-			} catch(const std::invalid_argument& ia) {
-				Log::ger().log(ia.what(), Log::Label::Error);
-			}
-		}
-	);
-}
+GameMenu::~GameMenu() {}
 
 void GameMenu::setMapSelection(int i) {
 	if (!m_mapsFound) {
@@ -98,16 +53,16 @@ void GameMenu::setMapSelection(int i) {
 		return;
 	}
 
-	if (i >= (int)m_maps.size()) {
+	if (i >= (int)m_gameReader.getMaps().size()) {
 		i = 0;
 	}
 	else if (i < 0) {
-		i = m_maps.size() - 1;
+		i = m_gameReader.getMaps().size() - 1;
 	}
 
 	m_selectedMap = i;
 
-	m_mapName.setString(m_maps[m_selectedMap]->getName());
+	m_mapName.setString(m_gameReader.getMaps()[m_selectedMap]->getName());
 }
 
 void GameMenu::setActionSelection(char i) {
@@ -123,7 +78,7 @@ void GameMenu::setActionSelection(char i) {
 void GameMenu::startGame() {
 	if (m_mapsFound) {
 		m_gameController.clearGameObjects();
-		m_gameController.setMap(m_maps[m_selectedMap]);
+		m_gameController.setMap(m_gameReader.getMaps()[m_selectedMap]);
 		m_gameWindow.setViewZoom();
 		for(GameObjectSelection& gos : m_gamePlayers)
 			if(gos.selected)
@@ -193,7 +148,7 @@ void GameMenu::update(sf::Time ellapsed) {
 	m_ps.update(ellapsed);
 	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
-		//m_maps[m_selectedMap]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
+		//m_gameReader.getMaps()[m_selectedMap]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
 		break;
 	case ActiveGameWindow::INGAME:
 		m_gameWindow.update(ellapsed);
@@ -217,7 +172,7 @@ void GameMenu::drawImgui()
 	auto object_pos = ImVec2(m_controller.getSettings().toW(0.7f), m_controller.getSettings().toH(0.1f));
 	auto window_size = ImVec2(m_controller.getSettings().toW(0.2f), m_controller.getSettings().toH(0.8f));
 
-	std::string no_files_found = "No Files of this type in " + m_controller.getSettings().getGameObjectDirectory();
+	std::string no_files_found = "No Files of this type found.";
 
 	ImGui::SetNextWindowPos(player_pos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
@@ -247,11 +202,11 @@ void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
 		if (m_mapsFound) {
-			sf::View view(sf::FloatRect(0, 0, m_maps[m_selectedMap]->getImageWidth(), m_maps[m_selectedMap]->getImageHeight()));
+			sf::View view(sf::FloatRect(0, 0, m_gameReader.getMaps()[m_selectedMap]->getImageWidth(), m_gameReader.getMaps()[m_selectedMap]->getImageHeight()));
 			view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
 			target.draw(m_ps, states);
 			target.setView(view);
-			target.draw(*m_maps[m_selectedMap], states);
+			target.draw(*m_gameReader.getMaps()[m_selectedMap], states);
 		}
 
 		m_controller.setDefaultView();

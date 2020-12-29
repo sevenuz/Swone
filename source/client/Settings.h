@@ -15,8 +15,7 @@
 #define SETTINGS_HEIGHT_NAME "height"
 #define SETTINGS_BITS_PER_PIXEL_NAME "bits_per_pixel"
 #define SETTINGS_VERTICAL_SYNC_ENABLED_NAME "vertical_sync_enabled"
-#define SETTINGS_MAP_DIRECTORY_NAME "map_directory"
-#define SETTINGS_OBJ_DIRECTORY_NAME "obj_directory"
+#define SETTINGS_RESOURCE_DIRECTORY_NAME "resource_directory"
 #define SETTINGS_FONT_SOURCE_NAME "font_source"
 #define SETTINGS_CLEARING_COLOR_NAME "clearing_color"
 
@@ -41,11 +40,8 @@ public:
 	bool isVerticalSyncEnabled();
 	void setVerticalSyncEnabled(bool v);
 
-	std::string getMapDirectory();
-	void setMapDirectory(std::string s);
-
-	std::string getGameObjectDirectory();
-	void setGameObjectDirectory(std::string s);
+	std::string getResourceDirectory();
+	void setResourceDirectory(std::string s);
 
 	std::string getFontSource();
 	void setFontSource(std::string s);
@@ -79,8 +75,7 @@ private:
 	size_t m_bits_per_pixel = 32;
 	bool m_vertical_sync_enabled = true;
 
-	std::string m_map_directory = "../res/map/";
-	std::string m_obj_directory = "../res/obj/";
+	std::string m_resource_directory = "../res/";
 
 	std::string m_font_src = "../res/Roboto-Medium.ttf";
 	sf::Font m_font;
