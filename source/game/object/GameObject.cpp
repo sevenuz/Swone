@@ -30,7 +30,7 @@ GameObject::GameObject(std::string type, Config config, float radius, float dens
 	: GameObject(type, config, createCircleShape(radius, density))
 {}
 
-GameObject::GameObject(std::map<std::string, StringMap>& setupMap)
+GameObject::GameObject(StringMapMap& setupMap)
 	: m_type(setupMap[Reader::DEFAULT_PARAGRAPH][S_TYPE]),
 		m_identifier(generateIdentifier(setupMap[Reader::DEFAULT_PARAGRAPH][S_NAME]))
 {
@@ -63,7 +63,7 @@ void GameObject::initBody(ph::Body::Config config, ph::Shape* shape)
 	m_body = new ph::Body(config, shape, this);
 }
 
-void GameObject::initSetupMap(std::map<std::string, StringMap>& setupMap)
+void GameObject::initSetupMap(StringMapMap& setupMap)
 {
 	bool hasHitbox = setupMap.count(S_HITBOX_PARAGRAPH);
 	// hasHitbox - Flag: collidableSolid, collidableUnsolid, rotatable, solid, skip
@@ -100,7 +100,7 @@ void GameObject::initSetupMap(std::map<std::string, StringMap>& setupMap)
 	}
 }
 
-void GameObject::initExtension(std::string extensionName, std::map<std::string, StringMap>& setupMap)
+void GameObject::initExtension(std::string extensionName, StringMapMap& setupMap)
 {
 	if(extensionName == S_MOVEMENTX_EXTENSION)
 		m_extensions[S_MOVEMENTX_EXTENSION] = new MovementX(this, setupMap);
@@ -112,7 +112,7 @@ void GameObject::initExtension(std::string extensionName, std::map<std::string, 
 		m_extensions[S_ORIENT_CORRECTION_EXTENSION] = new OrientCorrection(this);
 }
 
-void GameObject::applySetupMap(std::map<std::string, StringMap>& setupMap)
+void GameObject::applySetupMap(StringMapMap& setupMap)
 {
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
 		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];

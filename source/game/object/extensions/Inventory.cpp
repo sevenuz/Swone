@@ -8,7 +8,7 @@
 
 int Inventory::Inventory_count = 0;
 
-Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
+Inventory::Inventory(GameObject* obj, StringMapMap& setupMap) : Extension(obj)
 {
 	Inventory_count++;
 
@@ -33,7 +33,7 @@ Inventory::Inventory(GameObject* obj, std::map<std::string, StringMap>& setupMap
 	applyConfig(setupMap);
 }
 
-void Inventory::applyConfig(std::map<std::string, StringMap>& setupMap)
+void Inventory::applyConfig(StringMapMap& setupMap)
 {
 	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
 		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_1))
@@ -48,7 +48,7 @@ void Inventory::applyConfig(std::map<std::string, StringMap>& setupMap)
 		m_rectangles[i]->setOutlineColor(m_obj->getColor());
 }
 
-void Inventory::getConfig(std::map<std::string, StringMap>& extensionMap)
+void Inventory::getConfig(StringMapMap& extensionMap)
 {
 	// TODO write inventory to extensionMap?
 }

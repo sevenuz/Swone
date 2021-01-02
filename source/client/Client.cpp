@@ -177,6 +177,7 @@ void Client::startMainLoop()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	while(window.isOpen()) {
+		// TODO Handle evenets in another thread
 		sf::Event event;
 		while(window.pollEvent(event)) {
 			ImGui::SFML::ProcessEvent(event);

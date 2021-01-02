@@ -84,16 +84,16 @@ public:
 		int zindex = 1;
 
 		ph::Body::Config body;
-		std::map<std::string, StringMap> extensionMap; // TODO improve data exchange with extensions
+		StringMapMap extensionMap; // TODO improve data exchange with extensions
 	};
 	typedef Config Package;
 
 	GameObject(std::string type, Config config, ph::Shape* shape);
 	GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density);
 	GameObject(std::string type, Config config, float radius, float density);
-	GameObject(std::map<std::string, StringMap>& setupMap);
+	GameObject(StringMapMap& setupMap);
 
-	void applySetupMap(std::map<std::string, StringMap>& setupMap);
+	void applySetupMap(StringMapMap& setupMap);
 
 	void applyConfig(Config config);
 	Config getConfig();
@@ -171,8 +171,8 @@ private:
 	ph::Shape* createPolyShape(std::vector<ph::Vec2>& vertices, float density = 1);
 	ph::Shape* createCircleShape(float radius, float density = 1);
 	void initBody(ph::Body::Config config, ph::Shape* shape);
-	void initSetupMap(std::map<std::string, StringMap>& setupMap);
-	void initExtension(std::string extensionName, std::map<std::string, StringMap>& setupMap);
+	void initSetupMap(StringMapMap& setupMap);
+	void initExtension(std::string extensionName, StringMapMap& setupMap);
 
 	bool m_log = false;
 	bool m_visible = true;

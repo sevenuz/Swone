@@ -19,8 +19,8 @@ public:
 	// in controls paragraph
 	static constexpr const char* CONTROLS_JUMP_NAME = "jump";
 
-	MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap);
-	void applyConfig(std::map<std::string, StringMap>& setupMap);
+	MultiJump(GameObject* obj, StringMapMap& setupMap);
+	void applyConfig(StringMapMap& setupMap);
 
 	void event(sf::Event& e) override;
 	void update(sf::Time ellapsed) override;

@@ -7,13 +7,13 @@
 
 #include "MultiJump.h"
 
-MultiJump::MultiJump(GameObject* obj, std::map<std::string, StringMap>& setupMap) : Extension(obj)
+MultiJump::MultiJump(GameObject* obj, StringMapMap& setupMap) : Extension(obj)
 {
 	applyConfig(setupMap);
 	resetJump();
 }
 
-void MultiJump::applyConfig(std::map<std::string, StringMap>& setupMap)
+void MultiJump::applyConfig(StringMapMap& setupMap)
 {
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH))
 		if(setupMap[Reader::DEFAULT_PARAGRAPH].count(Extension::S_VELOCITY))

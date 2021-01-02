@@ -13,8 +13,8 @@ public:
 
 	Extension(GameObject* obj) : m_obj(obj){};
 	virtual ~Extension(){};
-	virtual void applyConfig(std::map<std::string, StringMap>& setupMap){};
-	virtual void getConfig(std::map<std::string, StringMap>& extensionMap){};
+	virtual void applyConfig(StringMapMap& setupMap){};
+	virtual void getConfig(StringMapMap& extensionMap){};
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const{};
 	virtual void event(sf::Event& e){};
 	virtual void update(sf::Time ellapsed){};

@@ -19,8 +19,8 @@ public:
 	static constexpr const char* CONTROLS_LEFT_NAME = "left";
 	static constexpr const char* CONTROLS_RIGHT_NAME = "right";
 
-	MovementX(GameObject* obj, std::map<std::string, StringMap>& setupMap);
-	void applyConfig(std::map<std::string, StringMap>& setupMap);
+	MovementX(GameObject* obj, StringMapMap& setupMap);
+	void applyConfig(StringMapMap& setupMap);
 
 	void event(sf::Event& e) override;
 private:

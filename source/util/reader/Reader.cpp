@@ -45,7 +45,7 @@ void Reader::read()
 	endReading();
 };
 
-void Reader::write(std::string file, std::map<std::string, StringMap> m)
+void Reader::write(std::string file, StringMapMap m)
 {
 	std::ofstream outfile(file);
 	if (outfile.is_open())
@@ -72,7 +72,11 @@ void Reader::forEach(std::function<void(std::string, std::string, std::string)> 
 	}
 }
 
-std::map<std::string, StringMap>& Reader::getParagraphMap() {
+StringMapMap& Reader::getParagraphMap() {
+	return m_paragraphMap;
+}
+
+StringMapMap Reader::copyParagraphMap() {
 	return m_paragraphMap;
 }
 

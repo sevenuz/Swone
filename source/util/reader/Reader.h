@@ -11,6 +11,7 @@
 #include <utility>
 
 typedef std::map<std::string, std::string> StringMap;
+typedef std::map<std::string, StringMap> StringMapMap;
 typedef std::pair<std::string, std::string> StringPair;
 
 /*
@@ -36,13 +37,14 @@ public:
 
 	void setPath(std::string path);
 	void read();
-	static void write(std::string file, std::map<std::string, StringMap>);
+	static void write(std::string file, StringMapMap);
 
 	// fn is callback with two parameters:
 	// void fn(std::string paragraph, std::string key, std::string value);
 	void forEach(std::function<void(std::string, std::string, std::string)> fn);
 
-	std::map<std::string, StringMap>& getParagraphMap();
+	StringMapMap& getParagraphMap();
+	StringMapMap copyParagraphMap();
 	StringMap& getParagraphStringMap(std::string paragraph);
 
 	size_t getLineCounter();
@@ -73,7 +75,7 @@ private:
 	size_t m_lineCounter = 0;
 
 	std::string m_paragraph = DEFAULT_PARAGRAPH;
-	std::map<std::string, StringMap> m_paragraphMap;
+	StringMapMap m_paragraphMap;
 };
 
 #endif // SWONE_UTIL_READER_READER_H
