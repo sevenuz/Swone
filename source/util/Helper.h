@@ -38,6 +38,7 @@ public:
 	static int toInt(std::string s);
 	static long toLong(std::string s);
 	static float toFloat(std::string s);
+	static float toFloat(std::string s, float fallbackValue);
 	static double toDouble(std::string s);
 	static sf::Color toColor(std::string s);
 	static sf::Vector2f toVector2f(std::string s);

@@ -1,0 +1,10 @@
+type=object
+name=Laubbaum
+texture=../res/sprites/vegetation.png
+scale=(1.4,1.4)
+z-index=1
+hitbox
+solid=true
+collidableUnsolid=false
+ani_steady
+1=(0, 0, 64, 64)

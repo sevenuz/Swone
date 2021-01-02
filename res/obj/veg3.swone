@@ -1,0 +1,10 @@
+type=object
+name=Busch
+texture=../res/sprites/vegetation.png
+scale=(0.4,0.4)
+z-index=1
+hitbox
+solid=true
+collidableUnsolid=false
+ani_steady
+1=(128, 0, 64, 64)

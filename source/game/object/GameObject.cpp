@@ -69,7 +69,7 @@ void GameObject::initSetupMap(std::map<std::string, StringMap>& setupMap)
 	// hasHitbox - Flag: collidableSolid, collidableUnsolid, rotatable, solid, skip
 	ph::Body::Config config{hasHitbox, hasHitbox, hasHitbox, !hasHitbox, !hasHitbox};
 	if(hasHitbox) {
-		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY]);
+		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY], 1);
 		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
 			float radius = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH]["1"]);
 			initBody(config, createCircleShape(radius, density));
@@ -204,7 +204,7 @@ GameObject::Config GameObject::getConfig()
 
 GameObject* GameObject::castBodyCallback(ph::Body::Callback* c)
 {
-	if(c->getType() == S_OBJECT_TYPE || c->getType() == S_PLAYER_TYPE)
+	if(c->getCallbackType() == S_OBJECT_TYPE)
 		return static_cast<GameObject*>(c);
 	else
 		return NULL;
@@ -371,6 +371,10 @@ void GameObject::updateLog() const
 	log.detailsUpdateValue(std::to_string(getVel().y), "vel_y", m_identifier);
 
 	for(auto& e : m_extensions) e.second->updateLog();
+}
+
+const std::string GameObject::getCallbackType() const {
+	return S_OBJECT_TYPE;
 }
 
 const std::string GameObject::getType() const {

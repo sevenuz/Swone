@@ -1,4 +1,4 @@
-type=object
+type=item
 name=Air
 id=air_elem
 // color=Color(0,0,200)

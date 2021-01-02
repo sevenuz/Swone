@@ -69,6 +69,16 @@ float Helper::toFloat(std::string s)
 	return std::stof(s);
 }
 
+float Helper::toFloat(std::string s, float fallbackValue)
+{
+	try {
+		return Helper::toFloat(s);
+	} catch(...) {
+		return fallbackValue;
+	}
+}
+
+
 double Helper::toDouble(std::string s)
 {
 	return std::stod(s);

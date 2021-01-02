@@ -110,7 +110,7 @@ struct Tile : public ph::Body::Callback {
 	Tile(sf::Vector2i pos, MapTile type);
 
 	//virtual void onCollision(ph::Manifold* manifold) override;
-	const std::string getType() const override;
+	const std::string getCallbackType() const override;
 	static Tile* castBodyCallback(ph::Body::Callback* c);
 
 	bool isPassable() const;

@@ -124,7 +124,7 @@ void Inventory::addObject(GameObject* g)
 
 void Inventory::onObjectCollision(ph::Manifold* manifold, GameObject* go)
 {
-	if(go->getType() == GameObject::S_PLAYER_TYPE)
+	if(go->getType() != GameObject::S_ITEM_TYPE)
 		return;
 	go->getBody()->skip = true;
 	go->setVisible(false);

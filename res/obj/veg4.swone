@@ -1,0 +1,11 @@
+type=object
+name=Gras
+texture=../res/sprites/vegetation.png
+scale=(1,1)
+z-index=10
+hitbox
+density=1
+solid=true
+collidableUnsolid=false
+ani_steady
+1=(192, 0, 64, 64)

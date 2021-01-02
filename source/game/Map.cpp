@@ -185,14 +185,14 @@ Tile::Tile(sf::Vector2i pos, MapTile t)
 		*/
 }
 
-const std::string Tile::getType() const
+const std::string Tile::getCallbackType() const
 {
 	return MAP_TILE_TYPE;
 }
 
 Tile* Tile::castBodyCallback(ph::Body::Callback* c)
 {
-	if(c->getType() == MAP_TILE_TYPE)
+	if(c->getCallbackType() == MAP_TILE_TYPE)
 		return static_cast<Tile*>(c);
 	else
 		return NULL;

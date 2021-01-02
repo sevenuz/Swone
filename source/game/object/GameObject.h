@@ -35,6 +35,7 @@ public:
 	static constexpr const char* S_TYPE = "type";
 	static constexpr const char* S_PLAYER_TYPE = "player";
 	static constexpr const char* S_OBJECT_TYPE = "object";
+	static constexpr const char* S_ITEM_TYPE = "item";
 
 	static constexpr const char* S_NAME = "name";
 	static constexpr const char* S_COLOR = "color";
@@ -105,7 +106,9 @@ public:
 	virtual void onTileCollision(ph::Manifold* manifold, Tile* t);
 
 	void onCollision(ph::Manifold* manifold) override;
-	const std::string getType() const override;
+	const std::string getCallbackType() const override;
+
+	const std::string getType() const;
 
 	static GameObject* castBodyCallback(ph::Body::Callback* c);
 

@@ -38,10 +38,9 @@ GameMenu::GameMenu(Controller& c) :m_ps(100), m_controller(c), m_gameWindow(c, m
 		const std::string type = o->getType();
 		if(type == GameObject::S_PLAYER_TYPE) {
 			m_gamePlayers.push_back({o, true});
-		} else if(type == GameObject::S_OBJECT_TYPE) {
+		} else {
 			m_gameObjects.push_back({o, false});
-		} else
-			Log::ger().log("Unknown Type of object: " + o->getIdentifier(), Log::Label::Warning);
+		}
 	}
 }
 

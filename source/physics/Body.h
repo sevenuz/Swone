@@ -36,7 +36,7 @@ struct Body
   struct Callback {
     virtual ~Callback() {};
     virtual void onCollision(Manifold* manifold) {};
-    virtual const std::string getType() const { return "Body"; };
+    virtual const std::string getCallbackType() const { return "Body"; };
     static Callback* instance()
     {
       static Callback instance;

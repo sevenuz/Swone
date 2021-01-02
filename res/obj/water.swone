@@ -1,4 +1,4 @@
-type=object
+type=item
 name=Water
 id=water_elem
 // color=Color(0,0,200)
