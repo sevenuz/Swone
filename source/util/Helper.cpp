@@ -22,6 +22,7 @@ void Helper::readDirectory(std::string path, std::function<void(tinydir_file& fi
 	tinydir_dir dir;
 	tinydir_open(&dir, path.c_str());
 	readDirectory(dir, fn);
+	tinydir_close(&dir);
 }
 
 // convert fn

@@ -15,6 +15,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+
 #include <tinydir.h>
 
 #include "graphics/ParticleSystem.h"
@@ -39,23 +40,22 @@ private:
 
 	sf::Text m_play;
 
-	sf::Text m_mapName;
+	sf::Text m_sceneryName;
 	sf::Text m_switchLeft;
 	sf::Text m_switchRight;
 
 	// GamePanelMenuPoint type, but char to perform de/increment
 	char m_selectedAction = FIRST;
-	int m_selectedMap = 0;
-	bool m_mapsFound = false;
+	int m_selectedScenery = 0;
+	bool m_sceneriesFound = false;
 
 	struct GameObjectSelection {
 		GameObject* obj;
 		bool selected;
 	};
-	std::vector<GameObjectSelection> m_gameObjects;
 	std::vector<GameObjectSelection> m_gamePlayers;
 
-	void setMapSelection(int);
+	void setScenerySelection(int);
 	void setActionSelection(char);
 
 	void startGame();

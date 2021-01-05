@@ -35,8 +35,10 @@ sf::Vector2f GameWindow::getPlayerCenter()
 			pcount++;
 		}
 	}
-	ppos.x /= pcount;
-	ppos.y /= pcount;
+	if(pcount > 0) {
+		ppos.x /= pcount;
+		ppos.y /= pcount;
+	}
 	return ppos;
 }
 
@@ -96,24 +98,14 @@ void GameWindow::event(sf::Event& event) {
 		}
 	}
 
-	m_gc.eventMap(event);
-	m_gc.eventGameObjects(event);
+	m_gc.event(event);
 }
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	target.setView(m_view);
 
-	bool drawMap = true;
-	for (GameObject* g : m_gc.getGameObjects()) {
-		if(g->getZindex() >= 0 && drawMap) {
-			target.draw(*m_gc.getMap(), states);
-			drawMap = false;
-		}
-		target.draw(*g, states);
-	}
-	if(drawMap)
-		target.draw(*m_gc.getMap(), states);
+	target.draw(*m_gc.getScenery(), states);
 
 	// TODO toggle hitboxes
 	for (ph::Body* g : m_gc.getScene().bodies) {
@@ -137,7 +129,7 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 			circle.setOutlineColor(sf::Color::Red);
 			circle.setFillColor(sf::Color::Transparent);
 			circle.setOutlineThickness(1);
-			float r = Map::toMapPixelX(g->shape->radius);
+			float r = Map::toMapDimension(g->shape->radius);
 			float x = Map::toMapPixelX(g->position.x) - r;
 			float y = Map::toMapPixelY(g->position.y) - r;
 			circle.setRadius(r);

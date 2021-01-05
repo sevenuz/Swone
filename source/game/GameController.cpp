@@ -4,36 +4,41 @@ GameController::GameController() {}
 
 GameController::~GameController() {}
 
+Scenery* GameController::getScenery() {
+	return m_scenery;
+}
+
 Map* GameController::getMap() {
-	return m_map;
+	return m_scenery->getMap();
 }
 
-const std::list<GameObject*>& GameController::getGameObjects() const{
-	return m_game_objects;
+const std::list<GameObject*>& GameController::getGameObjects() const {
+	return m_scenery->getGameObjects();
 }
 
-void GameController::setMap(Map* m) {
-	m_map = m;
+void GameController::setScenery(Scenery* s) {
+	m_scenery = s;
+}
+
+void GameController::pushPlayer(GameObject* p)
+{
+	m_scenery->getGameObjects().push_back(p);
+}
+
+void GameController::clearPlayers()
+{
+	m_players.clear();
 }
 
 void GameController::startGame()
 {
 	m_scene.Clear();
-	for(auto& mm : m_map->getMapData())
+	for(auto& mm : getMap()->getMapData())
 		for(auto& mmm : mm.second)
 			if(!mmm.second->isPassable())
 				m_scene.Add(mmm.second->body);
-	for(GameObject* game_object : m_game_objects)
+	for(GameObject* game_object : getGameObjects())
 		m_scene.Add(game_object->getBody());
-}
-
-void GameController::pushGameObject(GameObject* game_object) {
-	m_game_objects.push_back(game_object);
-}
-
-void GameController::clearGameObjects()
-{
-	m_game_objects.clear();
 }
 
 const ph::Scene& GameController::getScene() const
@@ -51,42 +56,20 @@ void GameController::update(sf::Time ellapsed) {
 	if(m_clock>=m_sceneDt) {
 		// TODO fps from settings
 		// use steady time for determenistic and to increase steadyness
-		m_scene.Step(m_sceneDt.asSeconds(), ph::Vec2(0, m_map->getGravity()));
+		m_scene.Step(m_sceneDt.asSeconds(), ph::Vec2(0, getMap()->getGravity()));
 		m_clock -= m_sceneDt;
 	}
 
-	updateMap(ellapsed);
-	updateGameObjects(ellapsed);
+	m_scenery->update(ellapsed);
 }
 
-void GameController::updateMap(sf::Time ellapsed) {
-	getMap()->update(ellapsed);
-}
-
-void GameController::eventMap(sf::Event& e) {
-	getMap()->event(e);
-}
-
-void GameController::updateGameObjects(sf::Time ellapsed) {
-	for (GameObject* g : m_game_objects) {
-		g->apply();
-		g->update(ellapsed);
-	}
-	// sort list with z-index
-	m_game_objects.sort([](GameObject* a, GameObject* b) -> bool {
-		return a->getZindex() < b->getZindex();
-	});
-}
-
-void GameController::eventGameObjects(sf::Event& e) {
-	for (GameObject* g : m_game_objects) {
-		g->event(e);
-	}
+void GameController::event(sf::Event& e) {
+	m_scenery->event(e);
 }
 
 GameObject* GameController::getGameObjectById(const std::string & id) const
 {
-	for (GameObject* g : m_game_objects)
+	for (GameObject* g : getGameObjects())
 	{
 		if (g->getIdentifier() == id)
 			return g;
@@ -96,7 +79,7 @@ GameObject* GameController::getGameObjectById(const std::string & id) const
 
 void GameController::updateLog() const
 {
-	for (GameObject* g : m_game_objects) {
+	for (GameObject* g : getGameObjects()) {
 		g->updateLog();
 	}
 }

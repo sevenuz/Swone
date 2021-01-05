@@ -13,8 +13,10 @@ iSource = include_directories('./include')
 iInclude = include_directories('./source')
 iImgui = include_directories('./bib/imgui')
 iTinydir = include_directories('./bib/tinydir')
+iMd5 = include_directories('./bib/md5')
 
 src = [	'bib/imgui/imgui-SFML.cpp',
+	'bib/md5/md5.cpp',
 	'bib/imgui/imgui.cpp',
 	'bib/imgui/imgui_draw.cpp',
 	'bib/imgui/imgui_demo.cpp',
@@ -50,4 +52,4 @@ src = [	'bib/imgui/imgui-SFML.cpp',
 	'source/graphics/Animation.cpp',
 	'source/graphics/AnimatedSprite.cpp']
 
-executable('swone', src, cpp_args : ['-DNOMINMAX'], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow, sfmlNetwork])
+executable('swone', src, cpp_args : ['-DNOMINMAX'], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir, iMd5], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow, sfmlNetwork])

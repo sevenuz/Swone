@@ -55,9 +55,9 @@ void GameObject::initBody(ph::Body::Config config, ph::Shape* shape)
 {
 	if(shape == NULL) {
 		// GameObject Default Shape
-		Log::ger().log("Default Hitbox", Log::Label::Warning);
+		Log::ger().log("Default Hitbox", Log::Label::Warning, GO_LOG);
 		ph::PolygonShape* poly = new ph::PolygonShape();
-		poly->SetBox(0.1f, 0.1f);
+		poly->SetBox(0.0f, 0.0f);
 		shape = poly;
 	}
 	m_body = new ph::Body(config, shape, this);
@@ -81,9 +81,10 @@ void GameObject::initSetupMap(StringMapMap& setupMap)
 			}
 			initBody(config, createPolyShape(vertices, density));
 		} else {
-			Log::ger().log("Object has no hitbox type={circle|polygon}", Log::Label::Warning);
 			hasHitbox = false;
 		}
+	} else {
+		Log::ger().log(m_identifier + " has no hitbox paragraph.", Log::Label::Warning, GO_LOG);
 	}
 	if(!hasHitbox)
 		initBody(config, NULL); // Default Hitbox
@@ -224,7 +225,7 @@ void GameObject::onCollision(ph::Manifold* manifold)
 	} else if(t != NULL && g2 != NULL) {
 		onTileCollision(manifold, t);
 	} else {
-		Log::ger().log("Unhandled Collisions in GameObject", Log::Label::Warning);
+		Log::ger().log("Unhandled Collisions in GameObject", Log::Label::Warning, GO_LOG);
 	}
 }
 

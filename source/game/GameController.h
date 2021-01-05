@@ -3,8 +3,7 @@
 
 #include <list>
 
-#include "game/Map.h"
-#include "game/object/GameObject.h"
+#include "game/Scenery.h"
 #include "util/Log.h"
 #include "physics/Scene.h"
 
@@ -13,6 +12,7 @@ public:
 	GameController();
 	virtual ~GameController();
 
+	Scenery* getScenery();
 	Map* getMap();
 	const std::list<GameObject*>& getGameObjects() const;
 	GameObject* getGameObjectById(const std::string& id) const;
@@ -20,28 +20,24 @@ public:
 	void updateLog() const;
 
 	void update(sf::Time ellapsed);
+	void event(sf::Event& e);
 
-	void updateMap(sf::Time ellapsed);
-	void eventMap(sf::Event& e);
-
-	void updateGameObjects(sf::Time ellapsed);
-	void eventGameObjects(sf::Event& e);
-
-	void setMap(Map* m);
+	void pushPlayer(GameObject* p);
+	void clearPlayers();
 	void startGame();
 
-	void pushGameObject(GameObject* game_object);
-	void clearGameObjects();
+	void setScenery(Scenery* s);
 
 	const ph::Scene& getScene() const;
 	ph::Scene& getScene();
 protected:
 private:
-	Map* m_map = NULL;
+	Scenery* m_scenery = NULL;
+	std::list<GameObject*> m_players;
+
 	ph::Scene m_scene;
 	sf::Time m_clock;
 	sf::Time m_sceneDt = sf::seconds(1.0f/60.0f);
-	std::list<GameObject*> m_game_objects;
 
 	size_t round(float f) {
 		return static_cast<size_t> (f);

@@ -21,6 +21,7 @@
 #define GRAVITY 25
 
 #define TILE_SIZE 1.0f
+#define TILE_CORRECTION -0.5f
 
 enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
 
@@ -32,6 +33,7 @@ public:
 	static const size_t TILE_WIDTH = 64;
 	static const size_t TILE_HEIGHT = 64;
 
+	static float toMapDimension(float x);
 	static float toMapPixelX(float x);
 	static float toMapPixelY(float y);
 	static sf::Vector2f toMapPixel(sf::Vector2f v);
@@ -58,8 +60,8 @@ public:
 	void setBorder(MapTile);
 	size_t getWidth();
 	size_t getHeight();
-	size_t getImageWidth();
-	size_t getImageHeight();
+	const size_t getImageWidth() const;
+	const size_t getImageHeight() const;
 
 	float getScale();
 

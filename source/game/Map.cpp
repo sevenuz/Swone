@@ -4,12 +4,17 @@ Map::Map() {}
 
 Map::~Map() {}
 
-float Map::toMapPixelX(float x) {
+float Map::toMapDimension(float x)
+{
 	return x * Map::TILE_WIDTH;
 }
 
+float Map::toMapPixelX(float x) {
+	return (x-TILE_CORRECTION) * Map::TILE_WIDTH;
+}
+
 float Map::toMapPixelY(float y) {
-	return y * Map::TILE_HEIGHT;
+	return (y-TILE_CORRECTION) * Map::TILE_HEIGHT;
 }
 
 sf::Vector2f Map::toMapPixel(sf::Vector2f v)
@@ -66,11 +71,11 @@ size_t Map::getHeight() {
 	return m_height;
 }
 
-size_t Map::getImageWidth() {
+const size_t Map::getImageWidth() const {
 	return m_imgWidth;
 }
 
-size_t Map::getImageHeight() {
+const size_t Map::getImageHeight() const {
 	return m_imgHeight;
 }
 
@@ -118,7 +123,7 @@ void Map::createMapImage() {
 		throw std::invalid_argument("error: convert img to texture.");
 	} else {
 		m_sprite.setTexture(m_texture);
-		m_sprite.setPosition(sf::Vector2f(0, 0));
+		m_sprite.setPosition(sf::Vector2f(TILE_CORRECTION, TILE_CORRECTION));
 
 		m_mapDrawable = true;
 	}
@@ -140,8 +145,7 @@ void Map::event(sf::Event& event) {
 	}
 }
 
-void Map::update(sf::Time ellapsed) {
-}
+void Map::update(sf::Time ellapsed) {}
 
 void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
@@ -165,10 +169,10 @@ Tile::Tile(sf::Vector2i pos, MapTile t)
 	{
 		if(type == MapTile::UNDERSCORE) {
 			shape.SetBox(TILE_SIZE/2, TILE_SIZE/4);
-			body = new ph::Body(ph::Body::Config{x : ((float)pos.x)+TILE_SIZE/2, y : ((float)pos.y)+TILE_SIZE/4}, &shape, this);
+			body = new ph::Body(ph::Body::Config{x : ((float)pos.x), y : ((float)pos.y+TILE_CORRECTION/2)}, &shape, this);
 		} else {
 			shape.SetBox(TILE_SIZE/2, TILE_SIZE/2);
-			body = new ph::Body(ph::Body::Config{x : ((float)pos.x)+TILE_SIZE/2, y : ((float)pos.y)+TILE_SIZE/2}, &shape, this);
+			body = new ph::Body(ph::Body::Config{x : ((float)pos.x), y : ((float)pos.y)}, &shape, this);
 		}
 		body->SetSolid();
 		/*

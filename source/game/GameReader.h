@@ -2,6 +2,7 @@
 #define SWONE_GAME_GAMEREADER_H
 
 #include <vector>
+#include <map>
 
 #include "game/Map.h"
 #include "game/object/GameObject.h"
@@ -10,27 +11,34 @@
 
 #define RES_DIR_MAP "map/"
 #define RES_DIR_OBJECT "obj/"
-#define RES_DIR_SCENERY "scn/"
+#define RES_DIR_PLAYER "player/"
+#define RES_DIR_SCENERY "scenery/"
+
+class Scenery;
 
 class GameReader {
 public:
-	GameReader();
+	GameReader(std::string resDir);
 	virtual ~GameReader();
 
-	void read(std::string resDir);
-	//void readSceneriesFromDir(std::string resDir);
-	void readMapsFromDir(std::string resDir);
-	void readGameObjectsFromDir(std::string resDir);
+	void readSceneries();
+	void readPlayers();
+	Map* getMap(std::string mapFileName);
+	StringMapMap& getGameObjectParagraphMap(std::string objFileName);
 
-	//const std::vector<Scenery*>& getSceneries() const;
-	const std::vector<Map*>& getMaps() const;
-	const std::vector<GameObject*>& getGameObjects() const;
+	std::string getMapPath(std::string mapFileName);
+	std::string getGameObjectPath(std::string objFileName);
+
+	const std::vector<Scenery*>& getSceneries() const;
+	const std::vector<GameObject*>& getPlayers() const;
 private:
+	std::string m_resDir;
 	MapReader m_mapReader;
 
-	//std::vector<Scenery*> m_sceneries;
-	std::vector<Map*> m_maps;
-	std::vector<GameObject*> m_objects;
+	std::vector<Scenery*> m_sceneries;
+	std::vector<GameObject*> m_players;
+	std::map<std::string, Map*> m_maps;
+	std::map<std::string, StringMapMap> m_objects;
 };
 #endif
 

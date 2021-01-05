@@ -59,3 +59,13 @@ unsigned short SrvSettings::getTickRate()
 {
 	return m_tickRate;
 }
+
+std::string SrvSettings::getResourceDirectory()
+{
+	return m_resource_directory;
+}
+
+void SrvSettings::setResourceDirectory(std::string s)
+{
+	m_resource_directory = s;
+}

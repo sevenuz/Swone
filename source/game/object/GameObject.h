@@ -18,6 +18,8 @@
 #include "physics/Manifold.h"
 #include "physics/Scene.h"
 
+#define GO_LOG true
+
 #define SPEED_FACTOR 0.5
 
 #define JUMP_FORCE 16

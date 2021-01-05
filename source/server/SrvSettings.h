@@ -12,6 +12,7 @@
 #define SRVSETTINGS_DOMAIN "domain"
 #define SRVSETTINGS_PORT "port"
 #define SRVSETTINGS_TICK_RATE "tick-rate"
+#define SRVSETTINGS_RESOURCE_DIRECTORY "resource_directory"
 
 class SrvSettings {
 public:
@@ -26,11 +27,15 @@ public:
 
 	unsigned short getTickRate();
 	void setTickRate(unsigned short v);
+
+	std::string getResourceDirectory();
+	void setResourceDirectory(std::string s);
 protected:
 private:
 	std::string m_domain = "localhost"; // TODO necessary?
 	unsigned short m_port = 61007;
 	unsigned short m_tickRate = 20; // updates per second
+	std::string m_resource_directory = "../res/";
 };
 
 #endif
