@@ -177,7 +177,10 @@ void Client::startMainLoop()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	while(window.isOpen()) {
+		if(!controller.isRunning())
+			stop();
 		// TODO Handle evenets in another thread
+		// http://www.cplusplus.com/forum/beginner/194347/
 		sf::Event event;
 		while(window.pollEvent(event)) {
 			ImGui::SFML::ProcessEvent(event);
@@ -185,7 +188,7 @@ void Client::startMainLoop()
 				continue;
 			handleAllEvents(event);
 			if(event.type == sf::Event::Closed) {
-				window.close();
+				stop();
 			}
 
 			switch(controller.getActiveWindow()) {
@@ -287,11 +290,21 @@ void Client::initLogger()
 
 int Client::start()
 {
+	std::thread serverThread(&Server::start, &server);
+
 	ImGui::SFML::Init(window);
 	initSocket();
 	initLogger();
+	controller.start();
 	startMainLoop();
 
+	serverThread.join();
 	return 0;
+}
+
+void Client::stop()
+{
+	server.stop();
+	window.close();
 }
 

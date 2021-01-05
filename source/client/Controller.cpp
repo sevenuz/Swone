@@ -41,3 +41,19 @@ sf::RenderWindow& Controller::getWindow() {
 void Controller::setDefaultView() {
 	getWindow().setView(getWindow().getDefaultView());
 }
+
+bool Controller::isRunning()
+{
+	return m_run;
+}
+
+void Controller::start()
+{
+	m_run = true;
+}
+
+void Controller::stop()
+{
+	m_run = false;
+}
+

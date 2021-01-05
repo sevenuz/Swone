@@ -11,7 +11,6 @@ int main(int argc, char** argv)
 		Server server;
 		return server.start();
 	} else {
-		// TODO start also a server in another thread
 		Client client;
 		return client.start();
 	}

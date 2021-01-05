@@ -16,8 +16,9 @@ public:
 	virtual ~Server();
 
 	int start();
+	void stop();
 private:
-	bool m_run = true;
+	bool m_run = false;
 	void startMainLoop();
 
 	SrvSettings settings;

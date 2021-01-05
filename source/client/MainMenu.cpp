@@ -89,7 +89,7 @@ void MainMenu::m_lokalPressed() {
 void MainMenu::m_onlinePressed() {}
 void MainMenu::m_settingsPressed() {}
 void MainMenu::m_exitPressed() {
-	m_controller.getWindow().close();
+	m_controller.stop();
 }
 
 void MainMenu::event(sf::Event& event) {

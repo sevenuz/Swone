@@ -47,6 +47,12 @@ int Server::start()
 		Log::ger().log("Failed to bind Port " + std::to_string(settings.getPort()), Log::Label::Error);
 	}
 	socket.setBlocking(false);
+	m_run = true;
 	startMainLoop();
 	return 0;
+}
+
+void Server::stop()
+{
+	m_run = false;
 }

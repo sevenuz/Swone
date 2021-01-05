@@ -7,6 +7,8 @@ sfmlSystem = dependency('sfml-system')
 sfmlWindow = dependency('sfml-window')
 sfmlNetwork = dependency('sfml-network')
 
+thread_dep = dependency('threads')
+
 incdir = include_directories('include')
 
 iSource = include_directories('./include')
@@ -15,7 +17,8 @@ iImgui = include_directories('./bib/imgui')
 iTinydir = include_directories('./bib/tinydir')
 iMd5 = include_directories('./bib/md5')
 
-src = [	'bib/imgui/imgui-SFML.cpp',
+src = [
+	'bib/imgui/imgui-SFML.cpp',
 	'bib/md5/md5.cpp',
 	'bib/imgui/imgui.cpp',
 	'bib/imgui/imgui_draw.cpp',
@@ -50,6 +53,27 @@ src = [	'bib/imgui/imgui-SFML.cpp',
 	'source/util/Helper.cpp',
 	'source/graphics/ParticleSystem.cpp',
 	'source/graphics/Animation.cpp',
-	'source/graphics/AnimatedSprite.cpp']
+	'source/graphics/AnimatedSprite.cpp'
+]
 
-executable('swone', src, cpp_args : ['-DNOMINMAX'], include_directories : [iSource, iInclude, iImgui, iTinydir, incdir, iMd5], dependencies : [GL, sfmlGraphics, sfmlSystem, sfmlWindow, sfmlNetwork])
+executable(
+	'swone',
+	src,
+	cpp_args : ['-DNOMINMAX'],
+	include_directories : [
+		iSource,
+		iInclude,
+		iImgui,
+		iTinydir,
+		incdir,
+		iMd5
+	],
+	dependencies : [
+		GL,
+		sfmlGraphics,
+		sfmlSystem,
+		sfmlWindow,
+		sfmlNetwork,
+		thread_dep
+	]
+)

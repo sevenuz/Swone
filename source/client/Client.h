@@ -8,6 +8,7 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Time.hpp>
 #include <string>
+#include <thread>
 
 #include "client/MainMenu.h"
 #include "client/GameMenu.h"
@@ -16,6 +17,7 @@
 #include "graphics/ParticleSystem.h"
 #include "util/reader/Reader.h"
 #include "util/Log.h"
+#include "server/Server.h"
 
 class Client {
 public:
@@ -23,6 +25,7 @@ public:
 	virtual ~Client();
 
 	int start();
+	void stop();
 private:
 	void handleAllEvents(sf::Event& event);
 	void drawLog();
@@ -37,6 +40,8 @@ private:
 	Controller controller;
 	MainMenu menu;
 	GameMenu gameMenu;
+	Server server;
+
 	sf::Clock game_clock;
 
 	sf::UdpSocket socket;

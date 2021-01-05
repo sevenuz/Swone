@@ -38,10 +38,16 @@ public:
 	sf::RenderWindow& getWindow();
 
 	void setDefaultView();
+
+	bool isRunning();
+	void start();
+	void stop();
 protected:
 private:
 	Settings& m_settings;
 	sf::RenderWindow& m_window;
+
+	bool m_run = false;
 
 	ActiveWindow m_activeWindow = ActiveWindow::AW_FIRST;
 	ActiveGameWindow m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
