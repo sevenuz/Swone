@@ -2,7 +2,7 @@
 
 Client::Client()
 	: window(sf::VideoMode(settings.getWidth(), settings.getHeight(), settings.getBitsPerPixel()), "Swone o.O"),
-	controller(settings, window), menu(controller), gameMenu(controller)
+	controller(settings, window), menu(controller), localMenu(controller), onlineMenu(controller), settingsMenu(controller)
 {}
 
 Client::~Client() {}
@@ -81,7 +81,7 @@ void Client::drawLog()
 
 void Client::renderObjectSelector()
 {
-	const static std::list<GameObject*>& gameObjects = gameMenu.getGameController().getGameObjects();
+	const static std::list<GameObject*>& gameObjects = localMenu.getGameController().getGameObjects();
 
 	if(ImGui::TreeNode("GameObjects")) {
 		if(ImGui::TreeNode("all")) {
@@ -124,7 +124,7 @@ void Client::drawObjectViewer()
 	const static ValueDetailMap& value_detail_map = Log::ger().getValueMap();
 	const static std::vector<std::string>& inspected_obj_ids = Log::ger().getObjectIdentifiers();
 
-	gameMenu.updateLog();
+	localMenu.updateLog();
 	for(const std::string& id : inspected_obj_ids) {
 		bool open = true;
 		if(ImGui::CollapsingHeader(id.c_str(), &open)) {
@@ -165,7 +165,7 @@ void Client::drawObjectViewer()
 			value_detail_map.at(id).at("animation")->display(3.0);
 		}
 		if(!open) {
-			gameMenu.getGameObjectById(id)->toggleLogging();
+			localMenu.getGameObjectById(id)->toggleLogging();
 			Log::ger().toggleObjectInspect(id);
 		}
 	}
@@ -191,12 +191,18 @@ void Client::startMainLoop()
 				stop();
 			}
 
-			switch(controller.getActiveWindow()) {
-			case ActiveWindow::MAINMENU:
+			switch(controller.getActiveMenu()) {
+			case ActiveMenu::MAIN:
 				menu.event(event);
 				break;
-			case ActiveWindow::GAME:
-				gameMenu.event(event);
+			case ActiveMenu::LOCAL:
+				localMenu.event(event);
+				break;
+			case ActiveMenu::ONLINE:
+				onlineMenu.event(event);
+				break;
+			case ActiveMenu::SETTINGS:
+				settingsMenu.event(event);
 				break;
 			default:
 				menu.event(event);
@@ -210,15 +216,25 @@ void Client::startMainLoop()
 
 		ImGui::SFML::Update(window, ellapsed);
 
-		switch(controller.getActiveWindow()) {
-		case ActiveWindow::MAINMENU:
+		switch(controller.getActiveMenu()) {
+		case ActiveMenu::MAIN:
 			menu.update(ellapsed);
 			window.draw(menu);
 			break;
-		case ActiveWindow::GAME:
-			gameMenu.update(ellapsed);
-			gameMenu.drawImgui();
-			window.draw(gameMenu);
+		case ActiveMenu::LOCAL:
+			localMenu.update(ellapsed);
+			localMenu.drawImgui();
+			window.draw(localMenu);
+			break;
+		case ActiveMenu::ONLINE:
+			onlineMenu.update(ellapsed);
+			onlineMenu.drawImgui();
+			window.draw(onlineMenu);
+			break;
+		case ActiveMenu::SETTINGS:
+			settingsMenu.update(ellapsed);
+			settingsMenu.drawImgui();
+			window.draw(settingsMenu);
 			break;
 		default:
 			menu.update(ellapsed);

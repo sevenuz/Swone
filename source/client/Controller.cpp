@@ -6,16 +6,16 @@ Controller::Controller(Settings& settings, sf::RenderWindow& w) : m_settings(set
 
 Controller::~Controller() {}
 
-void Controller::setActiveWindow(ActiveWindow i) {
-	if (i > ActiveWindow::AW_LAST) {
-		m_activeWindow = ActiveWindow::AW_FIRST;
+void Controller::setActiveMenu(ActiveMenu i) {
+	if (i > ActiveMenu::AW_LAST) {
+		m_activeMenu = ActiveMenu::AW_FIRST;
 	}
 	else {
-		m_activeWindow = i;
+		m_activeMenu = i;
 	}
 }
-ActiveWindow Controller::getActiveWindow() {
-	return m_activeWindow;
+ActiveMenu Controller::getActiveMenu() {
+	return m_activeMenu;
 }
 
 void Controller::setActiveGameWindow(ActiveGameWindow i) {

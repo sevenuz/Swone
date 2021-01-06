@@ -9,7 +9,7 @@
 #include "client/Settings.h"
 
 // Prefix in front of First and Last is necessary to avoid name clash of the both enums
-enum ActiveWindow : char { MAINMENU, SETTINGS, GAME, AW_FIRST = MAINMENU, AW_LAST = GAME };
+enum ActiveMenu : char { MAIN, LOCAL, ONLINE, SETTINGS, AW_FIRST = MAIN, AW_LAST = SETTINGS };
 
 enum ActiveGameWindow : char { MAPSELECTION, INGAME, AGW_FIRST = MAPSELECTION, AGW_LAST = INGAME };
 
@@ -28,8 +28,8 @@ public:
 	Controller(Settings& settings, sf::RenderWindow& w);
 	virtual ~Controller();
 
-	void setActiveWindow(ActiveWindow i);
-	ActiveWindow getActiveWindow();
+	void setActiveMenu(ActiveMenu i);
+	ActiveMenu getActiveMenu();
 
 	void setActiveGameWindow(ActiveGameWindow i);
 	ActiveGameWindow getActiveGameWindow();
@@ -49,7 +49,7 @@ private:
 
 	bool m_run = false;
 
-	ActiveWindow m_activeWindow = ActiveWindow::AW_FIRST;
+	ActiveMenu m_activeMenu = ActiveMenu::AW_FIRST;
 	ActiveGameWindow m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
 };
 

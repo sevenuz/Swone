@@ -1,5 +1,5 @@
-#ifndef SWONE_CLIENT_GAMEMENU_H
-#define SWONE_CLIENT_GAMEMENU_H
+#ifndef SWONE_CLIENT_LOCALMENU_H
+#define SWONE_CLIENT_LOCALMENU_H
 
 #include "imgui.h"
 #include "imgui-SFML.h"
@@ -28,7 +28,7 @@
 #include "util/Log.h"
 #include "util/Helper.h"
 
-class GameMenu : public Handleable {
+class LocalMenu : public Handleable {
 private:
 	enum GamePanelMenuPoint : char { PLAY, FIRST = PLAY, LAST = PLAY };
 
@@ -67,8 +67,8 @@ public:
 
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
-	GameMenu(Controller& c);
-	~GameMenu();
+	LocalMenu(Controller& c);
+	~LocalMenu();
 
 	const GameController& getGameController() const;
 	GameObject* getGameObjectById(const std::string& id) const;

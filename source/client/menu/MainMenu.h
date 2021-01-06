@@ -20,6 +20,7 @@ class MainMenu : public Handleable {
 private:
 	enum Menupoint : char { LOKAL, ONLINE, SETTINGS, EXIT, FIRST = LOKAL, LAST = EXIT };
 
+	// TODO Abstract Menu class
 	int TEXT_MARGIN_LEFT = 30;
 	int TEXT_MARGIN_TOP = 50;
 	int TEXT_HEADER_SIZE = 50;

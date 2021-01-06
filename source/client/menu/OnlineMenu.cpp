@@ -1,6 +1,6 @@
-#include <client/GameMenu.h>
+#include <client/menu/OnlineMenu.h>
 
-GameMenu::GameMenu(Controller& c) :
+OnlineMenu::OnlineMenu(Controller& c) :
 	m_ps(100),
 	m_controller(c),
 	m_gameWindow(c, m_gameController),
@@ -46,9 +46,9 @@ GameMenu::GameMenu(Controller& c) :
 	}
 }
 
-GameMenu::~GameMenu() {}
+OnlineMenu::~OnlineMenu() {}
 
-void GameMenu::setScenerySelection(int i) {
+void OnlineMenu::setScenerySelection(int i) {
 	if (!m_sceneriesFound) {
 		Log::ger().log("no sceneries found.", Log::Label::Error);
 		return;
@@ -66,7 +66,7 @@ void GameMenu::setScenerySelection(int i) {
 	m_sceneryName.setString(m_gameReader.getSceneries()[m_selectedScenery]->getName());
 }
 
-void GameMenu::setActionSelection(char i) {
+void OnlineMenu::setActionSelection(char i) {
 	if (i > GamePanelMenuPoint::LAST) {
 		i = GamePanelMenuPoint::FIRST;
 	}
@@ -76,7 +76,7 @@ void GameMenu::setActionSelection(char i) {
 	m_selectedAction = i;
 }
 
-void GameMenu::startGame() {
+void OnlineMenu::startGame() {
 	if (m_sceneriesFound) {
 		m_gameController.clearPlayers();
 		m_gameController.setScenery(m_gameReader.getSceneries()[m_selectedScenery]);
@@ -92,7 +92,7 @@ void GameMenu::startGame() {
 	}
 }
 
-void GameMenu::event(sf::Event& event) {
+void OnlineMenu::event(sf::Event& event) {
 	sf::RenderWindow& w = m_controller.getWindow();
 	sf::Vector2i pixelPos = sf::Mouse::getPosition(w);
 	sf::Vector2f worldPos = w.mapPixelToCoords(pixelPos);
@@ -101,7 +101,7 @@ void GameMenu::event(sf::Event& event) {
 	case ActiveGameWindow::MAPSELECTION:
 		if (event.type == sf::Event::KeyPressed) {
 			if (event.key.code == sf::Keyboard::Escape) {
-				m_controller.setActiveWindow(ActiveWindow::MAINMENU);
+				m_controller.setActiveMenu(ActiveMenu::MAIN);
 			}
 			if (event.key.code == sf::Keyboard::Left) {
 				setScenerySelection(m_selectedScenery - 1);
@@ -142,7 +142,7 @@ void GameMenu::event(sf::Event& event) {
 	}
 }
 
-void GameMenu::update(sf::Time ellapsed) {
+void OnlineMenu::update(sf::Time ellapsed) {
 	m_ps.update(ellapsed);
 	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
@@ -156,7 +156,7 @@ void GameMenu::update(sf::Time ellapsed) {
 	}
 }
 
-void GameMenu::drawImgui()
+void OnlineMenu::drawImgui()
 {
 	if(m_controller.getActiveGameWindow() != ActiveGameWindow::MAPSELECTION)
 		return;
@@ -182,7 +182,7 @@ void GameMenu::drawImgui()
 	ImGui::End();
 }
 
-void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+void OnlineMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;
 
@@ -214,16 +214,16 @@ void GameMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	}
 };
 
-const GameController& GameMenu::getGameController() const {
+const GameController& OnlineMenu::getGameController() const {
 	return m_gameController;
 }
 
-GameObject* GameMenu::getGameObjectById(const std::string& id) const
+GameObject* OnlineMenu::getGameObjectById(const std::string& id) const
 {
 	return m_gameController.getGameObjectById(id);
 }
 
-void GameMenu::updateLog() const
+void OnlineMenu::updateLog() const
 {
 	m_gameController.updateLog();
 }

@@ -10,8 +10,10 @@
 #include <string>
 #include <thread>
 
-#include "client/MainMenu.h"
-#include "client/GameMenu.h"
+#include "client/menu/MainMenu.h"
+#include "client/menu/LocalMenu.h"
+#include "client/menu/OnlineMenu.h"
+#include "client/menu/SettingsMenu.h"
 #include "client/Controller.h"
 #include "client/Settings.h"
 #include "graphics/ParticleSystem.h"
@@ -39,7 +41,9 @@ private:
 	sf::RenderWindow window;
 	Controller controller;
 	MainMenu menu;
-	GameMenu gameMenu;
+	LocalMenu localMenu;
+	OnlineMenu onlineMenu;
+	SettingsMenu settingsMenu;
 	Server server;
 
 	sf::Clock game_clock;

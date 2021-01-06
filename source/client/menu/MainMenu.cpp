@@ -1,4 +1,4 @@
-#include <client/MainMenu.h>
+#include <client/menu/MainMenu.h>
 
 MainMenu::MainMenu(Controller& c) : m_ps(100), m_controller(c) {
 	m_ps.setColor(sf::Color::White);
@@ -84,10 +84,14 @@ void MainMenu::setFont(sf::Font& font) {
 }
 
 void MainMenu::m_lokalPressed() {
-	m_controller.setActiveWindow(ActiveWindow::GAME);
+	m_controller.setActiveMenu(ActiveMenu::LOCAL);
 }
-void MainMenu::m_onlinePressed() {}
-void MainMenu::m_settingsPressed() {}
+void MainMenu::m_onlinePressed() {
+	m_controller.setActiveMenu(ActiveMenu::ONLINE);
+}
+void MainMenu::m_settingsPressed() {
+	m_controller.setActiveMenu(ActiveMenu::SETTINGS);
+}
 void MainMenu::m_exitPressed() {
 	m_controller.stop();
 }
