@@ -1,3 +1,5 @@
 name=Spoony Moony
 map=bsp.map
-
+player
+1=player.swone
+2=player2.swone

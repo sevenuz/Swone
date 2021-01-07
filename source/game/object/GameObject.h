@@ -94,6 +94,7 @@ public:
 	GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density);
 	GameObject(std::string type, Config config, float radius, float density);
 	GameObject(StringMapMap& setupMap);
+	virtual ~GameObject();
 
 	void applySetupMap(StringMapMap& setupMap);
 

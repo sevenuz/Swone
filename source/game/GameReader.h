@@ -11,7 +11,6 @@
 
 #define RES_DIR_MAP "map/"
 #define RES_DIR_OBJECT "obj/"
-#define RES_DIR_PLAYER "player/"
 #define RES_DIR_SCENERY "scenery/"
 
 class Scenery;
@@ -22,7 +21,6 @@ public:
 	virtual ~GameReader();
 
 	void readSceneries();
-	void readPlayers();
 	Map* getMap(std::string mapFileName);
 	StringMapMap& getGameObjectParagraphMap(std::string objFileName);
 
@@ -30,13 +28,11 @@ public:
 	std::string getGameObjectPath(std::string objFileName);
 
 	const std::vector<Scenery*>& getSceneries() const;
-	const std::vector<GameObject*>& getPlayers() const;
 private:
 	std::string m_resDir;
 	MapReader m_mapReader;
 
 	std::vector<Scenery*> m_sceneries;
-	std::vector<GameObject*> m_players;
 	std::map<std::string, Map*> m_maps;
 	std::map<std::string, StringMapMap> m_objects;
 };

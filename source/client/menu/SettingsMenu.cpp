@@ -21,10 +21,6 @@ SettingsMenu::SettingsMenu(Controller& c) :
 SettingsMenu::~SettingsMenu() {}
 
 void SettingsMenu::event(sf::Event& event) {
-	sf::RenderWindow& w = m_controller.getWindow();
-	sf::Vector2i pixelPos = sf::Mouse::getPosition(w);
-	sf::Vector2f worldPos = w.mapPixelToCoords(pixelPos);
-
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Escape) {
 			m_controller.setActiveMenu(ActiveMenu::MAIN);

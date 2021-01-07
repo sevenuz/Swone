@@ -5,7 +5,6 @@ GameReader::GameReader(std::string resDir)
 {
 	m_resDir = resDir;
 	readSceneries();
-	readPlayers();
 }
 
 GameReader::~GameReader()
@@ -21,11 +20,6 @@ const std::vector<Scenery*>& GameReader::getSceneries() const
 	return m_sceneries;
 }
 
-const std::vector<GameObject*>& GameReader::getPlayers() const
-{
-	return m_players;
-}
-
 void GameReader::readSceneries()
 {
 	std::string dir = m_resDir + RES_DIR_SCENERY;
@@ -39,30 +33,8 @@ void GameReader::readSceneries()
 					std::string sceneryPath = ss.str();
 					// TODO should only once create Reader
 					Reader r(sceneryPath);
-					Scenery* s = new Scenery(sceneryPath, r.getParagraphMap(), *this);
+					Scenery* s = new Scenery(sceneryPath, r.copyParagraphMap(), *this);
 					m_sceneries.push_back(s);
-				}
-			} catch(const std::invalid_argument& ia) {
-				Log::ger().log(ia.what(), Log::Label::Error);
-			}
-		}
-	);
-}
-
-void GameReader::readPlayers()
-{
-	std::string dir = m_resDir + RES_DIR_PLAYER;
-	Helper::readDirectory(dir,
-		[&](tinydir_file& file){
-			try {
-				if (!file.is_dir)
-				{
-					std::stringstream ss;
-					ss << dir << file.name;
-					// TODO should only once create Reader
-					Reader r(ss.str());
-					GameObject* p = new GameObject(r.getParagraphMap());
-					m_players.push_back(p);
 				}
 			} catch(const std::invalid_argument& ia) {
 				Log::ger().log(ia.what(), Log::Label::Error);

@@ -25,8 +25,6 @@
 
 class SettingsMenu : public Handleable {
 private:
-	enum GamePanelMenuPoint : char { PLAY, FIRST = PLAY, LAST = PLAY };
-
 	ParticleSystem m_ps;
 	Controller& m_controller;
 

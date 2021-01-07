@@ -38,6 +38,10 @@ GameObject::GameObject(StringMapMap& setupMap)
 	applySetupMap(setupMap);
 }
 
+GameObject::~GameObject() {
+	Log::ger().log("destroy " + getIdentifier());
+}
+
 ph::Shape* GameObject::createPolyShape(std::vector<ph::Vec2>& vertices, float density)
 {
 	ph::PolygonShape* poly = new ph::PolygonShape(density);

@@ -12,6 +12,7 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/Color.hpp>
 
+#include <map>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -35,8 +36,8 @@ private:
 	ParticleSystem m_ps;
 	Controller& m_controller;
 	GameWindow m_gameWindow;
+	GameReader& m_gameReader;
 	GameController m_gameController;
-	GameReader m_gameReader;
 
 	sf::Text m_play;
 
@@ -50,10 +51,11 @@ private:
 	bool m_sceneriesFound = false;
 
 	struct GameObjectSelection {
-		GameObject* obj;
+		std::string key;
+		std::string name;
 		bool selected;
 	};
-	std::vector<GameObjectSelection> m_gamePlayers;
+	std::map<int, std::vector<GameObjectSelection>> m_gamePlayers; // key: m_selectedScenery
 
 	void setScenerySelection(int);
 	void setActionSelection(char);
@@ -67,7 +69,7 @@ public:
 
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
-	LocalMenu(Controller& c);
+	LocalMenu(Controller& c, GameReader& gr);
 	~LocalMenu();
 
 	const GameController& getGameController() const;

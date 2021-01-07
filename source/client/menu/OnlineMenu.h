@@ -15,8 +15,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-
-#include <tinydir.h>
+#include <thread>
 
 #include "graphics/ParticleSystem.h"
 #include "game/GameController.h"
@@ -30,50 +29,28 @@
 
 class OnlineMenu : public Handleable {
 private:
-	enum GamePanelMenuPoint : char { PLAY, FIRST = PLAY, LAST = PLAY };
-
 	ParticleSystem m_ps;
 	Controller& m_controller;
-	GameWindow m_gameWindow;
-	GameController m_gameController;
-	GameReader m_gameReader;
+	GameReader& m_gameReader;
 
-	sf::Text m_play;
-
-	sf::Text m_sceneryName;
-	sf::Text m_switchLeft;
-	sf::Text m_switchRight;
-
-	// GamePanelMenuPoint type, but char to perform de/increment
-	char m_selectedAction = FIRST;
-	int m_selectedScenery = 0;
-	bool m_sceneriesFound = false;
-
-	struct GameObjectSelection {
-		GameObject* obj;
-		bool selected;
-	};
-	std::vector<GameObjectSelection> m_gamePlayers;
-
-	void setScenerySelection(int);
-	void setActionSelection(char);
-
-	void startGame();
+	sf::Text m_header;
+	int m_selectedScenery = -1;
+	std::string m_lobbyName = "Swone's Fightclub";
+	std::string m_lobbyPassword = "";
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	void drawJoinWindow();
+	void drawCreateWindow();
 
+	void createLobby();
 public:
 	void drawImgui();
 
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
-	OnlineMenu(Controller& c);
+
+	OnlineMenu(Controller& c, GameReader& gr);
 	~OnlineMenu();
-
-	const GameController& getGameController() const;
-	GameObject* getGameObjectById(const std::string& id) const;
-
-	void updateLog() const;
 };
 
 #endif

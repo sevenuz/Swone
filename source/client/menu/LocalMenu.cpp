@@ -1,10 +1,10 @@
 #include <client/menu/LocalMenu.h>
 
-LocalMenu::LocalMenu(Controller& c) :
+LocalMenu::LocalMenu(Controller& c, GameReader& gr) :
 	m_ps(100),
 	m_controller(c),
 	m_gameWindow(c, m_gameController),
-	m_gameReader(c.getSettings().getResourceDirectory())
+	m_gameReader(gr)
 {
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
@@ -38,10 +38,9 @@ LocalMenu::LocalMenu(Controller& c) :
 	if(m_sceneriesFound)
 		setScenerySelection(0);
 
-	for(GameObject* o : m_gameReader.getPlayers()) {
-		const std::string type = o->getType();
-		if(type == GameObject::S_PLAYER_TYPE) {
-			m_gamePlayers.push_back({o, true});
+	for(size_t i = 0; i < m_gameReader.getSceneries().size(); i++) {
+		for(auto& p : m_gameReader.getSceneries()[i]->getPlayerSetupMaps()) {
+			m_gamePlayers[i].push_back({p.first, p.second[Reader::DEFAULT_PARAGRAPH][GameObject::S_NAME], true});
 		}
 	}
 }
@@ -78,12 +77,13 @@ void LocalMenu::setActionSelection(char i) {
 
 void LocalMenu::startGame() {
 	if (m_sceneriesFound) {
-		m_gameController.clearPlayers();
-		m_gameController.setScenery(m_gameReader.getSceneries()[m_selectedScenery]);
+		Scenery* s = m_gameReader.getSceneries()[m_selectedScenery];
+		s->reset();
+		m_gameController.setScenery(s);
 		m_gameWindow.setViewZoom();
-		for(GameObjectSelection& gos : m_gamePlayers)
+		for(GameObjectSelection& gos : m_gamePlayers[m_selectedScenery])
 			if(gos.selected)
-				m_gameController.pushPlayer(gos.obj);
+				s->spawnPlayer(gos.key);
 		m_gameController.startGame();
 		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
 	}
@@ -174,11 +174,11 @@ void LocalMenu::drawImgui()
 	ImGui::SetNextWindowPos(player_pos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
 	ImGui::Begin("Select Players", w_open, window_flags);
-	if(m_gamePlayers.size() == 0)
+	if(m_gamePlayers[m_selectedScenery].size() == 0)
 		ImGui::TextColored(ImColor(210, 0, 0), no_files_found.c_str());
 	else
-		for(GameObjectSelection& gos : m_gamePlayers)
-			ImGui::Selectable(gos.obj->getIdentifier().c_str(), &gos.selected);
+		for(GameObjectSelection& gos : m_gamePlayers[m_selectedScenery])
+			ImGui::Selectable(gos.name.c_str(), &gos.selected);
 	ImGui::End();
 }
 
@@ -196,7 +196,8 @@ void LocalMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 			view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
 			target.draw(m_ps, states);
 			target.setView(view);
-			target.draw(*m_gameReader.getSceneries()[m_selectedScenery], states);
+			// Scenery Preview Draw
+			m_gameReader.getSceneries()[m_selectedScenery]->drawPreview(target, states);
 		}
 
 		m_controller.setDefaultView();

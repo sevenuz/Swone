@@ -11,13 +11,15 @@
 #define SETTINGS_FILE "../res/settings.ini"
 
 // settings property names
-#define SETTINGS_WIDTH_NAME "width"
-#define SETTINGS_HEIGHT_NAME "height"
-#define SETTINGS_BITS_PER_PIXEL_NAME "bits_per_pixel"
-#define SETTINGS_VERTICAL_SYNC_ENABLED_NAME "vertical_sync_enabled"
-#define SETTINGS_RESOURCE_DIRECTORY_NAME "resource_directory"
-#define SETTINGS_FONT_SOURCE_NAME "font_source"
-#define SETTINGS_CLEARING_COLOR_NAME "clearing_color"
+#define SETTINGS_WIDTH "width"
+#define SETTINGS_HEIGHT "height"
+#define SETTINGS_BITS_PER_PIXEL "bits_per_pixel"
+#define SETTINGS_VERTICAL_SYNC_ENABLED "vertical_sync_enabled"
+#define SETTINGS_RESOURCE_DIRECTORY "resource_directory"
+#define SETTINGS_FONT_SOURCE "font_source"
+#define SETTINGS_CLEARING_COLOR "clearing_color"
+#define SETTINGS_SERVER "server"
+#define SETTINGS_PORT "port"
 
 class Settings {
 public:
@@ -52,6 +54,12 @@ public:
 	sf::Color getClearingColor();
 	void setClearingColor(sf::Color c);
 
+	std::string getServer();
+	void setServer(std::string v);
+
+	unsigned short getPort();
+	void setPort(unsigned short v);
+
 	bool isChanged();
 	void setChanged(bool v);
 
@@ -80,6 +88,9 @@ private:
 	std::string m_font_src = "../res/Roboto-Medium.ttf";
 	sf::Font m_font;
 	sf::Color m_clearing_color = sf::Color::Black;
+
+	std::string m_server = "localhost";
+	unsigned short m_port = 61007;
 
 	// indicates if the settings changed compared to settings.ini
 	bool m_changed = false;

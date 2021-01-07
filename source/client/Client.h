@@ -16,6 +16,7 @@
 #include "client/menu/SettingsMenu.h"
 #include "client/Controller.h"
 #include "client/Settings.h"
+#include "game/GameReader.h"
 #include "graphics/ParticleSystem.h"
 #include "util/reader/Reader.h"
 #include "util/Log.h"
@@ -40,6 +41,7 @@ private:
 	Settings settings;
 	sf::RenderWindow window;
 	Controller controller;
+	GameReader gameReader;
 	MainMenu menu;
 	LocalMenu localMenu;
 	OnlineMenu onlineMenu;

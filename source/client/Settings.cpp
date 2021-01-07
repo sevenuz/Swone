@@ -7,19 +7,19 @@ Settings::Settings()
 		Reader r(SETTINGS_FILE);
 		r.forEach([&](std::string p, std::string k, std::string v){
 			Log::ger().log(k + " = " + v);
-			if(k==SETTINGS_WIDTH_NAME)
+			if(k==SETTINGS_WIDTH)
 				setWidth(Helper::toLong(v));
-			else if(k==SETTINGS_HEIGHT_NAME)
+			else if(k==SETTINGS_HEIGHT)
 				setHeight(Helper::toLong(v));
-			else if(k==SETTINGS_BITS_PER_PIXEL_NAME)
+			else if(k==SETTINGS_BITS_PER_PIXEL)
 				setBitsPerPixel(Helper::toLong(v));
-			else if(k==SETTINGS_VERTICAL_SYNC_ENABLED_NAME)
+			else if(k==SETTINGS_VERTICAL_SYNC_ENABLED)
 				setVerticalSyncEnabled(Helper::toBool(v));
-			else if(k==SETTINGS_RESOURCE_DIRECTORY_NAME)
+			else if(k==SETTINGS_RESOURCE_DIRECTORY)
 				setResourceDirectory(v);
-			else if(k==SETTINGS_FONT_SOURCE_NAME)
+			else if(k==SETTINGS_FONT_SOURCE)
 				setFontSource(v);
-			else if(k==SETTINGS_CLEARING_COLOR_NAME)
+			else if(k==SETTINGS_CLEARING_COLOR)
 				setClearingColor(Helper::toColor(v));
 			else
 				Log::ger().log(k + " is not a settings option", Log::Label::Warning);
@@ -130,6 +130,28 @@ void Settings::setClearingColor(sf::Color c)
 	setChanged(true);
 }
 
+std::string Settings::getServer()
+{
+	return m_server;
+}
+
+void Settings::setServer(std::string v)
+{
+	m_server = v;
+	setChanged(true);
+}
+
+void Settings::setPort(unsigned short v)
+{
+	m_port = v;
+	setChanged(true);
+}
+
+unsigned short Settings::getPort()
+{
+	return m_port;
+}
+
 bool Settings::isChanged()
 {
 	return m_changed;
@@ -143,17 +165,19 @@ void Settings::setChanged(bool v)
 void Settings::writeSettings()
 {
 	Reader::write(SETTINGS_FILE, {{"global", {
-		StringPair(SETTINGS_WIDTH_NAME, std::to_string(getWidth())),
-		StringPair(SETTINGS_HEIGHT_NAME, std::to_string(getHeight())),
-		StringPair(SETTINGS_BITS_PER_PIXEL_NAME, std::to_string(getBitsPerPixel())),
-		StringPair(SETTINGS_VERTICAL_SYNC_ENABLED_NAME, isVerticalSyncEnabled()?"true":"false"),
-		StringPair(SETTINGS_RESOURCE_DIRECTORY_NAME, getResourceDirectory()),
-		StringPair(SETTINGS_FONT_SOURCE_NAME, getFontSource()),
-		StringPair(SETTINGS_CLEARING_COLOR_NAME, "Color(" +
+		StringPair(SETTINGS_WIDTH, std::to_string(getWidth())),
+		StringPair(SETTINGS_HEIGHT, std::to_string(getHeight())),
+		StringPair(SETTINGS_BITS_PER_PIXEL, std::to_string(getBitsPerPixel())),
+		StringPair(SETTINGS_VERTICAL_SYNC_ENABLED, isVerticalSyncEnabled()?"true":"false"),
+		StringPair(SETTINGS_RESOURCE_DIRECTORY, getResourceDirectory()),
+		StringPair(SETTINGS_FONT_SOURCE, getFontSource()),
+		StringPair(SETTINGS_CLEARING_COLOR, "Color(" +
 			std::to_string(getClearingColor().r) + "," +
 			std::to_string(getClearingColor().g) + "," +
 			std::to_string(getClearingColor().b) + ")"
-		)
+		),
+		StringPair(SETTINGS_SERVER, getServer()),
+		StringPair(SETTINGS_PORT, std::to_string(getPort()))
 	}}});
 }
 
