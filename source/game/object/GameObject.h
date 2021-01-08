@@ -42,6 +42,7 @@ public:
 	static constexpr const char* S_NAME = "name";
 	static constexpr const char* S_COLOR = "color";
 	static constexpr const char* S_TEXTURE = "texture";
+	static constexpr const char* S_TEXTURE_PATH = "texturePath"; // is set in Scenery
 	static constexpr const char* S_SCALE = "scale";
 	static constexpr const char* S_ZINDEX = "z-index";
 

@@ -2,6 +2,7 @@
 #define SWONE_SERVER_SERVER_H
 
 #include <thread>
+#include <vector>
 #include <SFML/Network.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Time.hpp>
@@ -40,8 +41,8 @@ private:
 	sf::TcpListener listener;
 	sf::UdpSocket socket;
 
-	Lobby lobby;
-	StringMap m_fileMap;
+	std::vector<Lobby> lobbys;
+	StringMap fileMap;
 };
 
 #endif // SWONE_SERVER_SERVER_H

@@ -7,7 +7,7 @@ posible_jumps=2
 // in seconds
 jump_cooldown=3
 color=Color(0,0,200)
-texture=../res/sprites/player.png
+texture=player.png
 hitbox
 initial_position=(0,0)
 type=circle

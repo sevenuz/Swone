@@ -1,8 +1,9 @@
 #include "util/reader/MapReader.h"
 
-MapReader::MapReader(std::string path, Map* mapObj) : Reader(path), m_map(mapObj) {}
-
-MapReader::MapReader() : Reader() {}
+MapReader::MapReader(std::string tbp) :
+	Reader(),
+	m_textureBasePath(tbp)
+{}
 
 MapReader::~MapReader()
 {
@@ -37,8 +38,10 @@ void MapReader::addParagraphValue(std::string paragraph, StringPair p) {
 		m_map->setName(p.second);
 	else if (p.first == "gravity")
 		m_map->setGravity(Helper::toFloat(p.second));
-	else if (p.first == "texture")
-		m_map->setTileTexturePath(p.second);
+	else if (p.first == "texture") {
+		m_map->setTileTextureName(p.second);
+		m_map->setTileTexturePath(m_textureBasePath + p.second);
+	}
 	else
 		Log::ger().log(p.first + " is not a map option", Log::Label::Warning);
 }

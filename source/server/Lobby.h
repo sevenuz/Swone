@@ -11,19 +11,22 @@
 #include "server/Player.h"
 #include "util/Log.h"
 #include "game/GameController.h"
+#include "game/Net.h"
 
 class Lobby {
 public:
-	Lobby(std::string name, sf::UdpSocket& socket);
+	Lobby(Net::CreateLobbyRequest m_lobbyData);
 	virtual ~Lobby();
 
 	bool registerClient(Player::Connection connection);
 	std::list<Player*>& getPlayers();
 	void start();
+	void sendState();
+	void update(sf::Time ellapsed);
 private:
-	std::string m_name;
+	Net::CreateLobbyRequest m_lobbyData;
+
 	std::list<Player*> m_players;
-	sf::UdpSocket& m_socket;
 	GameController m_gc;
 
 	bool m_run = false;

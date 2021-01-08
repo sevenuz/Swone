@@ -40,6 +40,13 @@ std::string Map::getTileTexturePath() {
 	return m_tileTexturePath;
 }
 
+void Map::setTileTextureName(std::string n) {
+	m_tileTextureName = n;
+}
+std::string Map::getTileTextureName() {
+	return m_tileTextureName;
+}
+
 void Map::setGravity(float f)
 {
 	m_gravity = f;

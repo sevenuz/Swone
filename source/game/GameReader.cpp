@@ -1,9 +1,10 @@
 #include "game/GameReader.h"
 #include "game/Scenery.h"
 
-GameReader::GameReader(std::string resDir)
+GameReader::GameReader(std::string resDir) :
+	m_resDir(resDir),
+	m_mapReader(getTextureBasePath())
 {
-	m_resDir = resDir;
 	readSceneries();
 }
 
@@ -28,12 +29,11 @@ void GameReader::readSceneries()
 			try {
 				if (!file.is_dir)
 				{
-					std::stringstream ss;
-					ss << dir << file.name;
-					std::string sceneryPath = ss.str();
+					std::string sceneryPath(file.path);
+					std::string fileName(file.name);
 					// TODO should only once create Reader
 					Reader r(sceneryPath);
-					Scenery* s = new Scenery(sceneryPath, r.copyParagraphMap(), *this);
+					Scenery* s = new Scenery(sceneryPath, fileName, r.copyParagraphMap(), *this);
 					m_sceneries.push_back(s);
 				}
 			} catch(const std::invalid_argument& ia) {
@@ -43,9 +43,21 @@ void GameReader::readSceneries()
 	);
 }
 
-std::string GameReader::getMapPath(std::string mapFileName)
+std::string GameReader::getTextureBasePath()
 {
-	return m_resDir + RES_DIR_MAP + mapFileName;
+	return m_resDir + RES_DIR_TEXTURE;
+}
+
+std::string GameReader::getSceneryBasePath() {
+ return m_resDir + RES_DIR_SCENERY;
+}
+
+std::string GameReader::getMapBasePath() {
+ return m_resDir + RES_DIR_MAP;
+}
+
+std::string GameReader::getObjectBasePath() {
+ return m_resDir + RES_DIR_OBJECT;
 }
 
 Map* GameReader::getMap(std::string file)
@@ -61,10 +73,6 @@ Map* GameReader::getMap(std::string file)
 		m_maps[file] = map;
 	}
 	return m_maps[file];
-}
-
-std::string GameReader::getGameObjectPath(std::string objFileName) {
- return m_resDir + RES_DIR_OBJECT + objFileName;
 }
 
 StringMapMap& GameReader::getGameObjectParagraphMap(std::string file)

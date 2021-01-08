@@ -19,14 +19,15 @@ public:
 	const std::string MAP_START_TOKEN = "map:start";
 	const std::string MAP_END_TOKEN = "map:end";
 
-	MapReader(std::string path, Map* mapObj);
-	MapReader();
+	MapReader(std::string textureBasePath);
 	virtual ~MapReader();
 
 	void setMap(Map* mapObj);
 	static MapTile charToMapTile(char);
 protected:
 private:
+	std::string m_textureBasePath;
+
 	Map* m_map = NULL;
 
 	bool m_mapParse = false;

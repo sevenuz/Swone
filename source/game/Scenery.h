@@ -18,7 +18,7 @@ public:
 
 	static constexpr const char* S_PLAYER_PARAGRAPH = "player";
 
-	Scenery(std::string path, StringMapMap setupMap, GameReader& gameReader); // TODO remove GameReader Dependency
+	Scenery(std::string path, std::string fileName, StringMapMap setupMap, GameReader& gameReader); // TODO remove GameReader Dependency
 	virtual ~Scenery();
 
 	void drawPreview(sf::RenderTarget& target, sf::RenderStates states) const;

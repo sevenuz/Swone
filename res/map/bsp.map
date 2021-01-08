@@ -3,7 +3,7 @@ height=20
 border=.
 name=Sweap
 gravity=9.81
-texture=../res/sprites/tile.png
+texture=tile.png
 
 map:start
 ....................

@@ -72,6 +72,7 @@ void OnlineMenu::drawCreateWindow()
 			if (ImGui::Selectable(m_gameReader.getSceneries()[i]->getName().c_str(), m_selectedScenery == i))
 				m_selectedScenery = i;
 		ImGui::EndChild();
+		ImGui::Separator();
 
 		ImGui::InputText("Lobbyname", m_lobbyName.data(), 32);
 		ImGui::InputText("Password", m_lobbyPassword.data(), 32);

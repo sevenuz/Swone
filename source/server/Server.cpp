@@ -1,7 +1,6 @@
 #include "server/Server.h"
 
-Server::Server() :
-	lobby("Swonsch", socket)
+Server::Server()
 {
 	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
 }
@@ -23,21 +22,25 @@ void Server::startMainLoop()
 			std::string msg;
 			packet >> msg;
 			std::cout << msg << std::endl;
-			lobby.registerClient(conncetion);
+			for(Lobby l : lobbys)
+				l.registerClient(conncetion);
 		}
 
-		//lobby.update();
+		for(Lobby l : lobbys)
+			l.update(ellapsed);
 
 		if(m_tickT>=m_tickDt) {
 			m_tickT -= m_tickDt;
 
-			//lobby.sendState();
+			for(Lobby l : lobbys)
+				l.sendState();
 
 			sf::Packet packet;
 			packet << "Moin vom Server :)";
-			for(Player* c : lobby.getPlayers()) {
-				socket.send(packet, c->getConnection().address, c->getConnection().port);
-			}
+			for(Lobby l : lobbys)
+				for(Player* c : l.getPlayers())
+					socket.send(packet, c->getConnection().address, c->getConnection().port);
+
 		}
 	}
 }
@@ -79,7 +82,7 @@ Net::Packet Server::handleTcpCreateLobby(Net::Packet& reqPacket)
 	Net::CreateLobbyResponse res;
 
 	for(auto& p : req.fileMap)
-		if(!m_fileMap.count(p.second))
+		if(!fileMap.count(p.second))
 			res.fileMap[p.first] = settings.getResourceDirectory() + RES_DIR_UPLOADS;
 
 	if(!res.fileMap.size())
@@ -97,7 +100,7 @@ void Server::readDirFileHashesRecursive(std::string dir)
 				return;
 			try {
 				if (!file.is_dir) {
-					m_fileMap[md5file(file.path)] = std::string(file.path);
+					fileMap[md5file(file.path)] = std::string(file.path);
 				}
 				else {
 					if (strcmp(file.name, ".") != 0 && strcmp(file.name, "..") != 0)

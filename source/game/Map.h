@@ -50,6 +50,9 @@ public:
 	void setTileTexturePath(std::string);
 	std::string getTileTexturePath();
 
+	void setTileTextureName(std::string);
+	std::string getTileTextureName();
+
 	void setGravity(float f);
 	float getGravity();
 
@@ -93,6 +96,7 @@ private:
 	MapTile m_border;
 
 	std::string m_tileTexturePath;
+	std::string m_tileTextureName;
 	sf::Image m_mapImage;//Img with map tiles
 	sf::Texture m_texture;
 	sf::Sprite m_sprite;

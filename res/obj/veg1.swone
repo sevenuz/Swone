@@ -1,6 +1,6 @@
 type=object
 name=Laubbaum
-texture=../res/sprites/vegetation.png
+texture=vegetation.png
 scale=(1,1)
 z-index=1
 hitbox

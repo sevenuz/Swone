@@ -2,7 +2,7 @@ width=10
 height=10
 border=.
 name=Rimp
-texture=../res/sprites/tile.png
+texture=tile.png
 
 map:start
    __

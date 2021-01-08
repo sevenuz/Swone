@@ -4,7 +4,6 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
 #include <SFML/Graphics.hpp>
-#include <SFML/Network.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Time.hpp>
 #include <string>
@@ -35,7 +34,6 @@ private:
 	void renderObjectSelector();
 	void drawObjectViewer();
 	void startMainLoop();
-	void initSocket();
 	void initLogger();
 
 	Settings settings;
@@ -49,8 +47,6 @@ private:
 	Server server;
 
 	sf::Clock game_clock;
-
-	sf::UdpSocket socket;
 
 	bool key_strg_pressed = false;
 	bool key_l_pressed = false;

@@ -2,7 +2,7 @@ type=item
 name=Water
 id=water_elem
 // color=Color(0,0,200)
-texture=../res/sprites/items.png
+texture=items.png
 scale=(0.4,0.4)
 hitbox
 initial_position=(5,-5)

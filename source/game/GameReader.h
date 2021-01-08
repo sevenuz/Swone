@@ -12,6 +12,7 @@
 #define RES_DIR_MAP "map/"
 #define RES_DIR_OBJECT "obj/"
 #define RES_DIR_SCENERY "scenery/"
+#define RES_DIR_TEXTURE "texture/"
 
 class Scenery;
 
@@ -24,8 +25,10 @@ public:
 	Map* getMap(std::string mapFileName);
 	StringMapMap& getGameObjectParagraphMap(std::string objFileName);
 
-	std::string getMapPath(std::string mapFileName);
-	std::string getGameObjectPath(std::string objFileName);
+	std::string getTextureBasePath();
+	std::string getSceneryBasePath();
+	std::string getMapBasePath();
+	std::string getObjectBasePath();
 
 	const std::vector<Scenery*>& getSceneries() const;
 private:

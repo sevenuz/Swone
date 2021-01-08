@@ -2,7 +2,7 @@ type=item
 name=Air
 id=air_elem
 // color=Color(0,0,200)
-texture=../res/sprites/items.png
+texture=items.png
 scale=(0.4,0.4)
 // z-index=-1
 hitbox

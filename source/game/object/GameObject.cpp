@@ -125,8 +125,8 @@ void GameObject::applySetupMap(StringMapMap& setupMap)
 			setName(global[S_NAME]);
 		if(global.count(S_COLOR))
 			setColor(Helper::toColor(global[S_COLOR]));
-		if(global.count(S_TEXTURE))
-			setTexturePath(global[S_TEXTURE]);
+		if(global.count(S_TEXTURE_PATH))
+			setTexturePath(global[S_TEXTURE_PATH]);
 		if(global.count(S_SCALE))
 			setScale(Helper::toVector2f(global[S_SCALE]));
 		if(global.count(S_ZINDEX))
