@@ -33,7 +33,10 @@ public:
 
 	std::map<std::string, StringMapMap>& getPlayerSetupMaps();
 	std::map<std::string, StringMapMap>& getObjectSetupMaps();
-	const StringMap& getFileList() const;
+	const StringPair& getSceneryFile() const;
+	const StringPair& getMapFile() const;
+	const StringMap& getTextureFileMap() const;
+	const StringMap& getObjectFileMap() const;
 
 	void setName(std::string);
 	std::string getName();
@@ -53,7 +56,11 @@ private:
 	StringMapMap m_setupMap;
 	std::map<std::string, StringMapMap> m_playerSetupMaps;
 	std::map<std::string, StringMapMap> m_objectSetupMaps;
-	StringMap m_fileMap;
+
+	StringPair m_sceneryFile;
+	StringPair m_mapFile;
+	StringMap m_textureFileMap;
+	StringMap m_objectFileMap;
 };
 #endif
 

@@ -12,36 +12,6 @@ void Server::startMainLoop()
 	while(m_run) {
 		sf::Time ellapsed = clock.restart();
 		m_tickT += ellapsed;
-
-		sf::Packet packet;
-		Player::Connection conncetion;
-		if(socket.receive(packet, conncetion.address, conncetion.port) == sf::Socket::Done)
-		{
-			// not error or not received (sf::Socket::NotReady)
-			Log::ger().log("Packet from " + conncetion.address.toString() + ":" + std::to_string(conncetion.port));
-			std::string msg;
-			packet >> msg;
-			std::cout << msg << std::endl;
-			for(Lobby l : lobbys)
-				l.registerClient(conncetion);
-		}
-
-		for(Lobby l : lobbys)
-			l.update(ellapsed);
-
-		if(m_tickT>=m_tickDt) {
-			m_tickT -= m_tickDt;
-
-			for(Lobby l : lobbys)
-				l.sendState();
-
-			sf::Packet packet;
-			packet << "Moin vom Server :)";
-			for(Lobby l : lobbys)
-				for(Player* c : l.getPlayers())
-					socket.send(packet, c->getConnection().address, c->getConnection().port);
-
-		}
 	}
 }
 
@@ -78,18 +48,27 @@ Net::Packet Server::handleTcpCreateLobby(Net::Packet& reqPacket)
 	Net::CreateLobbyRequest req;
 	reqPacket >> req;
 
-	Net::Packet resPacket(Net::T_CREATE_LOBBY);
 	Net::CreateLobbyResponse res;
 
-	for(auto& p : req.fileMap)
+	res.sceneryFile = !fileMap.count(req.sceneryFile.second);
+	res.mapFile = !fileMap.count(req.mapFile.second);
+	for(auto& p : req.objectFileMap)
 		if(!fileMap.count(p.second))
-			res.fileMap[p.first] = settings.getResourceDirectory() + RES_DIR_UPLOADS;
+			res.objectFiles.push_back(p.first);
+	for(auto& p : req.textureFileMap)
+		if(!fileMap.count(p.second))
+			res.textureFiles.push_back(p.first);
 
-	if(!res.fileMap.size())
-		res.fileMap["Todo"] = "Bien :D";
-
-	resPacket << res;
-	return resPacket;
+	if(res.sceneryFile || res.mapFile || res.objectFiles.size()>0 || res.textureFiles.size()>0) {
+		// trigger file upload
+		Net::Packet resPacket(Net::T_CREATE_LOBBY);
+		resPacket << res;
+		return resPacket;
+	} else {
+		// create Lobby
+		Net::Packet resPacket(Net::T_JOIN_LOBBY_ACK);
+		return resPacket;
+	}
 }
 
 void Server::readDirFileHashesRecursive(std::string dir)

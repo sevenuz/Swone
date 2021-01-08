@@ -12,6 +12,7 @@
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/Color.hpp>
 
+#include <stack>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -38,6 +39,8 @@ private:
 	int m_selectedScenery = -1;
 	std::string m_lobbyName = "Swone's Fightclub";
 	std::string m_lobbyPassword = "";
+
+	std::stack<std::string> m_modalMessageStack;
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	void drawJoinWindow();

@@ -99,14 +99,22 @@ void OnlineMenu::createLobby()
 		Log::ger().log("You need a Lobbyname", Log::Label::Error);
 		return;
 	}
-	Log::ger().log("Scenery Client Files:");
-	for(auto& s : m_gameReader.getSceneries()[m_selectedScenery]->getFileList()) {
+	Log::ger().log("Client: Scenery: Texture Files:");
+	for(auto& s : m_gameReader.getSceneries()[m_selectedScenery]->getTextureFileMap()) {
 		Log::ger().log(s.first + " : " + s.second);
 	}
+	Log::ger().log("Client: Scenery: Object Files:");
+	for(auto& s : m_gameReader.getSceneries()[m_selectedScenery]->getObjectFileMap()) {
+		Log::ger().log(s.first + " : " + s.second);
+	}
+
 	Net::CreateLobbyRequest clr = Net::CreateLobbyRequest{
 		m_lobbyName,
 		m_lobbyPassword,
-		m_gameReader.getSceneries()[m_selectedScenery]->getFileList()
+		m_gameReader.getSceneries()[m_selectedScenery]->getSceneryFile(),
+		m_gameReader.getSceneries()[m_selectedScenery]->getMapFile(),
+		m_gameReader.getSceneries()[m_selectedScenery]->getTextureFileMap(),
+		m_gameReader.getSceneries()[m_selectedScenery]->getObjectFileMap()
 	};
 	std::thread(&OnlineMenu::sendLobbyRequest, this, clr).detach();
 }
@@ -116,29 +124,37 @@ void OnlineMenu::sendLobbyRequest(Net::CreateLobbyRequest clr)
 	sf::TcpSocket socket;
 	sf::Socket::Status status = socket.connect(m_controller.getSettings().getServerIpAddress(), m_controller.getSettings().getPort());
 	if (status != sf::Socket::Done) {
-		// TODO show error model
-		Log::ger().log("sendLobbyRequest: Error while Connecting to " + m_controller.getSettings().getServerAndPort(), Log::Label::Error);
+		std::string err = "sendLobbyRequest: Error while Connecting to " + m_controller.getSettings().getServerAndPort();
+		m_modalMessageStack.push(err);
+		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
 	Net::Packet reqPacket(Net::T_CREATE_LOBBY);
 	reqPacket << clr;
 	if (socket.send(reqPacket) != sf::Socket::Done) {
-		// TODO show error model
-		Log::ger().log("sendLobbyRequest: Error while Sending to " + m_controller.getSettings().getServerAndPort(), Log::Label::Error);
+		std::string err = "sendLobbyRequest: Error while Sending to " + m_controller.getSettings().getServerAndPort();
+		m_modalMessageStack.push(err);
+		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
 
 	Net::Packet resPacket;
-	Net::CreateLobbyResponse res;
 	if(socket.receive(resPacket) != sf::Socket::Done) {
-		// TODO show error model
-		Log::ger().log("sendLobbyRequest: Error while Receiving to " + m_controller.getSettings().getServerAndPort(), Log::Label::Error);
+		std::string err = "sendLobbyRequest: Error while Receiving to " + m_controller.getSettings().getServerAndPort();
+		m_modalMessageStack.push(err);
+		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
-	resPacket >> res;
-	Log::ger().log("Server needs Files:");
-	for(auto& s : res.fileMap) {
-		Log::ger().log(s.first + " : " + s.second);
+
+	Net::CreateLobbyResponse res;
+	switch((int)resPacket.getType()) {
+		case Net::T_CREATE_LOBBY:
+			resPacket >> res;
+			m_modalMessageStack.push("Server needs files...");
+			break;
+		case Net::T_JOIN_LOBBY_ACK:
+			m_modalMessageStack.push("Join Lobby");
+			break;
 	}
 	socket.disconnect();
 }
@@ -147,6 +163,21 @@ void OnlineMenu::drawImgui()
 {
 	drawJoinWindow();
 	drawCreateWindow();
+
+	if (!m_modalMessageStack.empty())
+			ImGui::OpenPopup("Message:");
+	if (ImGui::BeginPopupModal("Message:", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+			ImGui::Text(m_modalMessageStack.top().c_str());
+			ImGui::Separator();
+
+			if (ImGui::Button("OK", ImVec2(120,0))) {
+				m_modalMessageStack.pop();
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SetItemDefaultFocus();
+			ImGui::EndPopup();
+	}
 }
 
 void OnlineMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {

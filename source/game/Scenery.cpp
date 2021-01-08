@@ -1,7 +1,7 @@
 #include <game/Scenery.h>
 
 Scenery::Scenery(std::string path, std::string fileName, StringMapMap setupMap, GameReader& gameReader) : m_setupMap(setupMap) {
-	m_fileMap[fileName] = md5file(path.c_str());
+	m_sceneryFile = std::make_pair(fileName, md5file(path.c_str()));
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
 		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
 		if(global.count(S_NAME))
@@ -11,13 +11,13 @@ Scenery::Scenery(std::string path, std::string fileName, StringMapMap setupMap, 
 		if(global.count(S_MAP)) {
 			std::string mapName = global[S_MAP];
 			std::string mapPath = gameReader.getMapBasePath() + mapName;
-			m_fileMap[mapName] = md5file(mapPath.c_str());
+			m_mapFile = std::make_pair(mapName, md5file(mapPath.c_str()));
 
 			m_map = gameReader.getMap(mapPath);
 
 			std::string textureName = m_map->getTileTextureName();
 			std::string texturePath = m_map->getTileTexturePath();
-			m_fileMap[textureName] = md5file(texturePath.c_str());
+			m_textureFileMap[textureName] = md5file(texturePath.c_str());
 		} else
 			throw std::invalid_argument("Map-Filename missing.");
 	}
@@ -49,7 +49,7 @@ Scenery::~Scenery() {
 StringMapMap& Scenery::getGameObjectSetupMap(GameReader& gameReader, std::string goName)
 {
 	std::string goPath = gameReader.getObjectBasePath() + goName;
-	m_fileMap[goName] = md5file(goPath.c_str());
+	m_objectFileMap[goName] = md5file(goPath.c_str());
 
 	StringMapMap& goSetupMap = gameReader.getGameObjectParagraphMap(goPath);
 
@@ -58,7 +58,7 @@ StringMapMap& Scenery::getGameObjectSetupMap(GameReader& gameReader, std::string
 
 	// set texture path in setupMap
 	goSetupMap[Reader::DEFAULT_PARAGRAPH][GameObject::S_TEXTURE_PATH] = texturePath;
-	m_fileMap[textureName] = md5file(texturePath.c_str());
+	m_textureFileMap[textureName] = md5file(texturePath.c_str());
 
 	return goSetupMap;
 }
@@ -176,9 +176,24 @@ std::map<std::string, StringMapMap>& Scenery::getObjectSetupMaps()
 	return m_objectSetupMaps;
 }
 
-const StringMap& Scenery::getFileList() const
+const StringPair& Scenery::getSceneryFile() const
 {
-	return m_fileMap;
+	return m_sceneryFile;
+}
+
+const StringPair& Scenery::getMapFile() const
+{
+	return m_mapFile;
+}
+
+const StringMap& Scenery::getTextureFileMap() const
+{
+	return m_textureFileMap;
+}
+
+const StringMap& Scenery::getObjectFileMap() const
+{
+	return m_objectFileMap;
 }
 
 void Scenery::setName(std::string n)

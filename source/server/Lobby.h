@@ -29,6 +29,8 @@ private:
 	std::list<Player*> m_players;
 	GameController m_gc;
 
+	sf::UdpSocket socket;
+
 	bool m_run = false;
 };
 
