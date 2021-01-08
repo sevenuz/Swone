@@ -98,10 +98,48 @@ void OnlineMenu::createLobby()
 		Log::ger().log("You need a Lobbyname", Log::Label::Error);
 		return;
 	}
+	Log::ger().log("Scenery Client Files:");
 	for(auto& s : m_gameReader.getSceneries()[m_selectedScenery]->getFileList()) {
 		Log::ger().log(s.first + " : " + s.second);
 	}
-	//std::thread serverThread(&Server::start, &server);
+	Net::CreateLobbyRequest clr = Net::CreateLobbyRequest{
+		m_lobbyName,
+		m_lobbyPassword,
+		m_gameReader.getSceneries()[m_selectedScenery]->getFileList()
+	};
+	std::thread(&OnlineMenu::sendLobbyRequest, this, clr).detach();
+}
+
+void OnlineMenu::sendLobbyRequest(Net::CreateLobbyRequest clr)
+{
+	sf::TcpSocket socket;
+	sf::Socket::Status status = socket.connect(m_controller.getSettings().getServerIpAddress(), m_controller.getSettings().getPort());
+	if (status != sf::Socket::Done) {
+		// TODO show error model
+		Log::ger().log("sendLobbyRequest: Error while Connecting to " + m_controller.getSettings().getServerAndPort(), Log::Label::Error);
+		return;
+	}
+	Net::Packet reqPacket(Net::T_CREATE_LOBBY);
+	reqPacket << clr;
+	if (socket.send(reqPacket) != sf::Socket::Done) {
+		// TODO show error model
+		Log::ger().log("sendLobbyRequest: Error while Sending to " + m_controller.getSettings().getServerAndPort(), Log::Label::Error);
+		return;
+	}
+
+	Net::Packet resPacket;
+	Net::CreateLobbyResponse res;
+	if(socket.receive(resPacket) != sf::Socket::Done) {
+		// TODO show error model
+		Log::ger().log("sendLobbyRequest: Error while Receiving to " + m_controller.getSettings().getServerAndPort(), Log::Label::Error);
+		return;
+	}
+	resPacket >> res;
+	Log::ger().log("Server needs Files:");
+	for(auto& s : res.fileMap) {
+		Log::ger().log(s.first + " : " + s.second);
+	}
+	socket.disconnect();
 }
 
 void OnlineMenu::drawImgui()

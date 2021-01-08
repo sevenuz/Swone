@@ -44,6 +44,7 @@ src = [
 	'source/game/GameReader.cpp',
 	'source/game/Scenery.cpp',
 	'source/game/Map.cpp',
+	'source/game/Net.cpp',
 	'source/game/object/GameObject.cpp',
 	'source/game/object/extensions/MovementX.cpp',
 	'source/game/object/extensions/MultiJump.cpp',

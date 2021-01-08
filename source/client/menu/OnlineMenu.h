@@ -20,6 +20,7 @@
 #include "graphics/ParticleSystem.h"
 #include "game/GameController.h"
 #include "game/GameReader.h"
+#include "game/Net.h"
 #include "Handleable.h"
 #include "client/GameWindow.h"
 #include "client/Settings.h"
@@ -44,6 +45,8 @@ private:
 
 	void createLobby();
 public:
+	void sendLobbyRequest(Net::CreateLobbyRequest clr);
+
 	void drawImgui();
 
 	void update(sf::Time ellapsed);

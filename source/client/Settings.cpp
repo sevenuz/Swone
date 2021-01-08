@@ -152,6 +152,16 @@ unsigned short Settings::getPort()
 	return m_port;
 }
 
+sf::IpAddress Settings::getServerIpAddress()
+{
+	return sf::IpAddress(m_server);
+}
+
+std::string Settings::getServerAndPort()
+{
+	return m_server + ":" + std::to_string(m_port);
+}
+
 bool Settings::isChanged()
 {
 	return m_changed;

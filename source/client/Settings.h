@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
 #include <string>
 #include "util/reader/Reader.h"
 #include "util/Log.h"
@@ -59,6 +60,9 @@ public:
 
 	unsigned short getPort();
 	void setPort(unsigned short v);
+
+	sf::IpAddress getServerIpAddress();
+	std::string getServerAndPort();
 
 	bool isChanged();
 	void setChanged(bool v);
