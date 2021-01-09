@@ -31,8 +31,8 @@ public:
 	static long now();
 	static std::string parseFileName(std::string path);
 
-	static void readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& file)> fn);
-	static void readDirectory(std::string path, std::function<void(tinydir_file& file)> fn);
+	static void readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& file)> fn, bool recursive = false);
+	static void readDirectory(std::string path, std::function<void(tinydir_file& file)> fn, bool recursive = false);
 
 	// static convert fn
 	static std::vector<std::string> split(std::string str, char splitter);
@@ -54,22 +54,6 @@ public:
 
 	static sf::Vector2f toSfVec(ph::Vec2 v);
 	static ph::Vec2 toPhVec(sf::Vector2f v);
-
-	static const sf::Texture* loadTexture(std::string path);
-	static const sf::Image* loadImage(std::string path);
-protected:
-
-private:
-	// TODO Improve Texture Cache to Prevent Loading same Image multiple times
-	// is only once created and will be destroyed on termination
-	static std::map<std::string, sf::Texture*>& getTextureMap() {
-		static auto* map = new std::map<std::string, sf::Texture*>;
-		return *map;
-	};
-	static std::map<std::string, sf::Image*>& getImageMap() {
-		static auto* map = new std::map<std::string, sf::Image*>;
-		return *map;
-	};
 };
 
 #endif // SWONE_UTIL_HELPER_H

@@ -3,14 +3,12 @@
 
 #include <map>
 
-#include "game/Map.h"
-#include "util/Log.h"
-#include "util/reader/MapReader.h"
+#include <md5.h>
 
-#define RES_DIR_MAP "map/"
-#define RES_DIR_OBJECT "obj/"
-#define RES_DIR_SCENERY "scenery/"
-#define RES_DIR_TEXTURE "texture/"
+#include "util/Log.h"
+#include "util/reader/Reader.h"
+
+class Map;
 
 class GameReader {
 public:
@@ -19,6 +17,11 @@ public:
 	~GameReader() {};
 	GameReader(GameReader const&) = delete;
 	void operator=(GameReader const&) = delete;
+
+	static constexpr const char* RES_DIR_MAP = "map/";
+	static constexpr const char* RES_DIR_OBJECT = "obj/";
+	static constexpr const char* RES_DIR_SCENERY = "scenery/";
+	static constexpr const char* RES_DIR_TEXTURE = "texture/";
 
 	static StringMapMap& getSceneryMap(std::string file);
 	static Map* getMap(std::string resDir, std::string file);
@@ -30,8 +33,16 @@ public:
 	static std::string getGameObjectPath(std::string resDir, std::string name = "");
 
 	static void readSceneryMaps(std::string resDir);
+	static void hashResDir(std::string resDir);
+
+	static const sf::Texture* loadTexture(std::string path);
+	static const sf::Image* loadImage(std::string path);
 
 	// is only once created and will be destroyed on termination
+	static StringMap& getFileHashes() {
+		static auto* map = new StringMap;
+		return *map;
+	};
 	static std::map<std::string, StringMapMap>& getSceneryMaps() {
 		static auto* map = new std::map<std::string, StringMapMap>;
 		return *map;
@@ -42,6 +53,14 @@ public:
 	};
 	static std::map<std::string, StringMapMap>& getGameObjectMaps() {
 		static auto* map = new std::map<std::string, StringMapMap>;
+		return *map;
+	};
+	static std::map<std::string, sf::Texture*>& getTextureMap() {
+		static auto* map = new std::map<std::string, sf::Texture*>;
+		return *map;
+	};
+	static std::map<std::string, sf::Image*>& getImageMap() {
+		static auto* map = new std::map<std::string, sf::Image*>;
 		return *map;
 	};
 };

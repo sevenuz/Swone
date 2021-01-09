@@ -1,8 +1,8 @@
 name=Scene with Vegetation
 map=sum.map
 player
-1=player.swone
-2=player2.swone
+1=player/player.swone
+2=player/player2.swone
 // GameObjects:
 // vegetation
 veg1.swone

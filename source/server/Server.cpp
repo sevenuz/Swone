@@ -1,7 +1,9 @@
 #include "server/Server.h"
 
 Server::Server()
-{}
+{
+	GameReader::hashResDir(settings.getResourceDirectory()); // TODO here?
+}
 
 Server::~Server() {
 	stop();
@@ -42,13 +44,13 @@ Net::Packet Server::handleTcpCreateLobby(Net::Packet& reqPacket)
 
 	Net::CreateLobbyRes res;
 
-	res.sceneryFile = !fileMap.count(req.fileCheck.sceneryFile.second);
-	res.mapFile = !fileMap.count(req.fileCheck.mapFile.second);
+	res.sceneryFile = !GameReader::getFileHashes().count(req.fileCheck.sceneryFile.second);
+	res.mapFile = !GameReader::getFileHashes().count(req.fileCheck.mapFile.second);
 	for(auto& p : req.fileCheck.objectFileMap)
-		if(!fileMap.count(p.second))
+		if(!GameReader::getFileHashes().count(p.second))
 			res.objectFiles.push_back(p.first);
 	for(auto& p : req.fileCheck.textureFileMap)
-		if(!fileMap.count(p.second))
+		if(!GameReader::getFileHashes().count(p.second))
 			res.textureFiles.push_back(p.first);
 
 	if(res.sceneryFile || res.mapFile || res.objectFiles.size()>0 || res.textureFiles.size()>0) {
@@ -67,31 +69,8 @@ Net::Packet Server::handleTcpCreateLobby(Net::Packet& reqPacket)
 	}
 }
 
-void Server::readDirFileHashesRecursive(std::string dir)
-{
-	Helper::readDirectory(dir,
-		[&](tinydir_file& file){
-			if(file.name[0] == '0')
-				return;
-			try {
-				if (!file.is_dir) {
-					fileMap[md5file(file.path)] = std::string(file.path);
-				}
-				else {
-					if (strcmp(file.name, ".") != 0 && strcmp(file.name, "..") != 0)
-						readDirFileHashesRecursive(std::string(file.path));
-				}
-			} catch(const std::invalid_argument& ia) {
-				Log::ger().log(ia.what(), Log::Label::Error);
-			}
-		}
-	);
-}
-
 int Server::start()
 {
-	readDirFileHashesRecursive(settings.getResourceDirectory());
-
 	if (listener.listen(settings.getPort()) != sf::Socket::Done) {
 		Log::ger().log("handleCreateLobby: Failed to bind Port " + std::to_string(settings.getPort()), Log::Label::Error);
 	}

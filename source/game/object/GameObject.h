@@ -9,6 +9,7 @@
 
 #include "Handleable.h"
 #include "game/Map.h"
+#include "game/GameReader.h"
 #include "graphics/Animation.h"
 #include "graphics/AnimatedSprite.h"
 #include "util/reader/Reader.h"

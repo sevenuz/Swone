@@ -249,7 +249,7 @@ void GameObject::setAnimationFrames(Animation& animation, StringMap& m)
 		throw std::invalid_argument("GameObject Texture is missing.");
 	if(m.count(S_ANI_FRAME_TIME))
 		animation.setFrameTime(sf::seconds(Helper::toFloat(m[S_ANI_FRAME_TIME])));
-	animation.setSpriteSheet(*Helper::loadTexture(m_texturePath));
+	animation.setSpriteSheet(*GameReader::loadTexture(m_texturePath));
 	for(int i = 1; m.count(std::to_string(i)); i++){
 		animation.addFrame(Helper::toIntRect(m[std::to_string(i)]));
 	}

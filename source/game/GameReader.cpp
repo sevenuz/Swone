@@ -1,4 +1,6 @@
 #include "game/GameReader.h"
+#include "game/Map.h"
+#include "util/reader/MapReader.h"
 
 std::string GameReader::getTexturePath(std::string resDir, std::string name)
 {
@@ -67,4 +69,54 @@ void GameReader::readSceneryMaps(std::string resDir)
 			}
 		}
 	);
+}
+
+void GameReader::hashResDir(std::string resDir)
+{
+	auto fn = [&](tinydir_file& file){
+		try {
+			std::string path(file.path);
+			std::string hash = md5file(file.path);
+			Log::ger().log(path);
+			if(getFileHashes().count(hash) && getFileHashes()[hash] != path)
+				Log::ger().log("Collision: " + hash, Log::Label::Error);
+			getFileHashes()[hash] = path;
+		} catch(const std::invalid_argument& ia) {
+			Log::ger().log(ia.what(), Log::Label::Error);
+		}
+	};
+	Helper::readDirectory(GameReader::getSceneryPath(resDir), fn, true);
+	Helper::readDirectory(GameReader::getTexturePath(resDir), fn, true);
+	Helper::readDirectory(GameReader::getMapPath(resDir), fn, true);
+	Helper::readDirectory(GameReader::getGameObjectPath(resDir), fn, true);
+}
+
+const sf::Texture* GameReader::loadTexture(std::string path)
+{
+	if(getTextureMap().count(path)){
+		return getTextureMap()[path];
+	} else {
+		sf::Texture* t = new sf::Texture();
+		if (!t->loadFromFile(path)) {
+			Log::ger().log(path + ": Failed to load texture", Log::Label::Error);
+			throw std::invalid_argument("Failed to load texture");
+		}
+		getTextureMap()[path] = t;
+		return t;
+	}
+}
+
+const sf::Image* GameReader::loadImage(std::string path)
+{
+	if(getImageMap().count(path)){
+		return getImageMap()[path];
+	} else {
+		sf::Image* t = new sf::Image();
+		if (!t->loadFromFile(path)) {
+			Log::ger().log(path + ": Failed to load texture", Log::Label::Error);
+			throw std::invalid_argument("Failed to load texture");
+		}
+		getImageMap()[path] = t;
+		return t;
+	}
 }

@@ -15,7 +15,7 @@ std::string Helper::parseFileName(std::string path)
 	return path.substr(found+1);
 }
 
-void Helper::readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& file)>fn)
+void Helper::readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& file)>fn, bool recursive)
 {
 	if (!dir.has_next) {
 		throw std::invalid_argument("no files or no dir available");
@@ -26,17 +26,24 @@ void Helper::readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& fi
 		tinydir_file file;
 		tinydir_readfile(&dir, &file);
 
-		fn(file);
+		if (recursive && file.is_dir) {
+			if (strcmp(file.name, ".") != 0 && strcmp(file.name, "..") != 0) {
+				tinydir_open(&dir, file.path);
+				readDirectory(dir, fn, recursive);
+			}
+		} else {
+			fn(file);
+		}
 
 		tinydir_next(&dir);
 	}
 }
 
-void Helper::readDirectory(std::string path, std::function<void(tinydir_file& file)>fn)
+void Helper::readDirectory(std::string path, std::function<void(tinydir_file& file)>fn, bool recursive)
 {
 	tinydir_dir dir;
 	tinydir_open(&dir, path.c_str());
-	readDirectory(dir, fn);
+	readDirectory(dir, fn, recursive);
 	tinydir_close(&dir);
 }
 
@@ -143,34 +150,4 @@ sf::Vector2f Helper::toSfVec(ph::Vec2 v)
 ph::Vec2 Helper::toPhVec(sf::Vector2f v)
 {
 	return ph::Vec2(v.x, v.y);
-}
-
-const sf::Texture* Helper::loadTexture(std::string path)
-{
-	if(Helper::getTextureMap().count(path)){
-		return Helper::getTextureMap()[path];
-	} else {
-		sf::Texture* t = new sf::Texture();
-		if (!t->loadFromFile(path)) {
-			Log::ger().log(path + ": Failed to load texture", Log::Label::Error);
-			throw std::invalid_argument("Failed to load texture");
-		}
-		Helper::getTextureMap()[path] = t;
-		return t;
-	}
-}
-
-const sf::Image* Helper::loadImage(std::string path)
-{
-	if(Helper::getImageMap().count(path)){
-		return Helper::getImageMap()[path];
-	} else {
-		sf::Image* t = new sf::Image();
-		if (!t->loadFromFile(path)) {
-			Log::ger().log(path + ": Failed to load texture", Log::Label::Error);
-			throw std::invalid_argument("Failed to load texture");
-		}
-		Helper::getImageMap()[path] = t;
-		return t;
-	}
 }

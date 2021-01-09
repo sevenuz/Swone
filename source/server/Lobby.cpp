@@ -10,10 +10,14 @@ Lobby::Lobby(SrvSettings& settings, Net::CreateLobbyReq ld) :
 	m_lobbyData(ld)
 {
 	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
+	std::string path = GameReader::getFileHashes()[ld.fileCheck.sceneryFile.second];
+	m_scenery = new Scenery(settings.getResourceDirectory(), Helper::parseFileName(path), GameReader::getSceneryMap(path));
+	m_gc.setScenery(m_scenery);
 }
 
 Lobby::~Lobby() {
 	stop();
+	delete m_scenery;
 }
 
 void Lobby::startMainLoop()
@@ -22,7 +26,7 @@ void Lobby::startMainLoop()
 		sf::Time ellapsed = clock.restart();
 		m_tickT += ellapsed;
 
-		//m_gc.update(ellapsed);
+		m_gc.update(ellapsed);
 
 		if(m_tickT >= m_tickDt) {
 			m_tickT -= m_tickDt;
@@ -100,5 +104,5 @@ bool Lobby::verifyJoinLobbyReq(Net::JoinLobbyReq jlr)
 
 Net::JoinLobbyAck Lobby::getJoinLobbyAck()
 {
-	return Net::JoinLobbyAck{ m_port };
+	return Net::JoinLobbyAck{ m_port, m_lobbyData.fileCheck };
 }

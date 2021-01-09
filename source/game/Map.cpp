@@ -110,7 +110,7 @@ std::map<int, std::map<int, Tile*>>& Map::getMapData()
 void Map::createMapImage() {
 	if(m_tileTexturePath.empty())
 		throw std::invalid_argument("Map needs a texture!");
-	const sf::Image tileTexture = *Helper::loadImage(m_tileTexturePath);
+	const sf::Image tileTexture = *GameReader::loadImage(m_tileTexturePath);
 
 	m_imgWidth = Map::TILE_WIDTH * m_width;
 	m_imgHeight = Map::TILE_HEIGHT * m_height;

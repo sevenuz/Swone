@@ -12,7 +12,7 @@
 #include "server/Player.h"
 #include "server/Lobby.h"
 #include "game/Net.h"
-#include "util/reader/Reader.h"
+#include "game/GameReader.h"
 #include "util/Helper.h"
 #include "util/Log.h"
 
@@ -29,14 +29,12 @@ private:
 	bool m_run = false;
 	void handleTcpConnections();
 	Net::Packet handleTcpCreateLobby(Net::Packet& reqPacket);
-	void readDirFileHashesRecursive(std::string dir);
 
 	SrvSettings settings;
 
 	sf::TcpListener listener;
 
 	std::vector<Lobby*> lobbies;
-	StringMap fileMap;
 };
 
 #endif // SWONE_SERVER_SERVER_H

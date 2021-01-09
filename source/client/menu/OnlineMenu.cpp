@@ -18,6 +18,7 @@ OnlineMenu::OnlineMenu(Controller& c) :
 	m_ps.setOrigin(gb.left, gb.top, gb.width, gb.height, Origin::ON_BORDER);
 
 	GameReader::readSceneryMaps(m_controller.getSettings().getResourceDirectory());
+	GameReader::hashResDir(m_controller.getSettings().getResourceDirectory()); // TODO here?
 }
 
 OnlineMenu::~OnlineMenu() {}

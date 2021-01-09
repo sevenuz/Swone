@@ -14,6 +14,8 @@
 #include "util/Log.h"
 #include "util/Helper.h"
 
+#include "game/GameReader.h"
+
 #include "physics/Body.h"
 #include "physics/Shape.h"
 

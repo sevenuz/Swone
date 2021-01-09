@@ -15,6 +15,7 @@
 #include "util/Log.h"
 #include "util/Helper.h"
 #include "game/GameController.h"
+#include "game/Scenery.h"
 #include "game/Net.h"
 
 #define MAX_PLAYER_COUNT 10
@@ -50,6 +51,7 @@ private:
 
 	std::list<Player*> m_players;
 	GameController m_gc;
+	Scenery* m_scenery;
 
 	bool m_run = false;
 };
