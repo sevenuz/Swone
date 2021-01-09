@@ -1,11 +1,9 @@
 #ifndef SWONE_GAME_GAMEREADER_H
 #define SWONE_GAME_GAMEREADER_H
 
-#include <vector>
 #include <map>
 
 #include "game/Map.h"
-#include "game/object/GameObject.h"
 #include "util/Log.h"
 #include "util/reader/MapReader.h"
 
@@ -14,30 +12,38 @@
 #define RES_DIR_SCENERY "scenery/"
 #define RES_DIR_TEXTURE "texture/"
 
-class Scenery;
-
 class GameReader {
 public:
-	GameReader(std::string resDir);
-	virtual ~GameReader();
+	// Not posible to create Objects of this class
+	GameReader() = delete;
+	~GameReader() {};
+	GameReader(GameReader const&) = delete;
+	void operator=(GameReader const&) = delete;
 
-	void readSceneries();
-	Map* getMap(std::string mapFileName);
-	StringMapMap& getGameObjectParagraphMap(std::string objFileName);
+	static StringMapMap& getSceneryMap(std::string file);
+	static Map* getMap(std::string resDir, std::string file);
+	static StringMapMap& getGameObjectMap(std::string file);
 
-	std::string getTextureBasePath();
-	std::string getSceneryBasePath();
-	std::string getMapBasePath();
-	std::string getObjectBasePath();
+	static std::string getTexturePath(std::string resDir, std::string name = "");
+	static std::string getSceneryPath(std::string resDir, std::string name = "");
+	static std::string getMapPath(std::string resDir, std::string name = "");
+	static std::string getGameObjectPath(std::string resDir, std::string name = "");
 
-	const std::vector<Scenery*>& getSceneries() const;
-private:
-	std::string m_resDir;
-	MapReader m_mapReader;
+	static void readSceneryMaps(std::string resDir);
 
-	std::vector<Scenery*> m_sceneries;
-	std::map<std::string, Map*> m_maps;
-	std::map<std::string, StringMapMap> m_objects;
+	// is only once created and will be destroyed on termination
+	static std::map<std::string, StringMapMap>& getSceneryMaps() {
+		static auto* map = new std::map<std::string, StringMapMap>;
+		return *map;
+	};
+	static std::map<std::string, Map*>& getMapMap() {
+		static auto* map = new std::map<std::string, Map*>;
+		return *map;
+	};
+	static std::map<std::string, StringMapMap>& getGameObjectMaps() {
+		static auto* map = new std::map<std::string, StringMapMap>;
+		return *map;
+	};
 };
 #endif
 

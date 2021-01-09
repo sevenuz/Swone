@@ -3,10 +3,9 @@
 Client::Client() :
 	window(sf::VideoMode(settings.getWidth(), settings.getHeight(), settings.getBitsPerPixel()), "Swone o.O"),
 	controller(settings, window),
-	gameReader(settings.getResourceDirectory()),
 	menu(controller),
-	localMenu(controller, gameReader),
-	onlineMenu(controller, gameReader),
+	localMenu(controller),
+	onlineMenu(controller),
 	settingsMenu(controller)
 {}
 

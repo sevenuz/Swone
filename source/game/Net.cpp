@@ -79,23 +79,52 @@ sf::Packet& Net::operator >>(sf::Packet& packet, std::map<T, K>& sm)
 	return packet;
 }
 
-// Type: CreateLobbyRequest
-sf::Packet& Net::operator <<(sf::Packet& packet, const CreateLobbyRequest& lr)
+// Type: GameFileCheck
+sf::Packet& Net::operator <<(sf::Packet& packet, const GameFileCheck& lr)
 {
-	return packet << lr.name << lr.password << lr.sceneryFile << lr.mapFile << lr.objectFileMap << lr.textureFileMap;
+	return packet << lr.sceneryFile << lr.mapFile << lr.objectFileMap << lr.textureFileMap;
 }
-sf::Packet& Net::operator >>(sf::Packet& packet, CreateLobbyRequest& lr)
+sf::Packet& Net::operator >>(sf::Packet& packet, GameFileCheck& lr)
 {
-	return packet >> lr.name >> lr.password >> lr.sceneryFile >> lr.mapFile >> lr.objectFileMap >> lr.textureFileMap;
+	return packet >> lr.sceneryFile >> lr.mapFile >> lr.objectFileMap >> lr.textureFileMap;
 }
 
-// Type: CreateLobbyResponse
-sf::Packet& Net::operator <<(sf::Packet& packet, const CreateLobbyResponse& lr)
+// Type: CreateLobbyReq
+sf::Packet& Net::operator <<(sf::Packet& packet, const CreateLobbyReq& lr)
+{
+	return packet << lr.name << lr.password << lr.fileCheck;
+}
+sf::Packet& Net::operator >>(sf::Packet& packet, CreateLobbyReq& lr)
+{
+	return packet >> lr.name >> lr.password >> lr.fileCheck;
+}
+
+// Type: GameFileCheckAnswer
+sf::Packet& Net::operator <<(sf::Packet& packet, const GameFileCheckAnswer& lr)
 {
 	return packet << lr.sceneryFile << lr.mapFile << lr.objectFiles << lr.textureFiles;
 }
-sf::Packet& Net::operator >>(sf::Packet& packet, CreateLobbyResponse& lr)
+sf::Packet& Net::operator >>(sf::Packet& packet, GameFileCheckAnswer& lr)
 {
 	return packet >> lr.sceneryFile >> lr.mapFile >> lr.objectFiles >> lr.textureFiles;
 }
 
+// Type: JoinLobbyReq
+sf::Packet& Net::operator <<(sf::Packet& packet, const JoinLobbyReq& lr)
+{
+	return packet << lr.identifier << lr.password;
+}
+sf::Packet& Net::operator >>(sf::Packet& packet, JoinLobbyReq& lr)
+{
+	return packet >> lr.identifier >> lr.password;
+}
+
+// Type: JoinLobbyAck
+sf::Packet& Net::operator <<(sf::Packet& packet, const JoinLobbyAck& lr)
+{
+	return packet << lr.port << lr.fileCheck;
+}
+sf::Packet& Net::operator >>(sf::Packet& packet, JoinLobbyAck& lr)
+{
+	return packet >> lr.port >> lr.fileCheck;
+}

@@ -11,7 +11,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
 
-#include "Handleable.h"
 #include "util/Log.h"
 #include "util/Helper.h"
 
@@ -27,7 +26,7 @@ enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPA
 
 struct Tile;
 
-class Map : public Handleable
+class Map : public sf::Drawable
 {
 public:
 	static const size_t TILE_WIDTH = 64;
@@ -40,9 +39,6 @@ public:
 
 	Map();
 	virtual ~Map();
-
-	void update(sf::Time ellapsed);
-	void event(sf::Event& e);
 
 	void setName(std::string);
 	std::string getName();
@@ -66,8 +62,6 @@ public:
 	const size_t getImageWidth() const;
 	const size_t getImageHeight() const;
 
-	float getScale();
-
 	MapTile getBorder();
 	const Tile& getTile(int h, int w);
 	void setMapDataValue(size_t h, size_t w, MapTile v);
@@ -89,8 +83,6 @@ private:
 
 	size_t m_imgWidth = 0;
 	size_t m_imgHeight = 0;
-
-	float m_scale = 1;
 
 	std::map<int, std::map<int, Tile*>> m_mapData;//pointer (2d-array) to Map Infos
 	MapTile m_border;

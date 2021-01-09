@@ -7,6 +7,8 @@
 
 namespace Net
 {
+	typedef unsigned short Port;
+
 	static const unsigned char T_VOID = 0;
 	static const unsigned char T_CREATE_LOBBY = 1;
 	static const unsigned char T_JOIN_LOBBY_REQ = 2;
@@ -42,25 +44,46 @@ namespace Net
 	template<typename T, typename K>
 	sf::Packet& operator >>(sf::Packet& packet, std::map<T, K>& sm);
 
-	struct CreateLobbyRequest {
-		std::string name;
-		std::string password;
+	struct GameFileCheck {
 		StringPair sceneryFile;
 		StringPair mapFile;
 		StringMap textureFileMap;
 		StringMap objectFileMap;
 	};
-	sf::Packet& operator <<(sf::Packet& packet, const CreateLobbyRequest& lr);
-	sf::Packet& operator >>(sf::Packet& packet, CreateLobbyRequest& lr);
+	sf::Packet& operator <<(sf::Packet& packet, const GameFileCheck& lr);
+	sf::Packet& operator >>(sf::Packet& packet, GameFileCheck& lr);
 
-	struct CreateLobbyResponse {
+	struct CreateLobbyReq {
+		std::string name;
+		std::string password;
+		GameFileCheck fileCheck;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const CreateLobbyReq& lr);
+	sf::Packet& operator >>(sf::Packet& packet, CreateLobbyReq& lr);
+
+	struct GameFileCheckAnswer {
 		bool sceneryFile; // set if needed
 		bool mapFile; // set if needed
-		std::vector<std::string> textureFiles; // set if needed
-		std::vector<std::string> objectFiles; // set if needed
+		std::vector<std::string> textureFiles; // names of needed files
+		std::vector<std::string> objectFiles; // names of needed files
 	};
-	sf::Packet& operator <<(sf::Packet& packet, const CreateLobbyResponse& lr);
-	sf::Packet& operator >>(sf::Packet& packet, CreateLobbyResponse& lr);
+	sf::Packet& operator <<(sf::Packet& packet, const GameFileCheckAnswer& lr);
+	sf::Packet& operator >>(sf::Packet& packet, GameFileCheckAnswer& lr);
+	typedef GameFileCheckAnswer CreateLobbyRes;
+
+	struct JoinLobbyReq {
+		std::string identifier;
+		std::string password;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const JoinLobbyReq& lr);
+	sf::Packet& operator >>(sf::Packet& packet, JoinLobbyReq& lr);
+
+	struct JoinLobbyAck {
+		Port port;
+		GameFileCheck fileCheck;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const JoinLobbyAck& lr);
+	sf::Packet& operator >>(sf::Packet& packet, JoinLobbyAck& lr);
 }
 
 #endif // NET_H

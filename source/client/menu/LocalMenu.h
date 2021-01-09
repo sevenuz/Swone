@@ -36,7 +36,6 @@ private:
 	ParticleSystem m_ps;
 	Controller& m_controller;
 	GameWindow m_gameWindow;
-	GameReader& m_gameReader;
 	GameController m_gameController;
 
 	sf::Text m_play;
@@ -55,7 +54,10 @@ private:
 		std::string name;
 		bool selected;
 	};
+	std::vector<Scenery*> m_sceneries;
 	std::map<int, std::vector<GameObjectSelection>> m_gamePlayers; // key: m_selectedScenery
+
+	void readSceneries(std::string resDir);
 
 	void setScenerySelection(int);
 	void setActionSelection(char);
@@ -69,7 +71,7 @@ public:
 
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
-	LocalMenu(Controller& c, GameReader& gr);
+	LocalMenu(Controller& c);
 	~LocalMenu();
 
 	const GameController& getGameController() const;

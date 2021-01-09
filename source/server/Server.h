@@ -1,7 +1,6 @@
 #ifndef SWONE_SERVER_SERVER_H
 #define SWONE_SERVER_SERVER_H
 
-#include <thread>
 #include <vector>
 #include <SFML/Network.hpp>
 #include <SFML/System/Clock.hpp>
@@ -28,20 +27,15 @@ public:
 	void stop();
 private:
 	bool m_run = false;
-	void startMainLoop();
 	void handleTcpConnections();
 	Net::Packet handleTcpCreateLobby(Net::Packet& reqPacket);
 	void readDirFileHashesRecursive(std::string dir);
 
 	SrvSettings settings;
-	sf::Clock clock;
-	sf::Time m_tickT;
-	sf::Time m_tickDt = sf::seconds(1.0f/20.0f);
 
 	sf::TcpListener listener;
-	sf::UdpSocket socket;
 
-	std::vector<Lobby> lobbys;
+	std::vector<Lobby*> lobbies;
 	StringMap fileMap;
 };
 

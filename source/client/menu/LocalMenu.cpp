@@ -1,10 +1,9 @@
 #include <client/menu/LocalMenu.h>
 
-LocalMenu::LocalMenu(Controller& c, GameReader& gr) :
+LocalMenu::LocalMenu(Controller& c) :
 	m_ps(100),
 	m_controller(c),
-	m_gameWindow(c, m_gameController),
-	m_gameReader(gr)
+	m_gameWindow(c, m_gameController)
 {
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
@@ -34,12 +33,13 @@ LocalMenu::LocalMenu(Controller& c, GameReader& gr) :
 	m_switchRight.setFillColor(sf::Color::Yellow);
 	m_switchRight.setCharacterSize(m_controller.getSettings().toF(50));
 
-	m_sceneriesFound = m_gameReader.getSceneries().size() > 0;
+	readSceneries(m_controller.getSettings().getResourceDirectory());
+	m_sceneriesFound = m_sceneries.size() > 0;
 	if(m_sceneriesFound)
 		setScenerySelection(0);
 
-	for(size_t i = 0; i < m_gameReader.getSceneries().size(); i++) {
-		for(auto& p : m_gameReader.getSceneries()[i]->getPlayerSetupMaps()) {
+	for(size_t i = 0; i < m_sceneries.size(); i++) {
+		for(auto& p : m_sceneries[i]->getPlayerSetupMaps()) {
 			m_gamePlayers[i].push_back({p.first, p.second[Reader::DEFAULT_PARAGRAPH][GameObject::S_NAME], true});
 		}
 	}
@@ -47,22 +47,31 @@ LocalMenu::LocalMenu(Controller& c, GameReader& gr) :
 
 LocalMenu::~LocalMenu() {}
 
+void LocalMenu::readSceneries(std::string resDir)
+{
+	GameReader::readSceneryMaps(resDir);
+	for(auto& p : GameReader::getSceneryMaps()) {
+		Scenery* s = new Scenery(resDir, Helper::parseFileName(p.first), p.second);
+		m_sceneries.push_back(s);
+	}
+}
+
 void LocalMenu::setScenerySelection(int i) {
 	if (!m_sceneriesFound) {
 		Log::ger().log("no sceneries found.", Log::Label::Error);
 		return;
 	}
 
-	if (i >= (int)m_gameReader.getSceneries().size()) {
+	if (i >= (int)m_sceneries.size()) {
 		i = 0;
 	}
 	else if (i < 0) {
-		i = m_gameReader.getSceneries().size() - 1;
+		i = m_sceneries.size() - 1;
 	}
 
 	m_selectedScenery = i;
 
-	m_sceneryName.setString(m_gameReader.getSceneries()[m_selectedScenery]->getName());
+	m_sceneryName.setString(m_sceneries[m_selectedScenery]->getName());
 }
 
 void LocalMenu::setActionSelection(char i) {
@@ -77,7 +86,7 @@ void LocalMenu::setActionSelection(char i) {
 
 void LocalMenu::startGame() {
 	if (m_sceneriesFound) {
-		Scenery* s = m_gameReader.getSceneries()[m_selectedScenery];
+		Scenery* s = m_sceneries[m_selectedScenery];
 		s->reset();
 		m_gameController.setScenery(s);
 		m_gameWindow.setViewZoom();
@@ -146,7 +155,7 @@ void LocalMenu::update(sf::Time ellapsed) {
 	m_ps.update(ellapsed);
 	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
-		//m_gameReader.getSceneries()[m_selectedScenery]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
+		//m_sceneries[m_selectedScenery]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
 		break;
 	case ActiveGameWindow::INGAME:
 		m_gameWindow.update(ellapsed);
@@ -189,15 +198,16 @@ void LocalMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	switch (m_controller.getActiveGameWindow()) {
 	case ActiveGameWindow::MAPSELECTION:
 		if (m_sceneriesFound) {
+			// TODO Scenery Preview View
 			sf::View view(
-				sf::FloatRect(0, 0, m_gameReader.getSceneries()[m_selectedScenery]->getMap()->getImageWidth(),
-				m_gameReader.getSceneries()[m_selectedScenery]->getMap()->getImageHeight())
+				sf::FloatRect(0, 0, m_sceneries[m_selectedScenery]->getMap()->getImageWidth(),
+				m_sceneries[m_selectedScenery]->getMap()->getImageHeight())
 			);
 			view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
 			target.draw(m_ps, states);
 			target.setView(view);
 			// Scenery Preview Draw
-			m_gameReader.getSceneries()[m_selectedScenery]->drawPreview(target, states);
+			m_sceneries[m_selectedScenery]->drawPreview(target, states);
 		}
 
 		m_controller.setDefaultView();

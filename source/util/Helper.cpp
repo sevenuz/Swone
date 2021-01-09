@@ -1,5 +1,20 @@
 #include "Helper.h"
 
+long Helper::now()
+{
+	auto now = std::chrono::system_clock::now().time_since_epoch();
+	long time = std::chrono::duration_cast<std::chrono::seconds>(now).count();
+	return time;
+}
+
+std::string Helper::parseFileName(std::string path)
+{
+	// https://www.cplusplus.com/reference/string/string/find_last_of/
+	// parse filename, also works on window
+	std::size_t found = path.find_last_of("/\\");
+	return path.substr(found+1);
+}
+
 void Helper::readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& file)>fn)
 {
 	if (!dir.has_next) {

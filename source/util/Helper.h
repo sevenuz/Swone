@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <chrono>
 
 #include <tinydir.h>
 
@@ -25,6 +26,10 @@ public:
 	~Helper() {};
 	Helper(Helper const&) = delete;
 	void operator=(Helper const&) = delete;
+
+	// return time since epoch (1970?) in seconds
+	static long now();
+	static std::string parseFileName(std::string path);
 
 	static void readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& file)> fn);
 	static void readDirectory(std::string path, std::function<void(tinydir_file& file)> fn);

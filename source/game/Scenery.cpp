@@ -1,8 +1,10 @@
 #include <game/Scenery.h>
 
-Scenery::Scenery(std::string path, std::string fileName, StringMapMap setupMap, GameReader& gameReader) : m_setupMap(setupMap) {
-	m_sceneryFile = std::make_pair(fileName, md5file(path.c_str()));
-	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
+Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap) :
+	m_setupMap(setupMap)
+{
+	m_sceneryFile = std::make_pair(fileName, md5file(GameReader::getSceneryPath(resDir, fileName).c_str()));
+	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)) {
 		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
 		if(global.count(S_NAME))
 			m_name = global[S_NAME];
@@ -10,23 +12,26 @@ Scenery::Scenery(std::string path, std::string fileName, StringMapMap setupMap, 
 			throw std::invalid_argument("Name missing.");
 		if(global.count(S_MAP)) {
 			std::string mapName = global[S_MAP];
-			std::string mapPath = gameReader.getMapBasePath() + mapName;
+			std::string mapPath = GameReader::getMapPath(resDir, mapName);
 			m_mapFile = std::make_pair(mapName, md5file(mapPath.c_str()));
 
-			m_map = gameReader.getMap(mapPath);
+			m_map = GameReader::getMap(resDir, mapPath);
 
 			std::string textureName = m_map->getTileTextureName();
 			std::string texturePath = m_map->getTileTexturePath();
 			m_textureFileMap[textureName] = md5file(texturePath.c_str());
-		} else
+		} else {
 			throw std::invalid_argument("Map-Filename missing.");
+		}
 	}
 
-	if(setupMap.count(Scenery::S_PLAYER_PARAGRAPH)){
-		for(int i = 1; setupMap[Scenery::S_PLAYER_PARAGRAPH].count(std::to_string(i)); i++){
+	if(setupMap.count(Scenery::S_PLAYER_PARAGRAPH)) {
+		for(int i = 1; setupMap[Scenery::S_PLAYER_PARAGRAPH].count(std::to_string(i)); i++) {
 			std::string pName = setupMap[Scenery::S_PLAYER_PARAGRAPH][std::to_string(i)];
-			m_playerSetupMaps[pName] = getGameObjectSetupMap(gameReader, pName);
+			m_playerSetupMaps[pName] = getGameObjectSetupMap(resDir, pName);
 		}
+	} else {
+		throw std::invalid_argument("Player-Paragraph missing.");
 	}
 
 	for(auto& m : setupMap) {
@@ -36,7 +41,7 @@ Scenery::Scenery(std::string path, std::string fileName, StringMapMap setupMap, 
 		if(paragraph == Scenery::S_PLAYER_PARAGRAPH)
 			continue;
 
-		m_objectSetupMaps[paragraph] = getGameObjectSetupMap(gameReader, paragraph);
+		m_objectSetupMaps[paragraph] = getGameObjectSetupMap(resDir, paragraph);
 	}
 }
 
@@ -46,15 +51,15 @@ Scenery::~Scenery() {
 	m_gameObjects.clear();
 }
 
-StringMapMap& Scenery::getGameObjectSetupMap(GameReader& gameReader, std::string goName)
+StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goName)
 {
-	std::string goPath = gameReader.getObjectBasePath() + goName;
+	std::string goPath = GameReader::getGameObjectPath(resDir, goName);
 	m_objectFileMap[goName] = md5file(goPath.c_str());
 
-	StringMapMap& goSetupMap = gameReader.getGameObjectParagraphMap(goPath);
+	StringMapMap& goSetupMap = GameReader::getGameObjectMap(goPath);
 
 	std::string textureName = goSetupMap[Reader::DEFAULT_PARAGRAPH][GameObject::S_TEXTURE];
-	std::string texturePath = gameReader.getTextureBasePath() + textureName;
+	std::string texturePath = GameReader::getTexturePath(resDir, textureName);
 
 	// set texture path in setupMap
 	goSetupMap[Reader::DEFAULT_PARAGRAPH][GameObject::S_TEXTURE_PATH] = texturePath;
@@ -101,8 +106,6 @@ void Scenery::reset()
 
 void Scenery::event(sf::Event& event)
 {
-	getMap()->event(event);
-
 	for (GameObject* g : getGameObjects()) {
 		g->event(event);
 	}
@@ -110,8 +113,6 @@ void Scenery::event(sf::Event& event)
 
 void Scenery::update(sf::Time ellapsed)
 {
-	getMap()->update(ellapsed);
-
 	for (GameObject* g : getGameObjects()) {
 		g->apply();
 		g->update(ellapsed);

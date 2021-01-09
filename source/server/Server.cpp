@@ -1,18 +1,10 @@
 #include "server/Server.h"
 
 Server::Server()
-{
-	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
-}
+{}
 
-Server::~Server() {}
-
-void Server::startMainLoop()
-{
-	while(m_run) {
-		sf::Time ellapsed = clock.restart();
-		m_tickT += ellapsed;
-	}
+Server::~Server() {
+	stop();
 }
 
 void Server::handleTcpConnections()
@@ -45,17 +37,17 @@ void Server::handleTcpConnections()
 
 Net::Packet Server::handleTcpCreateLobby(Net::Packet& reqPacket)
 {
-	Net::CreateLobbyRequest req;
+	Net::CreateLobbyReq req;
 	reqPacket >> req;
 
-	Net::CreateLobbyResponse res;
+	Net::CreateLobbyRes res;
 
-	res.sceneryFile = !fileMap.count(req.sceneryFile.second);
-	res.mapFile = !fileMap.count(req.mapFile.second);
-	for(auto& p : req.objectFileMap)
+	res.sceneryFile = !fileMap.count(req.fileCheck.sceneryFile.second);
+	res.mapFile = !fileMap.count(req.fileCheck.mapFile.second);
+	for(auto& p : req.fileCheck.objectFileMap)
 		if(!fileMap.count(p.second))
 			res.objectFiles.push_back(p.first);
-	for(auto& p : req.textureFileMap)
+	for(auto& p : req.fileCheck.textureFileMap)
 		if(!fileMap.count(p.second))
 			res.textureFiles.push_back(p.first);
 
@@ -66,7 +58,11 @@ Net::Packet Server::handleTcpCreateLobby(Net::Packet& reqPacket)
 		return resPacket;
 	} else {
 		// create Lobby
+		Lobby* l = new Lobby(settings, req);
+		lobbies.push_back(l);
+		std::thread(&Lobby::start, l).detach();
 		Net::Packet resPacket(Net::T_JOIN_LOBBY_ACK);
+		resPacket << l->getJoinLobbyAck();
 		return resPacket;
 	}
 }
@@ -96,22 +92,14 @@ int Server::start()
 {
 	readDirFileHashesRecursive(settings.getResourceDirectory());
 
-	if (socket.bind(settings.getPort()) != sf::Socket::Done)
-	{
-		Log::ger().log("Failed to bind Port " + std::to_string(settings.getPort()), Log::Label::Error);
-	}
-	socket.setBlocking(false);
 	if (listener.listen(settings.getPort()) != sf::Socket::Done) {
 		Log::ger().log("handleCreateLobby: Failed to bind Port " + std::to_string(settings.getPort()), Log::Label::Error);
 	}
 	listener.setBlocking(false);
 
-	std::thread tcpThread(&Server::handleTcpConnections, this);
-
 	m_run = true;
-	startMainLoop();
+	handleTcpConnections();
 
-	tcpThread.join();
 	return 0;
 }
 
@@ -119,5 +107,7 @@ void Server::stop()
 {
 	m_run = false;
 	listener.close();
-	socket.unbind();
+	for(Lobby* l : lobbies) {
+		l->stop();
+	}
 }

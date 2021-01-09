@@ -21,6 +21,7 @@
 #include "graphics/ParticleSystem.h"
 #include "game/GameController.h"
 #include "game/GameReader.h"
+#include "game/Scenery.h"
 #include "game/Net.h"
 #include "Handleable.h"
 #include "client/GameWindow.h"
@@ -33,10 +34,9 @@ class OnlineMenu : public Handleable {
 private:
 	ParticleSystem m_ps;
 	Controller& m_controller;
-	GameReader& m_gameReader;
 
 	sf::Text m_header;
-	int m_selectedScenery = -1;
+	std::string m_selectedScenery = "";
 	std::string m_lobbyName = "Swone's Fightclub";
 	std::string m_lobbyPassword = "";
 
@@ -48,14 +48,14 @@ private:
 
 	void createLobby();
 public:
-	void sendLobbyRequest(Net::CreateLobbyRequest clr);
+	void sendLobbyRequest(Net::CreateLobbyReq clr);
 
 	void drawImgui();
 
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
 
-	OnlineMenu(Controller& c, GameReader& gr);
+	OnlineMenu(Controller& c);
 	~OnlineMenu();
 };
 

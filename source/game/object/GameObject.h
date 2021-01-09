@@ -89,7 +89,6 @@ public:
 		ph::Body::Config body;
 		StringMapMap extensionMap; // TODO improve data exchange with extensions
 	};
-	typedef Config Package;
 
 	GameObject(std::string type, Config config, ph::Shape* shape);
 	GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density);

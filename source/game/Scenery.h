@@ -18,7 +18,7 @@ public:
 
 	static constexpr const char* S_PLAYER_PARAGRAPH = "player";
 
-	Scenery(std::string path, std::string fileName, StringMapMap setupMap, GameReader& gameReader); // TODO remove GameReader Dependency
+	Scenery(std::string resDir, std::string fileName, StringMapMap setupMap);
 	virtual ~Scenery();
 
 	void drawPreview(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -44,7 +44,7 @@ public:
 	void spawnPlayer(std::string key);
 	void reset();
 private:
-	StringMapMap& getGameObjectSetupMap(GameReader& gameReader, std::string goName);
+	StringMapMap& getGameObjectSetupMap(std::string resDir, std::string goName);
 	void sortGameObjects();
 	void spawnGameObjects();
 

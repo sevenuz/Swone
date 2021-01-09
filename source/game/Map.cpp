@@ -90,10 +90,6 @@ MapTile Map::getBorder() {
 	return m_border;
 }
 
-float Map::getScale() {
-	return m_scale;
-}
-
 const Tile& Map::getTile(int h, int w) {
 	if (!m_mapData[h].count(w)) {
 		// add border tile to map if coordinate not exists
@@ -142,20 +138,7 @@ sf::Vector2i Map::getTileTexturePosition(MapTile t)
 	return sf::Vector2i(t * Map::TILE_WIDTH, 0);
 }
 
-void Map::event(sf::Event& event) {
-	if (event.type == sf::Event::KeyPressed) {
-		if (event.key.code == sf::Keyboard::C) {
-			Log::ger().log("color switch");
-
-			m_sprite.setColor(sf::Color(0, 255, 0, 128));
-		}
-	}
-}
-
-void Map::update(sf::Time ellapsed) {}
-
 void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	states.transform *= getTransform();
 	states.texture = NULL;
 	if (m_mapDrawable)
 	{

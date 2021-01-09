@@ -1,9 +1,8 @@
 #include <client/menu/OnlineMenu.h>
 
-OnlineMenu::OnlineMenu(Controller& c, GameReader& gr) :
+OnlineMenu::OnlineMenu(Controller& c) :
 	m_ps(100),
-	m_controller(c),
-	m_gameReader(gr)
+	m_controller(c)
 {
 	m_header.setFont(m_controller.getSettings().getFont());
 	m_header.setString("Online");
@@ -17,6 +16,8 @@ OnlineMenu::OnlineMenu(Controller& c, GameReader& gr) :
 	m_ps.setDrawingType(sf::Quads);
 	m_ps.setLifetime(sf::seconds(3));
 	m_ps.setOrigin(gb.left, gb.top, gb.width, gb.height, Origin::ON_BORDER);
+
+	GameReader::readSceneryMaps(m_controller.getSettings().getResourceDirectory());
 }
 
 OnlineMenu::~OnlineMenu() {}
@@ -68,9 +69,11 @@ void OnlineMenu::drawCreateWindow()
 		ImGui::Text("Select a Scenery");
 		ImGui::Separator();
 		ImGui::BeginChild("Scenery-Selection", ImVec2(0, -3 * ImGui::GetFrameHeightWithSpacing())); // 3 lines at the bottom
-		for(int i = 0; i < (int)m_gameReader.getSceneries().size(); i++)
-			if (ImGui::Selectable(m_gameReader.getSceneries()[i]->getName().c_str(), m_selectedScenery == i))
-				m_selectedScenery = i;
+		for(auto& p : GameReader::getSceneryMaps()) {
+			std::string name = p.second[Reader::DEFAULT_PARAGRAPH][Scenery::S_NAME];
+			if (ImGui::Selectable(name.c_str(), m_selectedScenery == p.first))
+				m_selectedScenery = p.first;
+		}
 		ImGui::EndChild();
 		ImGui::Separator();
 
@@ -91,7 +94,7 @@ void OnlineMenu::drawCreateWindow()
 
 void OnlineMenu::createLobby()
 {
-	if(m_selectedScenery < 0) {
+	if(m_selectedScenery.empty()) {
 		Log::ger().log("You need a Scenerey", Log::Label::Error);
 		return;
 	}
@@ -100,26 +103,30 @@ void OnlineMenu::createLobby()
 		return;
 	}
 	Log::ger().log("Client: Scenery: Texture Files:");
-	for(auto& s : m_gameReader.getSceneries()[m_selectedScenery]->getTextureFileMap()) {
+	auto& p = GameReader::getSceneryMaps()[m_selectedScenery];
+	Scenery scenery(m_controller.getSettings().getResourceDirectory(), Helper::parseFileName(m_selectedScenery), p);
+	for(auto& s : scenery.getTextureFileMap()) {
 		Log::ger().log(s.first + " : " + s.second);
 	}
 	Log::ger().log("Client: Scenery: Object Files:");
-	for(auto& s : m_gameReader.getSceneries()[m_selectedScenery]->getObjectFileMap()) {
+	for(auto& s : scenery.getObjectFileMap()) {
 		Log::ger().log(s.first + " : " + s.second);
 	}
 
-	Net::CreateLobbyRequest clr = Net::CreateLobbyRequest{
+	Net::CreateLobbyReq clr = Net::CreateLobbyReq{
 		m_lobbyName,
 		m_lobbyPassword,
-		m_gameReader.getSceneries()[m_selectedScenery]->getSceneryFile(),
-		m_gameReader.getSceneries()[m_selectedScenery]->getMapFile(),
-		m_gameReader.getSceneries()[m_selectedScenery]->getTextureFileMap(),
-		m_gameReader.getSceneries()[m_selectedScenery]->getObjectFileMap()
+		Net::GameFileCheck{
+			scenery.getSceneryFile(),
+			scenery.getMapFile(),
+			scenery.getTextureFileMap(),
+			scenery.getObjectFileMap()
+		}
 	};
 	std::thread(&OnlineMenu::sendLobbyRequest, this, clr).detach();
 }
 
-void OnlineMenu::sendLobbyRequest(Net::CreateLobbyRequest clr)
+void OnlineMenu::sendLobbyRequest(Net::CreateLobbyReq clr)
 {
 	sf::TcpSocket socket;
 	sf::Socket::Status status = socket.connect(m_controller.getSettings().getServerIpAddress(), m_controller.getSettings().getPort());
@@ -146,7 +153,7 @@ void OnlineMenu::sendLobbyRequest(Net::CreateLobbyRequest clr)
 		return;
 	}
 
-	Net::CreateLobbyResponse res;
+	Net::CreateLobbyRes res;
 	switch((int)resPacket.getType()) {
 		case Net::T_CREATE_LOBBY:
 			resPacket >> res;
