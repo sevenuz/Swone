@@ -10,7 +10,7 @@ Lobby::Lobby(SrvSettings& settings, Net::CreateLobbyReq ld) :
 	m_lobbyData(ld)
 {
 	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
-	std::string path = GameReader::getFileHashes()[ld.fileCheck.sceneryFile.second];
+	std::string path = GameReader::getFile(ld.fileCheck.sceneryFile.second);
 	m_scenery = new Scenery(settings.getResourceDirectory(), Helper::parseFileName(path), GameReader::getSceneryMap(path));
 	m_gc.setScenery(m_scenery);
 }

@@ -9,35 +9,23 @@ Server::~Server() {
 	stop();
 }
 
-void Server::handleTcpConnections()
+void Server::runTcpConnection(sf::TcpSocket& socket)
 {
-	while(m_run) {
-		sf::TcpSocket client;
-		if (listener.accept(client) == sf::Socket::Done) {
-
-			Net::Packet reqPacket;
-			if(client.receive(reqPacket) != sf::Socket::Done) {
-				Log::ger().log("sendLobbyRequest: Error while Receiving", Log::Label::Error);
-				return;
-			}
-
-			Net::Packet resPacket;
-			switch((int)reqPacket.getType()) {
-				case Net::T_CREATE_LOBBY:
-					resPacket = handleTcpCreateLobby(reqPacket);
-					break;
-			}
-
-			if (client.send(resPacket) != sf::Socket::Done) {
-				Log::ger().log("handleCreateLobby: Error while Sending", Log::Label::Error);
-				return;
-			}
-			client.disconnect();
-		}
+	Net::Packet reqPacket;
+	if(socket.receive(reqPacket) != sf::Socket::Done) {
+		Log::ger().log("sendLobbyRequest: Error while Receiving", Log::Label::Error);
+		return;
 	}
+
+	switch((int)reqPacket.getType()) {
+		case Net::T_CREATE_LOBBY:
+			handleTcpCreateLobby(socket, reqPacket);
+			break;
+	}
+	socket.disconnect();
 }
 
-Net::Packet Server::handleTcpCreateLobby(Net::Packet& reqPacket)
+void Server::handleTcpCreateLobby(sf::TcpSocket& socket, Net::Packet& reqPacket)
 {
 	Net::CreateLobbyReq req;
 	reqPacket >> req;
@@ -57,15 +45,20 @@ Net::Packet Server::handleTcpCreateLobby(Net::Packet& reqPacket)
 		// trigger file upload
 		Net::Packet resPacket(Net::T_CREATE_LOBBY);
 		resPacket << res;
-		return resPacket;
-	} else {
-		// create Lobby
-		Lobby* l = new Lobby(settings, req);
-		lobbies.push_back(l);
-		std::thread(&Lobby::start, l).detach();
-		Net::Packet resPacket(Net::T_JOIN_LOBBY_ACK);
-		resPacket << l->getJoinLobbyAck();
-		return resPacket;
+		if (socket.send(resPacket) != sf::Socket::Done) {
+			Log::ger().log("handleCreateLobby: Error while Sending", Log::Label::Error);
+		}
+		Net::receiveMissingFiles(socket, req.fileCheck, res, settings.getResourceDirectory());
+	}
+
+	// create Lobby
+	Lobby* l = new Lobby(settings, req);
+	lobbies.push_back(l);
+	std::thread(&Lobby::start, l).detach();
+	Net::Packet resPacket(Net::T_JOIN_LOBBY_ACK);
+	resPacket << l->getJoinLobbyAck();
+	if (socket.send(resPacket) != sf::Socket::Done) {
+		Log::ger().log("handleCreateLobby: Error while Sending", Log::Label::Error);
 	}
 }
 
@@ -77,7 +70,14 @@ int Server::start()
 	listener.setBlocking(false);
 
 	m_run = true;
-	handleTcpConnections();
+	while(m_run) {
+		sf::TcpSocket client;
+		if (listener.accept(client) == sf::Socket::Done) {
+			// TODO handle TcpConnection in different thread?
+			// std::thread(&Server::runTcpConnection, client).detach();
+			runTcpConnection(client);
+		}
+	}
 
 	return 0;
 }

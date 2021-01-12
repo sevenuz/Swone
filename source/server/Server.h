@@ -27,8 +27,8 @@ public:
 	void stop();
 private:
 	bool m_run = false;
-	void handleTcpConnections();
-	Net::Packet handleTcpCreateLobby(Net::Packet& reqPacket);
+	void runTcpConnection(sf::TcpSocket& client);
+	void handleTcpCreateLobby(sf::TcpSocket& socket, Net::Packet& reqPacket);
 
 	SrvSettings settings;
 

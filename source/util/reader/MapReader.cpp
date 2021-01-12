@@ -1,8 +1,9 @@
 #include "util/reader/MapReader.h"
+#include <functional>
 
-MapReader::MapReader(std::string tbp) :
+MapReader::MapReader(std::function<std::string(std::string textureName)> fn) :
 	Reader(),
-	m_textureBasePath(tbp)
+	m_textureMapper(fn)
 {}
 
 MapReader::~MapReader()
@@ -40,7 +41,7 @@ void MapReader::addParagraphValue(std::string paragraph, StringPair p) {
 		m_map->setGravity(Helper::toFloat(p.second));
 	else if (p.first == "texture") {
 		m_map->setTileTextureName(p.second);
-		m_map->setTileTexturePath(m_textureBasePath + p.second);
+		m_map->setTileTexturePath(m_textureMapper(p.second));
 	}
 	else
 		Log::ger().log(p.first + " is not a map option", Log::Label::Warning);

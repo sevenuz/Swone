@@ -13,6 +13,8 @@ SrvSettings::SrvSettings()
 				setPort((ushort)Helper::toLong(v));
 			else if(k==SRVSETTINGS_TICK_RATE)
 				setTickRate((ushort)Helper::toLong(v));
+			else if(k==SRVSETTINGS_RESOURCE_DIRECTORY)
+				setResourceDirectory(v);
 			else
 				Log::ger().log(k + " is not a srvsettings option", Log::Label::Warning);
 		});
@@ -23,6 +25,7 @@ SrvSettings::SrvSettings()
 			StringPair(SRVSETTINGS_DOMAIN, getDomain()),
 			StringPair(SRVSETTINGS_PORT, std::to_string(getPort())),
 			StringPair(SRVSETTINGS_TICK_RATE, std::to_string(getTickRate())),
+			StringPair(SRVSETTINGS_RESOURCE_DIRECTORY, getResourceDirectory()),
 		}}});
 		Log::ger().log("Write Default-SrvSettings. Try to restart.");
 	}

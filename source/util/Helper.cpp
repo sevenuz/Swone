@@ -47,6 +47,45 @@ void Helper::readDirectory(std::string path, std::function<void(tinydir_file& fi
 	tinydir_close(&dir);
 }
 
+void Helper::readFileBytes(std::string file, std::function<void(size_t length, char* data)> fn)
+{
+	// http://www.codecodex.com/wiki/Read_a_file_into_a_byte_array#C.2B.2B
+	std::ifstream fl(file, std::ios::binary);
+	fl.seekg(0, std::ios::end);
+	size_t len = fl.tellg();
+	char* dat = new char[len];
+	fl.seekg(0, std::ios::beg);
+	fl.read(dat, len);
+	fn(len, dat);
+	delete[] dat;
+	fl.close();
+}
+
+void Helper::writeFileBytes(std::string file, size_t length, char* data)
+{
+	std::ofstream(file, std::ios::binary).write(data, length);
+}
+
+std::string Helper::replaceIllegalCharacters(std::string s, std::string ic, char r)
+{
+	for(auto it = s.begin(); it < s.end(); ++it){
+		if(ic.find(*it) != std::string::npos){
+			*it = r;
+		}
+	}
+	return s;
+}
+
+void Helper::replaceAll(std::string& s, std::string toReplace, std::string replacement)
+{
+	size_t len = toReplace.size();
+	size_t pos = s.find(toReplace);
+	while(pos != std::string::npos) {
+		s.replace(pos, len, replacement);
+		pos = s.find(toReplace);
+	}
+}
+
 // convert fn
 std::vector<std::string> Helper::split(std::string str, char splitter)
 {

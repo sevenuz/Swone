@@ -8,6 +8,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <chrono>
+#include <iostream>
+#include <fstream>
 
 #include <tinydir.h>
 
@@ -33,6 +35,12 @@ public:
 
 	static void readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& file)> fn, bool recursive = false);
 	static void readDirectory(std::string path, std::function<void(tinydir_file& file)> fn, bool recursive = false);
+
+	static void readFileBytes(std::string file, std::function<void(size_t length, char* data)> fn);
+	static void writeFileBytes(std::string file, size_t length, char* data);
+
+	static std::string replaceIllegalCharacters(std::string s, std::string illegalCharacters, char replace);
+	static void replaceAll(std::string& s, std::string toReplace, std::string replacement);
 
 	// static convert fn
 	static std::vector<std::string> split(std::string str, char splitter);

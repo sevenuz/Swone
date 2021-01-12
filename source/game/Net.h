@@ -4,6 +4,9 @@
 #include <SFML/Network.hpp>
 
 #include "util/reader/Reader.h"
+#include "util/Log.h"
+#include "util/Helper.h"
+#include "game/GameReader.h"
 
 namespace Net
 {
@@ -13,6 +16,7 @@ namespace Net
 	static const unsigned char T_CREATE_LOBBY = 1;
 	static const unsigned char T_JOIN_LOBBY_REQ = 2;
 	static const unsigned char T_JOIN_LOBBY_ACK = 3;
+	static const unsigned char T_FILE = 4;
 
 	class Packet : public sf::Packet {
 		private:
@@ -44,22 +48,25 @@ namespace Net
 	template<typename T, typename K>
 	sf::Packet& operator >>(sf::Packet& packet, std::map<T, K>& sm);
 
+	struct File {
+		sf::Uint64 length;
+		char* data;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const File& f);
+	sf::Packet& operator >>(sf::Packet& packet, File& f);
+
+	static constexpr const char* GFC_SCENERY_FILE = "GfcSceneryFile";
+	static constexpr const char* GFC_MAP_FILE = "GfcMapFile";
+	static constexpr const char* GFC_TEXTURE_FILE_MAP = "GfcTextureFileMap";
+	static constexpr const char* GFC_OBJECT_FILE_MAP = "GfcObjectFileMap";
 	struct GameFileCheck {
-		StringPair sceneryFile;
-		StringPair mapFile;
-		StringMap textureFileMap;
-		StringMap objectFileMap;
+		StringPair sceneryFile; // first: fileName, second: checksum
+		StringPair mapFile; // first: fileName, second: checksum
+		StringMap textureFileMap; // first: fileName, second: checksum
+		StringMap objectFileMap; // first: fileName, second: checksum
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const GameFileCheck& lr);
 	sf::Packet& operator >>(sf::Packet& packet, GameFileCheck& lr);
-
-	struct CreateLobbyReq {
-		std::string name;
-		std::string password;
-		GameFileCheck fileCheck;
-	};
-	sf::Packet& operator <<(sf::Packet& packet, const CreateLobbyReq& lr);
-	sf::Packet& operator >>(sf::Packet& packet, CreateLobbyReq& lr);
 
 	struct GameFileCheckAnswer {
 		bool sceneryFile; // set if needed
@@ -70,6 +77,17 @@ namespace Net
 	sf::Packet& operator <<(sf::Packet& packet, const GameFileCheckAnswer& lr);
 	sf::Packet& operator >>(sf::Packet& packet, GameFileCheckAnswer& lr);
 	typedef GameFileCheckAnswer CreateLobbyRes;
+
+	void sendMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileCheckAnswer gfca);
+	void receiveMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileCheckAnswer gfca, std::string resDir);
+
+	struct CreateLobbyReq {
+		std::string name;
+		std::string password;
+		GameFileCheck fileCheck;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const CreateLobbyReq& lr);
+	sf::Packet& operator >>(sf::Packet& packet, CreateLobbyReq& lr);
 
 	struct JoinLobbyReq {
 		std::string identifier;

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <stdexcept>
+#include <functional>
 
 #include "util/reader/Reader.h"
 #include "game/Map.h"
@@ -19,14 +20,14 @@ public:
 	const std::string MAP_START_TOKEN = "map:start";
 	const std::string MAP_END_TOKEN = "map:end";
 
-	MapReader(std::string textureBasePath);
+	MapReader(std::function<std::string(std::string textureName)> textureMapper);
 	virtual ~MapReader();
 
 	void setMap(Map* mapObj);
 	static MapTile charToMapTile(char);
 protected:
 private:
-	std::string m_textureBasePath;
+	std::function<std::string(std::string textureName)> m_textureMapper;
 
 	Map* m_map = NULL;
 

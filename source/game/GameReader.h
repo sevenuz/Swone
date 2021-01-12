@@ -1,6 +1,7 @@
 #ifndef SWONE_GAME_GAMEREADER_H
 #define SWONE_GAME_GAMEREADER_H
 
+#include <functional>
 #include <map>
 
 #include <md5.h>
@@ -18,13 +19,15 @@ public:
 	GameReader(GameReader const&) = delete;
 	void operator=(GameReader const&) = delete;
 
+	static constexpr const char* GFC_FILE_EXTENSION = "Gfc";
+
 	static constexpr const char* RES_DIR_MAP = "map/";
 	static constexpr const char* RES_DIR_OBJECT = "obj/";
 	static constexpr const char* RES_DIR_SCENERY = "scenery/";
 	static constexpr const char* RES_DIR_TEXTURE = "texture/";
 
 	static StringMapMap& getSceneryMap(std::string file);
-	static Map* getMap(std::string resDir, std::string file);
+	static Map* getMap(std::string file, std::function<std::string(std::string textureName)> textureMapper);
 	static StringMapMap& getGameObjectMap(std::string file);
 
 	static std::string getTexturePath(std::string resDir, std::string name = "");
@@ -35,12 +38,15 @@ public:
 	static void readSceneryMaps(std::string resDir);
 	static void hashResDir(std::string resDir);
 
+	static std::string getHash(std::string file);
+	static std::string getFile(std::string hash);
+
 	static const sf::Texture* loadTexture(std::string path);
 	static const sf::Image* loadImage(std::string path);
 
 	// is only once created and will be destroyed on termination
 	static StringMap& getFileHashes() {
-		static auto* map = new StringMap;
+		static auto* map = new StringMap; // first: checksum, second: filePath
 		return *map;
 	};
 	static std::map<std::string, StringMapMap>& getSceneryMaps() {

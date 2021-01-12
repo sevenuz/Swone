@@ -39,6 +39,7 @@ private:
 	std::string m_selectedScenery = "";
 	std::string m_lobbyName = "Swone's Fightclub";
 	std::string m_lobbyPassword = "";
+	bool m_lobbyPrivate = false;
 
 	std::stack<std::string> m_modalMessageStack;
 

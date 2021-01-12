@@ -1,9 +1,18 @@
-#include <game/Scenery.h>
+#include "game/Scenery.h"
 
 Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap) :
 	m_setupMap(setupMap)
 {
-	m_sceneryFile = std::make_pair(fileName, md5file(GameReader::getSceneryPath(resDir, fileName).c_str()));
+	// sceneryFile will not mapped and so it is not important to keep the original name
+	m_fileCheck.sceneryFile = std::make_pair(fileName, md5file(GameReader::getSceneryPath(resDir, fileName).c_str()));
+	bool gfcInjection = setupMap.count(Net::GFC_SCENERY_FILE);
+
+	if(gfcInjection) {
+		for(auto p : setupMap[Net::GFC_MAP_FILE])
+			m_fileCheck.mapFile = p;
+		m_fileCheck.textureFileMap = setupMap[Net::GFC_TEXTURE_FILE_MAP];
+		m_fileCheck.objectFileMap = setupMap[Net::GFC_OBJECT_FILE_MAP];
+	}
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)) {
 		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
 		if(global.count(S_NAME))
@@ -11,15 +20,28 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 		else
 			throw std::invalid_argument("Name missing.");
 		if(global.count(S_MAP)) {
-			std::string mapName = global[S_MAP];
-			std::string mapPath = GameReader::getMapPath(resDir, mapName);
-			m_mapFile = std::make_pair(mapName, md5file(mapPath.c_str()));
+			std::string mapPath;
+			if(gfcInjection) {
+				mapPath = GameReader::getFile(m_fileCheck.mapFile.second);
+			} else {
+				std::string mapName = global[S_MAP];
+				mapPath = GameReader::getMapPath(resDir, mapName);
+				m_fileCheck.mapFile = std::make_pair(mapName, md5file(mapPath.c_str()));
+			}
 
-			m_map = GameReader::getMap(resDir, mapPath);
+			m_map = GameReader::getMap(mapPath, [&](std::string textureName) -> std::string {
+				if(gfcInjection) {
+					return GameReader::getFile(m_fileCheck.textureFileMap[textureName]);
+				} else {
+					return GameReader::getTexturePath(resDir, textureName);
+				}
+			});
 
-			std::string textureName = m_map->getTileTextureName();
-			std::string texturePath = m_map->getTileTexturePath();
-			m_textureFileMap[textureName] = md5file(texturePath.c_str());
+			if(!gfcInjection) {
+				std::string textureName = m_map->getTileTextureName();
+				std::string texturePath = m_map->getTileTexturePath();
+				m_fileCheck.textureFileMap[textureName] = md5file(texturePath.c_str());
+			}
 		} else {
 			throw std::invalid_argument("Map-Filename missing.");
 		}
@@ -28,7 +50,7 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 	if(setupMap.count(Scenery::S_PLAYER_PARAGRAPH)) {
 		for(int i = 1; setupMap[Scenery::S_PLAYER_PARAGRAPH].count(std::to_string(i)); i++) {
 			std::string pName = setupMap[Scenery::S_PLAYER_PARAGRAPH][std::to_string(i)];
-			m_playerSetupMaps[pName] = getGameObjectSetupMap(resDir, pName);
+			m_playerSetupMaps[pName] = getGameObjectSetupMap(resDir, pName, gfcInjection);
 		}
 	} else {
 		throw std::invalid_argument("Player-Paragraph missing.");
@@ -40,8 +62,16 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 			continue;
 		if(paragraph == Scenery::S_PLAYER_PARAGRAPH)
 			continue;
+		if(paragraph == Net::GFC_SCENERY_FILE)
+			continue;
+		if(paragraph == Net::GFC_MAP_FILE)
+			continue;
+		if(paragraph == Net::GFC_TEXTURE_FILE_MAP)
+			continue;
+		if(paragraph == Net::GFC_OBJECT_FILE_MAP)
+			continue;
 
-		m_objectSetupMaps[paragraph] = getGameObjectSetupMap(resDir, paragraph);
+		m_objectSetupMaps[paragraph] = getGameObjectSetupMap(resDir, paragraph, gfcInjection);
 	}
 }
 
@@ -51,19 +81,30 @@ Scenery::~Scenery() {
 	m_gameObjects.clear();
 }
 
-StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goName)
+StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goName, bool gfcInjection)
 {
-	std::string goPath = GameReader::getGameObjectPath(resDir, goName);
-	m_objectFileMap[goName] = md5file(goPath.c_str());
+	std::string goPath;
+	if(gfcInjection) {
+		goPath = GameReader::getFile(m_fileCheck.objectFileMap[goName]);
+	} else {
+		goPath = GameReader::getGameObjectPath(resDir, goName);
+		m_fileCheck.objectFileMap[goName] = md5file(goPath.c_str());
+	}
 
 	StringMapMap& goSetupMap = GameReader::getGameObjectMap(goPath);
 
 	std::string textureName = goSetupMap[Reader::DEFAULT_PARAGRAPH][GameObject::S_TEXTURE];
-	std::string texturePath = GameReader::getTexturePath(resDir, textureName);
+	std::string texturePath;
+	if(gfcInjection) {
+		texturePath = GameReader::getFile(m_fileCheck.textureFileMap[textureName]);
+	} else {
+		texturePath = GameReader::getTexturePath(resDir, textureName);
+	}
 
 	// set texture path in setupMap
 	goSetupMap[Reader::DEFAULT_PARAGRAPH][GameObject::S_TEXTURE_PATH] = texturePath;
-	m_textureFileMap[textureName] = md5file(texturePath.c_str());
+	if(!gfcInjection)
+		m_fileCheck.textureFileMap[textureName] = md5file(texturePath.c_str());
 
 	return goSetupMap;
 }
@@ -177,24 +218,9 @@ std::map<std::string, StringMapMap>& Scenery::getObjectSetupMaps()
 	return m_objectSetupMaps;
 }
 
-const StringPair& Scenery::getSceneryFile() const
+const Net::GameFileCheck& Scenery::getFileCheck() const
 {
-	return m_sceneryFile;
-}
-
-const StringPair& Scenery::getMapFile() const
-{
-	return m_mapFile;
-}
-
-const StringMap& Scenery::getTextureFileMap() const
-{
-	return m_textureFileMap;
-}
-
-const StringMap& Scenery::getObjectFileMap() const
-{
-	return m_objectFileMap;
+	return m_fileCheck;
 }
 
 void Scenery::setName(std::string n)

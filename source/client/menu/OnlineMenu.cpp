@@ -69,7 +69,7 @@ void OnlineMenu::drawCreateWindow()
 		ImGui::BeginGroup();
 		ImGui::Text("Select a Scenery");
 		ImGui::Separator();
-		ImGui::BeginChild("Scenery-Selection", ImVec2(0, -3 * ImGui::GetFrameHeightWithSpacing())); // 3 lines at the bottom
+		ImGui::BeginChild("Scenery-Selection", ImVec2(0, -4.4 * ImGui::GetFrameHeightWithSpacing())); // 4.4 lines at the bottom
 		for(auto& p : GameReader::getSceneryMaps()) {
 			std::string name = p.second[Reader::DEFAULT_PARAGRAPH][Scenery::S_NAME];
 			if (ImGui::Selectable(name.c_str(), m_selectedScenery == p.first))
@@ -81,6 +81,8 @@ void OnlineMenu::drawCreateWindow()
 		ImGui::InputText("Lobbyname", m_lobbyName.data(), 32);
 		ImGui::InputText("Password", m_lobbyPassword.data(), 32);
 		ImVec2 size = ImGui::GetItemRectSize();
+
+		ImGui::Checkbox("Private", &m_lobbyPrivate); // TODO add to CreateLobbyRequest
 
 		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(7.0f, 0.7f, 0.7f));
@@ -96,33 +98,25 @@ void OnlineMenu::drawCreateWindow()
 void OnlineMenu::createLobby()
 {
 	if(m_selectedScenery.empty()) {
-		Log::ger().log("You need a Scenerey", Log::Label::Error);
+		std::string err = "You have to select a Scenery to create a Lobby.";
+		m_modalMessageStack.push(err);
+		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
 	if(m_lobbyName.empty()) {
-		Log::ger().log("You need a Lobbyname", Log::Label::Error);
+		std::string err = "You have to choose a Lobby-Name to create a Lobby.";
+		m_modalMessageStack.push(err);
+		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
-	Log::ger().log("Client: Scenery: Texture Files:");
+
 	auto& p = GameReader::getSceneryMaps()[m_selectedScenery];
 	Scenery scenery(m_controller.getSettings().getResourceDirectory(), Helper::parseFileName(m_selectedScenery), p);
-	for(auto& s : scenery.getTextureFileMap()) {
-		Log::ger().log(s.first + " : " + s.second);
-	}
-	Log::ger().log("Client: Scenery: Object Files:");
-	for(auto& s : scenery.getObjectFileMap()) {
-		Log::ger().log(s.first + " : " + s.second);
-	}
 
 	Net::CreateLobbyReq clr = Net::CreateLobbyReq{
 		m_lobbyName,
 		m_lobbyPassword,
-		Net::GameFileCheck{
-			scenery.getSceneryFile(),
-			scenery.getMapFile(),
-			scenery.getTextureFileMap(),
-			scenery.getObjectFileMap()
-		}
+		scenery.getFileCheck()
 	};
 	std::thread(&OnlineMenu::sendLobbyRequest, this, clr).detach();
 }
@@ -159,6 +153,7 @@ void OnlineMenu::sendLobbyRequest(Net::CreateLobbyReq clr)
 		case Net::T_CREATE_LOBBY:
 			resPacket >> res;
 			m_modalMessageStack.push("Server needs files...");
+			Net::sendMissingFiles(socket, clr.fileCheck, res);
 			break;
 		case Net::T_JOIN_LOBBY_ACK:
 			m_modalMessageStack.push("Join Lobby");

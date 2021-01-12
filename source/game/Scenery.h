@@ -9,6 +9,7 @@
 #include "Handleable.h"
 #include "game/GameReader.h"
 #include "game/Map.h"
+#include "game/Net.h"
 #include "game/object/GameObject.h"
 
 class Scenery : public Handleable {
@@ -33,10 +34,7 @@ public:
 
 	std::map<std::string, StringMapMap>& getPlayerSetupMaps();
 	std::map<std::string, StringMapMap>& getObjectSetupMaps();
-	const StringPair& getSceneryFile() const;
-	const StringPair& getMapFile() const;
-	const StringMap& getTextureFileMap() const;
-	const StringMap& getObjectFileMap() const;
+	const Net::GameFileCheck& getFileCheck() const;
 
 	void setName(std::string);
 	std::string getName();
@@ -44,7 +42,7 @@ public:
 	void spawnPlayer(std::string key);
 	void reset();
 private:
-	StringMapMap& getGameObjectSetupMap(std::string resDir, std::string goName);
+	StringMapMap& getGameObjectSetupMap(std::string resDir, std::string goName, bool gfcInjection);
 	void sortGameObjects();
 	void spawnGameObjects();
 
@@ -57,10 +55,7 @@ private:
 	std::map<std::string, StringMapMap> m_playerSetupMaps;
 	std::map<std::string, StringMapMap> m_objectSetupMaps;
 
-	StringPair m_sceneryFile;
-	StringPair m_mapFile;
-	StringMap m_textureFileMap;
-	StringMap m_objectFileMap;
+	Net::GameFileCheck m_fileCheck;
 };
 #endif
 

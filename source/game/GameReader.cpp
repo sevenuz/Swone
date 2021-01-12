@@ -23,17 +23,23 @@ StringMapMap& GameReader::getSceneryMap(std::string file)
 {
 	if(!getSceneryMaps().count(file)) {
 		Reader r(file);
-		getSceneryMaps()[file] = r.copyParagraphMap();
+		auto sm = r.copyParagraphMap();
+		try {
+			Reader rgfc(file + GFC_FILE_EXTENSION);
+			sm.insert(rgfc.getParagraphMap().begin(), rgfc.getParagraphMap().end());
+		}
+		catch (const std::invalid_argument& ia) {} // normal with original game files
+		getSceneryMaps()[file] = sm;
 	}
 	return getSceneryMaps()[file];
 }
 
-Map* GameReader::getMap(std::string resDir, std::string file)
+Map* GameReader::getMap(std::string file, std::function<std::string(std::string textureName)> fn)
 {
 	if(!getMapMap().count(file)) {
 		Map* map = new Map();
 
-		static MapReader mapReader(getTexturePath(resDir));
+		MapReader mapReader(fn);
 		mapReader.setPath(file);
 
 		mapReader.setMap(map);
@@ -75,12 +81,7 @@ void GameReader::hashResDir(std::string resDir)
 {
 	auto fn = [&](tinydir_file& file){
 		try {
-			std::string path(file.path);
-			std::string hash = md5file(file.path);
-			Log::ger().log(path);
-			if(getFileHashes().count(hash) && getFileHashes()[hash] != path)
-				Log::ger().log("Collision: " + hash, Log::Label::Error);
-			getFileHashes()[hash] = path;
+			getHash(std::string(file.path));
 		} catch(const std::invalid_argument& ia) {
 			Log::ger().log(ia.what(), Log::Label::Error);
 		}
@@ -89,6 +90,27 @@ void GameReader::hashResDir(std::string resDir)
 	Helper::readDirectory(GameReader::getTexturePath(resDir), fn, true);
 	Helper::readDirectory(GameReader::getMapPath(resDir), fn, true);
 	Helper::readDirectory(GameReader::getGameObjectPath(resDir), fn, true);
+}
+
+std::string GameReader::getHash(std::string file)
+{
+	std::string hash = md5file(file.c_str());
+	// TODO is hash collision a problem?
+	if(getFileHashes().count(hash) && getFileHashes()[hash] != file) {
+		Log::ger().log("Collision: " + hash, Log::Label::Error);
+	}
+	getFileHashes()[hash] = file;
+	return hash;
+}
+
+std::string GameReader::getFile(std::string hash)
+{
+	// TODO different exception handling on file not found?
+	if(!getFileHashes().count(hash)) {
+		Log::ger().log("File(" + hash + ") not indexed or not in resDir", Log::Label::Error);
+		throw std::invalid_argument("hash not found");
+	}
+	return getFileHashes()[hash];
 }
 
 const sf::Texture* GameReader::loadTexture(std::string path)
