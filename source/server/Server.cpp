@@ -13,8 +13,7 @@ void Server::runTcpConnection(sf::TcpSocket& socket)
 {
 	Net::Packet reqPacket;
 	if(socket.receive(reqPacket) != sf::Socket::Done) {
-		Log::ger().log("sendLobbyRequest: Error while Receiving", Log::Label::Error);
-		return;
+		throw Net::Status{Net::C_RECEIVE, "runTcpConnection: Error while receiving"};
 	}
 
 	switch((int)reqPacket.getType()) {
@@ -43,10 +42,10 @@ void Server::handleTcpCreateLobby(sf::TcpSocket& socket, Net::Packet& reqPacket)
 
 	if(res.sceneryFile || res.mapFile || res.objectFiles.size()>0 || res.textureFiles.size()>0) {
 		// trigger file upload
-		Net::Packet resPacket(Net::T_CREATE_LOBBY);
+		Net::Packet resPacket(Net::T_FILE_REQUEST);
 		resPacket << res;
 		if (socket.send(resPacket) != sf::Socket::Done) {
-			Log::ger().log("handleCreateLobby: Error while Sending", Log::Label::Error);
+			throw Net::Status{Net::C_SEND, "handleTcpCreateLobby: Error while sending T_FILE_REQUEST"};
 		}
 		Net::receiveMissingFiles(socket, req.fileCheck, res, settings.getResourceDirectory());
 	}
@@ -58,7 +57,7 @@ void Server::handleTcpCreateLobby(sf::TcpSocket& socket, Net::Packet& reqPacket)
 	Net::Packet resPacket(Net::T_JOIN_LOBBY_ACK);
 	resPacket << l->getJoinLobbyAck();
 	if (socket.send(resPacket) != sf::Socket::Done) {
-		Log::ger().log("handleCreateLobby: Error while Sending", Log::Label::Error);
+		throw Net::Status{Net::C_SEND, "handleTcpCreateLobby: Error while sending T_JOIN_LOBBY_ACK"};
 	}
 }
 
@@ -75,7 +74,13 @@ int Server::start()
 		if (listener.accept(client) == sf::Socket::Done) {
 			// TODO handle TcpConnection in different thread?
 			// std::thread(&Server::runTcpConnection, client).detach();
-			runTcpConnection(client);
+			try {
+				runTcpConnection(client);
+			} catch(Net::Status s) {
+				Log::ger().log(std::to_string(s.code) + ": " + s.message, Log::Label::Error);
+				Net::Packet p(Net::T_ERROR);
+				client.send(p << s);
+			}
 		}
 	}
 

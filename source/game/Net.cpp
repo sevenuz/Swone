@@ -86,7 +86,7 @@ void Net::sendMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileChe
 		Packet packet(T_FILE);
 		packet << File{length, data};
 		if (socket.send(packet) != sf::Socket::Done) {
-			Log::ger().log("FileTransport: failed to send", Log::Label::Error);
+			throw Status{T_FILE, "FileTransport: failed to send packet"};
 		}
 	};
 	if(gfca.sceneryFile) {
@@ -108,20 +108,18 @@ void Net::receiveMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFile
 	auto fn = [&](std::string file, std::string expectedHash) {
 		Packet packet;
 		if(socket.receive(packet) != sf::Socket::Done) {
-			Log::ger().log("FileTransport: failed to receive " + file, Log::Label::Error);
+			throw Status{C_RECEIVE, "FileTransport: failed to receive packet"};
 		}
 		if(packet.getType() == T_FILE) {
-			Log::ger().log("FileDownload: " + file);
 			File f;
 			packet >> f;
 			Helper::writeFileBytes(file, f.length, f.data);
 			delete f.data;
 			if(expectedHash != GameReader::getHash(file)) { // adds hash to GameReader::FileHashMap
-				Log::ger().log("FileDownload corrupt: " + file, Log::Label::Error); // TODO error handling?
+				throw Status{C_CORRUPT, "FileTransport: File corrupt after receiving"};
 			}
 		} else {
-			Log::ger().log("FileDownload expected", Log::Label::Error);
-			// TODO send error status
+			throw Status{C_TYPE, "FileTransport: expected File, got " + std::to_string(packet.getType())};
 		}
 	};
 
@@ -131,9 +129,16 @@ void Net::receiveMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFile
 		return Helper::replaceIllegalCharacters(basename, "/\\.", '_') + "#" + timestamp;
 	};
 
+	std::string file;
 	if(gfca.sceneryFile) {
-		std::string file = GameReader::getSceneryPath(resDir, fname(gfc.sceneryFile.first));
+		file = GameReader::getSceneryPath(resDir, fname(gfc.sceneryFile.first));
 		fn(file, gfc.sceneryFile.second);
+	} else {
+		// if sceneryFile is not uploaded, overwrite the GameFileCheck
+		// of the used scenerey with the new one to use right files.
+		file = GameReader::getFile(gfc.sceneryFile.second);
+	}
+	{
 		// write GameFileCheck wich is injected to Scenery SetupMap in GameReader
 		std::string fstr;
 		fstr += "// GameFileCheck (automaticly created)\n";
@@ -158,6 +163,16 @@ void Net::receiveMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFile
 	for(std::string name : gfca.textureFiles) {
 		fn(GameReader::getTexturePath(resDir, fname(name)), gfc.textureFileMap[name]);
 	}
+}
+
+// Type: Status
+sf::Packet& Net::operator <<(sf::Packet& packet, const Status& f)
+{
+	return packet << f.code << f.message;
+}
+sf::Packet& Net::operator >>(sf::Packet& packet, Status& f)
+{
+	return packet >> f.code >> f.message;
 }
 
 // Type: File

@@ -12,11 +12,21 @@ namespace Net
 {
 	typedef unsigned short Port;
 
+	// Packet Types
 	static const unsigned char T_VOID = 0;
 	static const unsigned char T_CREATE_LOBBY = 1;
 	static const unsigned char T_JOIN_LOBBY_REQ = 2;
 	static const unsigned char T_JOIN_LOBBY_ACK = 3;
 	static const unsigned char T_FILE = 4;
+	static const unsigned char T_FILE_REQUEST = 5;
+	static const unsigned char T_ERROR = 6;
+
+	// Status Codes
+	static const unsigned char C_CONNECTION = 1;
+	static const unsigned char C_SEND = 2;
+	static const unsigned char C_RECEIVE = 3;
+	static const unsigned char C_CORRUPT = 4;
+	static const unsigned char C_TYPE = 5;
 
 	class Packet : public sf::Packet {
 		private:
@@ -36,7 +46,7 @@ namespace Net
 	template<typename T>
 	sf::Packet& operator >>(sf::Packet& packet, std::vector<T>& sm);
 
-		// Type: std::pair<T, K>
+	// Type: std::pair<T, K>
 	template<typename T, typename K>
 	sf::Packet& operator <<(sf::Packet& packet, const std::pair<T, K>& sm);
 	template<typename T, typename K>
@@ -47,6 +57,13 @@ namespace Net
 	sf::Packet& operator <<(sf::Packet& packet, const std::map<T, K>& sm);
 	template<typename T, typename K>
 	sf::Packet& operator >>(sf::Packet& packet, std::map<T, K>& sm);
+
+	struct Status {
+		sf::Uint16 code;
+		std::string message;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const Status& f);
+	sf::Packet& operator >>(sf::Packet& packet, Status& f);
 
 	struct File {
 		sf::Uint64 length;

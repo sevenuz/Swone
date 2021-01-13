@@ -1,4 +1,4 @@
-#include <client/menu/OnlineMenu.h>
+#include "client/menu/OnlineMenu.h"
 
 OnlineMenu::OnlineMenu(Controller& c) :
 	m_ps(100),
@@ -124,40 +124,45 @@ void OnlineMenu::createLobby()
 void OnlineMenu::sendLobbyRequest(Net::CreateLobbyReq clr)
 {
 	sf::TcpSocket socket;
-	sf::Socket::Status status = socket.connect(m_controller.getSettings().getServerIpAddress(), m_controller.getSettings().getPort());
-	if (status != sf::Socket::Done) {
-		std::string err = "sendLobbyRequest: Error while Connecting to " + m_controller.getSettings().getServerAndPort();
-		m_modalMessageStack.push(err);
-		Log::ger().log(err, Log::Label::Error);
-		return;
-	}
-	Net::Packet reqPacket(Net::T_CREATE_LOBBY);
-	reqPacket << clr;
-	if (socket.send(reqPacket) != sf::Socket::Done) {
-		std::string err = "sendLobbyRequest: Error while Sending to " + m_controller.getSettings().getServerAndPort();
-		m_modalMessageStack.push(err);
-		Log::ger().log(err, Log::Label::Error);
-		return;
-	}
+	try {
+		sf::Socket::Status status = socket.connect(m_controller.getSettings().getServerIpAddress(), m_controller.getSettings().getPort());
+		if (status != sf::Socket::Done) {
+			throw Net::Status{Net::C_CONNECTION, "sendLobbyRequest: Error while Connecting to " + m_controller.getSettings().getServerAndPort()};
+		}
+		Net::Packet reqPacket(Net::T_CREATE_LOBBY);
+		reqPacket << clr;
+		if (socket.send(reqPacket) != sf::Socket::Done) {
+			throw Net::Status{Net::C_SEND, "sendLobbyRequest: Error while sending T_CREATE_LOBBY"};
+		}
 
-	Net::Packet resPacket;
-	if(socket.receive(resPacket) != sf::Socket::Done) {
-		std::string err = "sendLobbyRequest: Error while Receiving to " + m_controller.getSettings().getServerAndPort();
-		m_modalMessageStack.push(err);
-		Log::ger().log(err, Log::Label::Error);
-		return;
-	}
+		Net::Packet resPacket;
+		if(socket.receive(resPacket) != sf::Socket::Done) {
+			throw Net::Status{Net::C_RECEIVE, "sendLobbyRequest: Error while receiving"};
+		}
 
-	Net::CreateLobbyRes res;
-	switch((int)resPacket.getType()) {
-		case Net::T_CREATE_LOBBY:
+		if(resPacket.getType() == Net::T_FILE_REQUEST) {
+			Net::CreateLobbyRes res;
 			resPacket >> res;
 			m_modalMessageStack.push("Server needs files...");
 			Net::sendMissingFiles(socket, clr.fileCheck, res);
-			break;
-		case Net::T_JOIN_LOBBY_ACK:
+			resPacket = Net::Packet();
+			if(socket.receive(resPacket) != sf::Socket::Done) {
+				throw Net::Status{Net::C_RECEIVE, "sendLobbyRequest: Error while receiving T_JOIN_LOBBY_ACK"};
+			}
+		}
+
+		if(resPacket.getType() == Net::T_JOIN_LOBBY_ACK) {
 			m_modalMessageStack.push("Join Lobby");
-			break;
+		}
+
+		if(resPacket.getType() == Net::T_ERROR) {
+			Net::Status s;
+			resPacket >> s;
+			throw s;
+		}
+	} catch(Net::Status s) {
+		m_modalMessageStack.push(s.message);
+		Log::ger().log(std::to_string(s.code) + ": " + s.message, Log::Label::Error);
 	}
 	socket.disconnect();
 }
