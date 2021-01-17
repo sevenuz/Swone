@@ -29,6 +29,8 @@ private:
 	bool m_run = false;
 	void runTcpConnection(sf::TcpSocket& client);
 	void handleTcpCreateLobby(sf::TcpSocket& socket, Net::Packet& reqPacket);
+	void handleTcpLobbyRefresh(sf::TcpSocket& socket, Net::Packet& reqPacket);
+	void handleTcpJoinLobbyReq(sf::TcpSocket& socket, Net::Packet& reqPacket);
 
 	SrvSettings settings;
 

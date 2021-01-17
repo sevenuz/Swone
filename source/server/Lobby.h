@@ -35,6 +35,7 @@ public:
 
 	bool verifyJoinLobbyReq(Net::JoinLobbyReq jlr);
 	Net::JoinLobbyAck getJoinLobbyAck();
+	Net::LobbyStatus getLobbyStatus();
 private:
 	void startMainLoop();
 	void handleUdpConnections();
@@ -45,7 +46,7 @@ private:
 
 	sf::UdpSocket socket;
 
-	const std::string m_identifier;
+	const std::string m_code;
 	Net::CreateLobbyReq m_lobbyData;
 	Net::Port m_port = sf::Socket::AnyPort;
 

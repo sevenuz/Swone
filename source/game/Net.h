@@ -1,7 +1,9 @@
 #ifndef SWONE_GAME_NET_H
 #define SWONE_GAME_NET_H
 
+#include <SFML/Config.hpp>
 #include <SFML/Network.hpp>
+#include <vector>
 
 #include "util/reader/Reader.h"
 #include "util/Log.h"
@@ -20,6 +22,7 @@ namespace Net
 	static const unsigned char T_FILE = 4;
 	static const unsigned char T_FILE_REQUEST = 5;
 	static const unsigned char T_ERROR = 6;
+	static const unsigned char T_LOBBY_REFRESH = 7;
 
 	// Status Codes
 	static const unsigned char C_CONNECTION = 1;
@@ -107,7 +110,7 @@ namespace Net
 	sf::Packet& operator >>(sf::Packet& packet, CreateLobbyReq& lr);
 
 	struct JoinLobbyReq {
-		std::string identifier;
+		std::string code;
 		std::string password;
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const JoinLobbyReq& lr);
@@ -119,6 +122,21 @@ namespace Net
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const JoinLobbyAck& lr);
 	sf::Packet& operator >>(sf::Packet& packet, JoinLobbyAck& lr);
+
+	struct LobbyStatus {
+		std::string name;
+		std::string code;
+		bool hasPassword;
+		sf::Uint8 playerCount;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const LobbyStatus& lr);
+	sf::Packet& operator >>(sf::Packet& packet, LobbyStatus& lr);
+
+	struct LobbyRefresh {
+		std::vector<LobbyStatus> lobbies;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const LobbyRefresh& lr);
+	sf::Packet& operator >>(sf::Packet& packet, LobbyRefresh& lr);
 }
 
 #endif // NET_H

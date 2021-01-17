@@ -6,6 +6,7 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/Network/TcpSocket.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -30,15 +31,24 @@
 #include "util/Log.h"
 #include "util/Helper.h"
 
+#define LOBBY_NAME_LENGTH 49
+#define LOBBY_PASSWORD_LENGTH 25
+#define LOBBY_CODE_LENGTH 7
+
 class OnlineMenu : public Handleable {
 private:
 	ParticleSystem m_ps;
 	Controller& m_controller;
 
 	sf::Text m_header;
-	std::string m_selectedScenery = "";
-	std::string m_lobbyName = "Swone's Fightclub";
-	std::string m_lobbyPassword = "";
+
+	std::string m_joinLobbyCode;
+	std::string m_joinLobbyPassword;
+	std::vector<Net::LobbyStatus> m_lobbies;
+
+	std::string m_selectedScenery;
+	char m_lobbyName[LOBBY_NAME_LENGTH];
+	char m_lobbyPassword[LOBBY_PASSWORD_LENGTH];
 	bool m_lobbyPrivate = false;
 
 	std::stack<std::string> m_modalMessageStack;
@@ -48,8 +58,12 @@ private:
 	void drawCreateWindow();
 
 	void createLobby();
+	void joinLobby();
 public:
-	void sendLobbyRequest(Net::CreateLobbyReq clr);
+	void sendCreateLobby(Net::CreateLobbyReq clr);
+	void sendJoinLobby(Net::JoinLobbyReq jlr);
+	void handleJoinLobby(sf::TcpSocket& socket, Net::JoinLobbyAck jlr);
+	void sendLobbyRefresh();
 
 	void drawImgui();
 

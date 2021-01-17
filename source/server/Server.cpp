@@ -20,6 +20,12 @@ void Server::runTcpConnection(sf::TcpSocket& socket)
 		case Net::T_CREATE_LOBBY:
 			handleTcpCreateLobby(socket, reqPacket);
 			break;
+		case Net::T_LOBBY_REFRESH:
+			handleTcpLobbyRefresh(socket, reqPacket);
+			break;
+		case Net::T_JOIN_LOBBY_REQ:
+			handleTcpJoinLobbyReq(socket, reqPacket);
+			break;
 	}
 	socket.disconnect();
 }
@@ -59,6 +65,24 @@ void Server::handleTcpCreateLobby(sf::TcpSocket& socket, Net::Packet& reqPacket)
 	if (socket.send(resPacket) != sf::Socket::Done) {
 		throw Net::Status{Net::C_SEND, "handleTcpCreateLobby: Error while sending T_JOIN_LOBBY_ACK"};
 	}
+}
+
+void Server::handleTcpLobbyRefresh(sf::TcpSocket& socket, Net::Packet& reqPacket)
+{
+
+	Net::Packet resPacket(Net::T_LOBBY_REFRESH);
+	Net::LobbyRefresh lr;
+	for(auto* l : lobbies)
+		lr.lobbies.push_back(l->getLobbyStatus());
+	resPacket << lr;
+	if (socket.send(resPacket) != sf::Socket::Done) {
+		throw Net::Status{Net::C_SEND, "handleTcpLobbyRefresh: Error while sending T_LOBBY_REFRESH"};
+	}
+}
+
+void Server::handleTcpJoinLobbyReq(sf::TcpSocket& socket, Net::Packet& reqPacket)
+{
+
 }
 
 int Server::start()

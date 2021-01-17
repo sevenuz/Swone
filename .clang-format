@@ -1,0 +1,7 @@
+BasedOnStyle: Chromium
+AllowShortBlocksOnASingleLine: SBS_Empty
+UseCRLF: false
+UseTab: UT_ForIndentation
+PointerAlignment: PAS_Left
+BreakBeforeBraces: BS_WebKit
+ColumnLimit: 99

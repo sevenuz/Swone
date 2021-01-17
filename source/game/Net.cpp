@@ -230,11 +230,11 @@ sf::Packet& Net::operator >>(sf::Packet& packet, GameFileCheckAnswer& lr)
 // Type: JoinLobbyReq
 sf::Packet& Net::operator <<(sf::Packet& packet, const JoinLobbyReq& lr)
 {
-	return packet << lr.identifier << lr.password;
+	return packet << lr.code << lr.password;
 }
 sf::Packet& Net::operator >>(sf::Packet& packet, JoinLobbyReq& lr)
 {
-	return packet >> lr.identifier >> lr.password;
+	return packet >> lr.code >> lr.password;
 }
 
 // Type: JoinLobbyAck
@@ -245,4 +245,24 @@ sf::Packet& Net::operator <<(sf::Packet& packet, const JoinLobbyAck& lr)
 sf::Packet& Net::operator >>(sf::Packet& packet, JoinLobbyAck& lr)
 {
 	return packet >> lr.port >> lr.fileCheck;
+}
+
+// Type: LobbyStatus
+sf::Packet& Net::operator <<(sf::Packet& packet, const LobbyStatus& lr)
+{
+	return packet << lr.name << lr.code << lr.hasPassword << lr.playerCount;
+}
+sf::Packet& Net::operator >>(sf::Packet& packet, LobbyStatus& lr)
+{
+	return packet >> lr.name >> lr.code >> lr.hasPassword >> lr.playerCount;
+}
+
+// Type: LobbyRefresh
+sf::Packet& Net::operator <<(sf::Packet& packet, const LobbyRefresh& lr)
+{
+	return packet << lr.lobbies;
+}
+sf::Packet& Net::operator >>(sf::Packet& packet, LobbyRefresh& lr)
+{
+	return packet >> lr.lobbies;
 }

@@ -17,6 +17,9 @@ OnlineMenu::OnlineMenu(Controller& c) :
 	m_ps.setLifetime(sf::seconds(3));
 	m_ps.setOrigin(gb.left, gb.top, gb.width, gb.height, Origin::ON_BORDER);
 
+	m_joinLobbyCode.reserve(LOBBY_CODE_LENGTH);
+	m_joinLobbyPassword.reserve(LOBBY_PASSWORD_LENGTH);
+
 	GameReader::readSceneryMaps(m_controller.getSettings().getResourceDirectory());
 	GameReader::hashResDir(m_controller.getSettings().getResourceDirectory()); // TODO here?
 }
@@ -48,9 +51,126 @@ void OnlineMenu::drawJoinWindow()
 	ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
 	ImGui::Begin("Join a Game", w_open, window_flags);
-		// TODO imgui online joining menu
-		ImGui::TextColored(ImColor(210, 0, 0), "Joining is not possible yet.");
+		ImGui::BeginGroup();
+		ImGui::Text("Select a Lobby");
+		ImGui::Separator();
+		ImGui::BeginChild("Lobby-Selection", ImVec2(0, -4.4 * ImGui::GetFrameHeightWithSpacing())); // 4.4 lines at the bottom
+		for(auto& p : m_lobbies) {
+			ImGui::PushID(p.code.c_str());
+			if(ImGui::Selectable(p.name.c_str(), m_joinLobbyCode == p.code))
+				m_joinLobbyCode = p.code;
+			ImGui::PopID();
+		}
+		ImGui::EndChild();
+		ImGui::Separator();
+
+		ImGui::InputText("Code", m_joinLobbyCode.data(), LOBBY_CODE_LENGTH);
+		ImGui::InputText("Password", m_joinLobbyPassword.data(), LOBBY_PASSWORD_LENGTH);
+		ImVec2 size = ImGui::GetItemRectSize();
+
+		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(111.0f, 0.58f, 0.45f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(111.0f, 0.68f, 0.55f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(111.0f, 0.78f, 0.65f));
+		if(ImGui::Button("REFRESH")) {
+			sendLobbyRefresh();
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 0.8f, 0.8f));
+
+		if(ImGui::Button("JOIN", size)) {
+			joinLobby();
+		}
+		ImGui::PopStyleColor(3);
+		ImGui::EndGroup();
 	ImGui::End();
+}
+
+void OnlineMenu::sendLobbyRefresh()
+{
+	std::thread([&](){
+		sf::TcpSocket socket;
+		try {
+			sf::Socket::Status status = socket.connect(m_controller.getSettings().getServerIpAddress(), m_controller.getSettings().getPort());
+			if (status != sf::Socket::Done) {
+				throw Net::Status{Net::C_CONNECTION, "sendLobbyRefresh: Error while Connecting to " + m_controller.getSettings().getServerAndPort()};
+			}
+			Net::Packet reqPacket(Net::T_LOBBY_REFRESH);
+			if (socket.send(reqPacket) != sf::Socket::Done) {
+				throw Net::Status{Net::C_SEND, "sendLobbyRefresh: Error while sending T_LOBBY_REFRESH"};
+			}
+			Net::Packet resPacket;
+			if(socket.receive(resPacket) != sf::Socket::Done) {
+				throw Net::Status{Net::C_RECEIVE, "sendLobbyRefresh: Error while receiving"};
+			}
+			if(resPacket.getType() == Net::T_LOBBY_REFRESH) {
+				Net::LobbyRefresh ls;
+				resPacket >> ls;
+				m_lobbies = ls.lobbies;
+			}
+			if(resPacket.getType() == Net::T_ERROR) {
+				Net::Status s;
+				resPacket >> s;
+				throw s;
+			}
+		} catch(Net::Status s) {
+			m_modalMessageStack.push(s.message);
+			Log::ger().log(std::to_string(s.code) + ": " + s.message, Log::Label::Error);
+		}
+		socket.disconnect();
+	}).detach();
+}
+
+void OnlineMenu::joinLobby()
+{
+	if(m_joinLobbyCode.empty()) {
+		std::string err = "You have to enter a Lobby-Identifier to join a Lobby.";
+		m_modalMessageStack.push(err);
+		Log::ger().log(err, Log::Label::Error);
+		return;
+	}
+
+	Net::JoinLobbyReq jlr = Net::JoinLobbyReq{
+		m_joinLobbyCode,
+		m_joinLobbyPassword
+	};
+	std::thread(&OnlineMenu::sendJoinLobby, this, jlr).detach();
+}
+
+void OnlineMenu::sendJoinLobby(Net::JoinLobbyReq jlr)
+{
+	sf::TcpSocket socket;
+	try {
+		sf::Socket::Status status = socket.connect(m_controller.getSettings().getServerIpAddress(), m_controller.getSettings().getPort());
+		if (status != sf::Socket::Done) {
+			throw Net::Status{Net::C_CONNECTION, "sendJoinLobby: Error while Connecting to " + m_controller.getSettings().getServerAndPort()};
+		}
+		Net::Packet reqPacket(Net::T_JOIN_LOBBY_REQ);
+		reqPacket << jlr;
+		if (socket.send(reqPacket) != sf::Socket::Done) {
+			throw Net::Status{Net::C_SEND, "sendJoinLobby: Error while sending T_JOIN_LOBBY_REQ"};
+		}
+		Net::Packet resPacket;
+		if(socket.receive(resPacket) != sf::Socket::Done) {
+			throw Net::Status{Net::C_RECEIVE, "sendJoinLobby: Error while receiving"};
+		}
+		if(resPacket.getType() == Net::T_JOIN_LOBBY_ACK) {
+			Net::JoinLobbyAck jla;
+			resPacket >> jla;
+			handleJoinLobby(socket, jla);
+		}
+		if(resPacket.getType() == Net::T_ERROR) {
+			Net::Status s;
+			resPacket >> s;
+			throw s;
+		}
+	} catch(Net::Status s) {
+		m_modalMessageStack.push(s.message);
+		Log::ger().log(std::to_string(s.code) + ": " + s.message, Log::Label::Error);
+	}
+	socket.disconnect();
 }
 
 void OnlineMenu::drawCreateWindow()
@@ -78,8 +198,8 @@ void OnlineMenu::drawCreateWindow()
 		ImGui::EndChild();
 		ImGui::Separator();
 
-		ImGui::InputText("Lobbyname", m_lobbyName.data(), 32);
-		ImGui::InputText("Password", m_lobbyPassword.data(), 32);
+		ImGui::InputText("Lobbyname", m_lobbyName, LOBBY_NAME_LENGTH);
+		ImGui::InputText("Password", m_lobbyPassword, LOBBY_PASSWORD_LENGTH);
 		ImVec2 size = ImGui::GetItemRectSize();
 
 		ImGui::Checkbox("Private", &m_lobbyPrivate); // TODO add to CreateLobbyRequest
@@ -103,7 +223,8 @@ void OnlineMenu::createLobby()
 		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
-	if(m_lobbyName.empty()) {
+	std::string lobbyName(m_lobbyName);
+	if(lobbyName.empty()) {
 		std::string err = "You have to choose a Lobby-Name to create a Lobby.";
 		m_modalMessageStack.push(err);
 		Log::ger().log(err, Log::Label::Error);
@@ -114,14 +235,14 @@ void OnlineMenu::createLobby()
 	Scenery scenery(m_controller.getSettings().getResourceDirectory(), Helper::parseFileName(m_selectedScenery), p);
 
 	Net::CreateLobbyReq clr = Net::CreateLobbyReq{
-		m_lobbyName,
-		m_lobbyPassword,
+		lobbyName,
+		std::string(m_lobbyPassword),
 		scenery.getFileCheck()
 	};
-	std::thread(&OnlineMenu::sendLobbyRequest, this, clr).detach();
+	std::thread(&OnlineMenu::sendCreateLobby, this, clr).detach();
 }
 
-void OnlineMenu::sendLobbyRequest(Net::CreateLobbyReq clr)
+void OnlineMenu::sendCreateLobby(Net::CreateLobbyReq clr)
 {
 	sf::TcpSocket socket;
 	try {
@@ -152,7 +273,9 @@ void OnlineMenu::sendLobbyRequest(Net::CreateLobbyReq clr)
 		}
 
 		if(resPacket.getType() == Net::T_JOIN_LOBBY_ACK) {
-			m_modalMessageStack.push("Join Lobby");
+			Net::JoinLobbyAck jla;
+			resPacket >> jla;
+			handleJoinLobby(socket, jla);
 		}
 
 		if(resPacket.getType() == Net::T_ERROR) {
@@ -165,6 +288,12 @@ void OnlineMenu::sendLobbyRequest(Net::CreateLobbyReq clr)
 		Log::ger().log(std::to_string(s.code) + ": " + s.message, Log::Label::Error);
 	}
 	socket.disconnect();
+}
+
+void OnlineMenu::handleJoinLobby(sf::TcpSocket& socket, Net::JoinLobbyAck jla)
+{
+	// TODO implement join lobby
+	m_modalMessageStack.push("Join Lobby");
 }
 
 void OnlineMenu::drawImgui()

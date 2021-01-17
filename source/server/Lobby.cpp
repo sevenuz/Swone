@@ -6,7 +6,7 @@ std::string Lobby::generateIdentifier(std::string name)
 }
 
 Lobby::Lobby(SrvSettings& settings, Net::CreateLobbyReq ld) :
-	m_identifier(generateIdentifier(ld.name)),
+	m_code(generateIdentifier(ld.name)),
 	m_lobbyData(ld)
 {
 	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
@@ -75,7 +75,7 @@ void Lobby::start()
 	socket.setBlocking(false);
 	m_port = socket.getLocalPort();
 	std::thread udpThread(&Lobby::handleUdpConnections, this);
-	Log::ger().log("Lobby#" + m_identifier + " is listening.");
+	Log::ger().log("Lobby#" + m_code + " is listening.");
 	startMainLoop();
 	udpThread.join();
 }
@@ -98,11 +98,21 @@ bool Lobby::verifyJoinLobbyReq(Net::JoinLobbyReq jlr)
 {
 	return
 		m_players.size() < MAX_PLAYER_COUNT && // TODO handle full Lobby different
-		jlr.identifier == m_identifier &&
+		jlr.code == m_code &&
 		jlr.password == m_lobbyData.password;
 }
 
 Net::JoinLobbyAck Lobby::getJoinLobbyAck()
 {
 	return Net::JoinLobbyAck{ m_port, m_lobbyData.fileCheck };
+}
+
+Net::LobbyStatus Lobby::getLobbyStatus()
+{
+	return Net::LobbyStatus{
+		m_lobbyData.name,
+		m_code,
+		m_lobbyData.password.empty(),
+		(sf::Uint8)m_players.size()
+	};
 }
