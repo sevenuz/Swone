@@ -41,6 +41,7 @@ public:
 
 	static std::string replaceIllegalCharacters(std::string s, std::string illegalCharacters, char replace);
 	static void replaceAll(std::string& s, std::string toReplace, std::string replacement);
+	static std::string trim(const std::string& s, const std::string& whitespace = " \t");
 
 	// static convert fn
 	static std::vector<std::string> split(std::string str, char splitter);

@@ -35,9 +35,8 @@ void Reader::read()
 	std::string line;
 	while (std::getline(infile, line))
 	{
-		// TODO ignore empty lines
-		// ignore comment lines:
-		if (line.substr(0, 2) == "//")
+		// ignore comment lines and empty lines:
+		if (line.substr(0, 2) == "//" || Helper::trim(line).empty())
 			continue;
 		parseLine(m_paragraph, line);
 		m_lineCounter++;

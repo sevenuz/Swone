@@ -86,6 +86,19 @@ void Helper::replaceAll(std::string& s, std::string toReplace, std::string repla
 	}
 }
 
+// https://stackoverflow.com/questions/1798112/removing-leading-and-trailing-spaces-from-a-string
+std::string Helper::trim(const std::string& str, const std::string& whitespace)
+{
+    const auto strBegin = str.find_first_not_of(whitespace);
+    if (strBegin == std::string::npos)
+        return ""; // no content
+
+    const auto strEnd = str.find_last_not_of(whitespace);
+    const auto strRange = strEnd - strBegin + 1;
+
+    return str.substr(strBegin, strRange);
+}
+
 // convert fn
 std::vector<std::string> Helper::split(std::string str, char splitter)
 {

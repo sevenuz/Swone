@@ -10,6 +10,8 @@
 #include <vector>
 #include <utility>
 
+#include "util/Helper.h"
+
 typedef std::map<std::string, std::string> StringMap;
 typedef std::map<std::string, StringMap> StringMapMap;
 typedef std::pair<std::string, std::string> StringPair;

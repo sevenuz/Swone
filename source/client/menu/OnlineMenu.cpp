@@ -223,7 +223,7 @@ void OnlineMenu::createLobby()
 		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
-	std::string lobbyName(m_lobbyName);
+	std::string lobbyName = Helper::trim(std::string(m_lobbyName));
 	if(lobbyName.empty()) {
 		std::string err = "You have to choose a Lobby-Name to create a Lobby.";
 		m_modalMessageStack.push(err);
