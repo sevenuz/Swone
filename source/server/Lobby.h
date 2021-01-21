@@ -33,6 +33,8 @@ public:
 	void stop();
 	void sendState();
 
+	const std::string getCode() const;
+
 	bool verifyJoinLobbyReq(Net::JoinLobbyReq jlr);
 	Net::JoinLobbyAck getJoinLobbyAck();
 	Net::LobbyStatus getLobbyStatus();
@@ -52,7 +54,7 @@ private:
 
 	std::list<Player*> m_players;
 	GameController m_gc;
-	Scenery* m_scenery;
+	Scenery m_scenery;
 
 	bool m_run = false;
 };

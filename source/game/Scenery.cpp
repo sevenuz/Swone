@@ -1,5 +1,7 @@
 #include "game/Scenery.h"
 
+Scenery::Scenery() {}
+
 Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap) :
 	m_setupMap(setupMap)
 {

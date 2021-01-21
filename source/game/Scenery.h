@@ -19,6 +19,7 @@ public:
 
 	static constexpr const char* S_PLAYER_PARAGRAPH = "player";
 
+	Scenery();
 	Scenery(std::string resDir, std::string fileName, StringMapMap setupMap);
 	virtual ~Scenery();
 
@@ -48,7 +49,7 @@ private:
 
 	std::string m_name = "";
 
-	Map* m_map = NULL;
+	Map* m_map = nullptr;
 	std::list<GameObject*> m_gameObjects;
 
 	StringMapMap m_setupMap;

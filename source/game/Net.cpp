@@ -79,6 +79,32 @@ sf::Packet& Net::operator >>(sf::Packet& packet, std::map<T, K>& sm)
 	return packet;
 }
 
+void Net::handleGameFileCheck(sf::TcpSocket& socket, const GameFileCheck& gfc, const std::string& resDir)
+{
+	GameFileCheckAnswer gfca;
+	gfca.sceneryFile = !GameReader::getFileHashes().count(gfc.sceneryFile.second);
+	gfca.mapFile = !GameReader::getFileHashes().count(gfc.mapFile.second);
+	for(auto& p : gfc.objectFileMap)
+		if(!GameReader::getFileHashes().count(p.second))
+			gfca.objectFiles.push_back(p.first);
+	for(auto& p : gfc.textureFileMap)
+		if(!GameReader::getFileHashes().count(p.second))
+			gfca.textureFiles.push_back(p.first);
+
+	bool needFiles = gfca.sceneryFile
+		|| gfca.mapFile
+		|| gfca.objectFiles.size()>0
+		|| gfca.textureFiles.size()>0;
+	if(needFiles) {
+		// trigger file upload
+		Net::Packet resPacket(Net::T_FILE_REQUEST);
+		resPacket << gfca;
+		if (socket.send(resPacket) != sf::Socket::Done) {
+			throw Net::Status{Net::C_SEND, "handleTcpCreateLobby: Error while sending T_FILE_REQUEST"};
+		}
+		Net::receiveMissingFiles(socket, gfc, gfca, resDir);
+	}
+}
 
 void Net::sendMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileCheckAnswer gfca)
 {
@@ -103,7 +129,7 @@ void Net::sendMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileChe
 	}
 }
 
-void Net::receiveMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileCheckAnswer gfca, std::string resDir)
+void Net::receiveMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileCheckAnswer gfca, const std::string& resDir)
 {
 	auto fn = [&](std::string file, std::string expectedHash) {
 		Packet packet;

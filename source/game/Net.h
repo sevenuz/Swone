@@ -3,6 +3,7 @@
 
 #include <SFML/Config.hpp>
 #include <SFML/Network.hpp>
+#include <SFML/Network/TcpSocket.hpp>
 #include <vector>
 
 #include "util/reader/Reader.h"
@@ -30,6 +31,7 @@ namespace Net
 	static const unsigned char C_RECEIVE = 3;
 	static const unsigned char C_CORRUPT = 4;
 	static const unsigned char C_TYPE = 5;
+	static const unsigned char C_INVALID = 6;
 
 	class Packet : public sf::Packet {
 		private:
@@ -96,10 +98,10 @@ namespace Net
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const GameFileCheckAnswer& lr);
 	sf::Packet& operator >>(sf::Packet& packet, GameFileCheckAnswer& lr);
-	typedef GameFileCheckAnswer CreateLobbyRes;
 
+	void handleGameFileCheck(sf::TcpSocket& socket, const GameFileCheck& gfc, const std::string& resDir);
 	void sendMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileCheckAnswer gfca);
-	void receiveMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileCheckAnswer gfca, std::string resDir);
+	void receiveMissingFiles(sf::TcpSocket& socket, GameFileCheck gfc, GameFileCheckAnswer gfca, const std::string& resDir);
 
 	struct CreateLobbyReq {
 		std::string name;

@@ -1,4 +1,5 @@
 #include "server/Server.h"
+#include "game/Net.h"
 
 Server::Server()
 {
@@ -35,45 +36,21 @@ void Server::handleTcpCreateLobby(sf::TcpSocket& socket, Net::Packet& reqPacket)
 	Net::CreateLobbyReq req;
 	reqPacket >> req;
 
-	Net::CreateLobbyRes res;
-
-	res.sceneryFile = !GameReader::getFileHashes().count(req.fileCheck.sceneryFile.second);
-	res.mapFile = !GameReader::getFileHashes().count(req.fileCheck.mapFile.second);
-	for(auto& p : req.fileCheck.objectFileMap)
-		if(!GameReader::getFileHashes().count(p.second))
-			res.objectFiles.push_back(p.first);
-	for(auto& p : req.fileCheck.textureFileMap)
-		if(!GameReader::getFileHashes().count(p.second))
-			res.textureFiles.push_back(p.first);
-
-	if(res.sceneryFile || res.mapFile || res.objectFiles.size()>0 || res.textureFiles.size()>0) {
-		// trigger file upload
-		Net::Packet resPacket(Net::T_FILE_REQUEST);
-		resPacket << res;
-		if (socket.send(resPacket) != sf::Socket::Done) {
-			throw Net::Status{Net::C_SEND, "handleTcpCreateLobby: Error while sending T_FILE_REQUEST"};
-		}
-		Net::receiveMissingFiles(socket, req.fileCheck, res, settings.getResourceDirectory());
-	}
+	Net::handleGameFileCheck(socket, req.fileCheck, settings.getResourceDirectory());
 
 	// create Lobby
 	Lobby* l = new Lobby(settings, req);
-	lobbies.push_back(l);
+	lobbies[l->getCode()] = l;
 	std::thread(&Lobby::start, l).detach();
-	Net::Packet resPacket(Net::T_JOIN_LOBBY_ACK);
-	resPacket << l->getJoinLobbyAck();
-	if (socket.send(resPacket) != sf::Socket::Done) {
-		throw Net::Status{Net::C_SEND, "handleTcpCreateLobby: Error while sending T_JOIN_LOBBY_ACK"};
-	}
+	sendTcpJoinLobbyAck(socket, l->getJoinLobbyAck());
 }
 
 void Server::handleTcpLobbyRefresh(sf::TcpSocket& socket, Net::Packet& reqPacket)
 {
-
 	Net::Packet resPacket(Net::T_LOBBY_REFRESH);
 	Net::LobbyRefresh lr;
-	for(auto* l : lobbies)
-		lr.lobbies.push_back(l->getLobbyStatus());
+	for(auto& p : lobbies)
+		lr.lobbies.push_back(p.second->getLobbyStatus());
 	resPacket << lr;
 	if (socket.send(resPacket) != sf::Socket::Done) {
 		throw Net::Status{Net::C_SEND, "handleTcpLobbyRefresh: Error while sending T_LOBBY_REFRESH"};
@@ -82,7 +59,30 @@ void Server::handleTcpLobbyRefresh(sf::TcpSocket& socket, Net::Packet& reqPacket
 
 void Server::handleTcpJoinLobbyReq(sf::TcpSocket& socket, Net::Packet& reqPacket)
 {
+	Net::JoinLobbyReq jlr;
+	reqPacket >> jlr;
+	if(lobbies.count(jlr.code)) {
+		Lobby* l = lobbies[jlr.code];
+		if(l->verifyJoinLobbyReq(jlr))
+			sendTcpJoinLobbyAck(socket, l->getJoinLobbyAck());
+	} else {
+		throw Net::Status{Net::C_INVALID, "handleTcpJoinLobbyReq: Lobby not exists"};
+	}
+}
 
+void Server::sendTcpJoinLobbyAck(sf::TcpSocket& socket, Net::JoinLobbyAck jla)
+{
+	Net::Packet resPacket(Net::T_JOIN_LOBBY_ACK);
+	resPacket << jla;
+	if (socket.send(resPacket) != sf::Socket::Done) {
+		throw Net::Status{Net::C_SEND, "sendTcpJoinLobbyAck: Error while sending T_JOIN_LOBBY_ACK"};
+	}
+	Net::Packet reqPacket;
+	if(reqPacket.getType() == Net::T_FILE_REQUEST) {
+		Net::GameFileCheckAnswer res;
+		resPacket >> res;
+		Net::sendMissingFiles(socket, jla.fileCheck, res);
+	}
 }
 
 int Server::start()
@@ -115,7 +115,7 @@ void Server::stop()
 {
 	m_run = false;
 	listener.close();
-	for(Lobby* l : lobbies) {
-		l->stop();
+	for(auto& p : lobbies) {
+		p.second->stop();
 	}
 }

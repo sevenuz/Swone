@@ -1,7 +1,7 @@
 #ifndef SWONE_SERVER_SERVER_H
 #define SWONE_SERVER_SERVER_H
 
-#include <vector>
+#include <map>
 #include <SFML/Network.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Time.hpp>
@@ -32,11 +32,13 @@ private:
 	void handleTcpLobbyRefresh(sf::TcpSocket& socket, Net::Packet& reqPacket);
 	void handleTcpJoinLobbyReq(sf::TcpSocket& socket, Net::Packet& reqPacket);
 
+	void sendTcpJoinLobbyAck(sf::TcpSocket& socket, Net::JoinLobbyAck jla);
+
 	SrvSettings settings;
 
 	sf::TcpListener listener;
 
-	std::vector<Lobby*> lobbies;
+	std::map<std::string, Lobby*> lobbies;
 };
 
 #endif // SWONE_SERVER_SERVER_H

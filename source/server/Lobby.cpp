@@ -11,13 +11,12 @@ Lobby::Lobby(SrvSettings& settings, Net::CreateLobbyReq ld) :
 {
 	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
 	std::string path = GameReader::getFile(ld.fileCheck.sceneryFile.second);
-	m_scenery = new Scenery(settings.getResourceDirectory(), Helper::parseFileName(path), GameReader::getSceneryMap(path));
-	m_gc.setScenery(m_scenery);
+	m_scenery = Scenery(settings.getResourceDirectory(), Helper::parseFileName(path), GameReader::getSceneryMap(path));
+	m_gc.setScenery(&m_scenery);
 }
 
 Lobby::~Lobby() {
 	stop();
-	delete m_scenery;
 }
 
 void Lobby::startMainLoop()
@@ -94,12 +93,20 @@ void Lobby::sendState()
 	//}
 }
 
+const std::string Lobby::getCode() const
+{
+	return m_code;
+}
+
 bool Lobby::verifyJoinLobbyReq(Net::JoinLobbyReq jlr)
 {
-	return
-		m_players.size() < MAX_PLAYER_COUNT && // TODO handle full Lobby different
-		jlr.code == m_code &&
-		jlr.password == m_lobbyData.password;
+	if(m_players.size() >= MAX_PLAYER_COUNT)
+		throw Net::Status{Net::C_INVALID, "verifyJoinLobbyReq: Lobby is full."};
+	if(jlr.code == m_code)
+		throw Net::Status{Net::C_INVALID, "verifyJoinLobbyReq: Lobby-code wrong."};
+	if(jlr.password == m_lobbyData.password)
+		throw Net::Status{Net::C_INVALID, "verifyJoinLobbyReq: Lobby-password wrong."};
+	return true;
 }
 
 Net::JoinLobbyAck Lobby::getJoinLobbyAck()
