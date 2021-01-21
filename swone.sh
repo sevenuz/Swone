@@ -2,22 +2,16 @@
 
 BUILDDIR="build"
 
-if [ $# -eq 0 ]
-then
-	echo 'Swone o.O'
-	echo '---------'
-	echo 'build : create build/ if not exists and build project'
-	echo 'build run : runs the project after build command'
-	echo 'todo : shows TODO in source/ folder'
-	exit 0
-fi
+clean(){
+	echo "clean..."
+	rm -r $BUILDDIR
+	git restore $BUILDDIR
+}
 
-if [ "$1" = "build" ]
-then
+build(){
 	if [ -d "$BUILDDIR" ]
 	then
 		### Take action if $DIR exists ###
-		echo "run ninja..."
 		cd $BUILDDIR
 	else
 		###  Control will jump here if $DIR does NOT exists ###
@@ -25,21 +19,45 @@ then
 		meson $BUILDDIR
 		cd $BUILDDIR
 	fi
+	echo "run ninja..."
 	ninja
 	FAILED=$(ninja | grep "build stopped")
 	echo "$FAILED"
-	if [ "$2" = "run" -a -z "$FAILED" ]
+	cd ..
+}
+
+run(){
+	if [ -z "$FAILED" ]
 	then
+		cd $BUILDDIR
 		./swone
+		cd ..
 	fi
-fi
-if [ "$1" = "run" ]
-then
-	cd $BUILDDIR
-	./swone
-fi
-if [ "$1" = "todo" ]
-then
+}
+
+todo(){
 	grep -rn TODO source/
+}
+
+help(){
+	echo 'Swone o.O'
+	echo '---------'
+	echo 'clean : reset build/ directory'
+	echo 'build : create build/ if not exists and build project'
+	echo 'run : runs the project, if build was not failing'
+	echo 'todo : shows TODO in source/ folder'
+	echo '---------'
+	echo 'all commands can be combined. ex.: ./swone.sh build run'
+}
+
+if [ $# -eq 0 ]
+then
+	help
 fi
+
+for var in "$@"
+do
+    $var 2>/dev/null || echo "$var is not a command. Try help to see all."
+	echo ''
+done
 
