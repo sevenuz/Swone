@@ -17,6 +17,8 @@ Settings::Settings()
 				setVerticalSyncEnabled(Helper::toBool(v));
 			else if(k==SETTINGS_RESOURCE_DIRECTORY)
 				setResourceDirectory(v);
+			else if(k==SETTINGS_DOWNLOAD_DIRECTORY)
+				setDownloadDirectory(v);
 			else if(k==SETTINGS_FONT_SOURCE)
 				setFontSource(v);
 			else if(k==SETTINGS_CLEARING_COLOR)
@@ -93,6 +95,20 @@ std::string Settings::getResourceDirectory()
 void Settings::setResourceDirectory(std::string s)
 {
 	m_resource_directory = s;
+	// TODO fs::create_directories(m_resource_directory);
+	setChanged(true);
+}
+
+std::string Settings::getDownloadDirectory()
+{
+	return m_download_directory;
+}
+
+void Settings::setDownloadDirectory(std::string s)
+{
+	m_download_directory = s;
+	// TODO fs::create_directories(m_download_directory);
+	// also for obj/ scenery/ map/ texture/
 	setChanged(true);
 }
 
@@ -180,6 +196,7 @@ void Settings::writeSettings()
 		StringPair(SETTINGS_BITS_PER_PIXEL, std::to_string(getBitsPerPixel())),
 		StringPair(SETTINGS_VERTICAL_SYNC_ENABLED, isVerticalSyncEnabled()?"true":"false"),
 		StringPair(SETTINGS_RESOURCE_DIRECTORY, getResourceDirectory()),
+		StringPair(SETTINGS_DOWNLOAD_DIRECTORY, getDownloadDirectory()),
 		StringPair(SETTINGS_FONT_SOURCE, getFontSource()),
 		StringPair(SETTINGS_CLEARING_COLOR, "Color(" +
 			std::to_string(getClearingColor().r) + "," +

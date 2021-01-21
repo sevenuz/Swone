@@ -318,7 +318,7 @@ void OnlineMenu::sendCreateLobbyReq(Net::CreateLobbyReq clr)
 void OnlineMenu::handleJoinLobbyAck(sf::TcpSocket& socket, Net::JoinLobbyAck jla)
 {
 	// TODO implement join lobby
-	Net::handleGameFileCheck(socket, jla.fileCheck, m_c.getSettings().getResourceDirectory());
+	Net::handleGameFileCheck(socket, jla.fileCheck, m_c.getSettings().getDownloadDirectory());
 
 	std::string path = GameReader::getFile(jla.fileCheck.sceneryFile.second);
 	m_scenery = Scenery(m_c.getSettings().getResourceDirectory(), Helper::parseFileName(path), GameReader::getSceneryMap(path));

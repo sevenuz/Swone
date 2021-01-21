@@ -11,6 +11,16 @@
 #include <iostream>
 #include <fstream>
 
+// include filesystem also for older standards then c++17
+// https://stackoverflow.com/a/53366603
+//#ifdef __cpp_lib_filesystem
+//    #include <filesystem>
+//    namespace fs = std::filesystem;
+//#elif __cpp_lib_experimental_filesystem
+//    #include <experimental/filesystem>
+//    namespace fs = std::experimental::filesystem;
+//#endif
+
 #include <tinydir.h>
 
 #include <SFML/Graphics/Color.hpp>

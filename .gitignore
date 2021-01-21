@@ -13,4 +13,5 @@ swone.layout
 winbuild.txt
 res/settings.ini
 res/srvsettings.ini
+res/download/
 .cache

@@ -17,6 +17,7 @@
 #define SETTINGS_BITS_PER_PIXEL "bits_per_pixel"
 #define SETTINGS_VERTICAL_SYNC_ENABLED "vertical_sync_enabled"
 #define SETTINGS_RESOURCE_DIRECTORY "resource_directory"
+#define SETTINGS_DOWNLOAD_DIRECTORY "download_directory"
 #define SETTINGS_FONT_SOURCE "font_source"
 #define SETTINGS_CLEARING_COLOR "clearing_color"
 #define SETTINGS_SERVER "server"
@@ -45,6 +46,9 @@ public:
 
 	std::string getResourceDirectory();
 	void setResourceDirectory(std::string s);
+
+	std::string getDownloadDirectory();
+	void setDownloadDirectory(std::string s);
 
 	std::string getFontSource();
 	void setFontSource(std::string s);
@@ -88,6 +92,7 @@ private:
 	bool m_vertical_sync_enabled = true;
 
 	std::string m_resource_directory = "../res/";
+	std::string m_download_directory = "../res/download/";
 
 	std::string m_font_src = "../res/Roboto-Medium.ttf";
 	sf::Font m_font;
