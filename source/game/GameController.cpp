@@ -1,33 +1,35 @@
- #include <game/GameController.h>
+#include <game/GameController.h>
 
 GameController::GameController() {}
 
 GameController::~GameController() {}
 
-Scenery* GameController::getScenery() {
+Scenery& GameController::getScenery() {
 	return m_scenery;
 }
 
 Map* GameController::getMap() {
-	return m_scenery->getMap();
+	return m_scenery.getMap();
 }
 
 const std::list<GameObject*>& GameController::getGameObjects() const {
-	return m_scenery->getGameObjects();
+	return m_scenery.getGameObjects();
 }
 
-void GameController::setScenery(Scenery* s) {
-	m_scenery = s;
+void GameController::loadScenery(std::string resDir, Net::GameFileCheck gfc) {
+	std::string path = GameReader::getFile(gfc.sceneryFile.second);
+	m_scenery = Scenery(resDir, Helper::parseFileName(path), GameReader::getSceneryMap(path));
 }
 
 void GameController::pushPlayer(GameObject* p)
 {
-	m_scenery->getGameObjects().push_back(p);
+	m_scenery.getGameObjects().push_back(p);
 }
 
 void GameController::clearPlayers()
 {
-	m_players.clear();
+	m_localPlayers.clear();
+	m_remotePlayers.clear();
 }
 
 void GameController::startGame()
@@ -60,11 +62,11 @@ void GameController::update(sf::Time ellapsed) {
 		m_clock -= m_sceneDt;
 	}
 
-	m_scenery->update(ellapsed);
+	m_scenery.update(ellapsed);
 }
 
 void GameController::event(sf::Event& e) {
-	m_scenery->event(e);
+	m_scenery.event(e);
 }
 
 GameObject* GameController::getGameObjectById(const std::string & id) const

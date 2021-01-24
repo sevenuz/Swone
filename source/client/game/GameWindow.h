@@ -1,14 +1,18 @@
-#ifndef SWONE_CLIENT_GAMEWINDOW_H
-#define SWONE_CLIENT_GAMEWINDOW_H
+#ifndef SWONE_CLIENT_GAME_GAMEWINDOW_H
+#define SWONE_CLIENT_GAME_GAMEWINDOW_H
+
+#include "imgui.h"
+#include "imgui-SFML.h"
 
 #include <SFML/Graphics/Drawable.hpp>
 #include "Handleable.h"
-#include "game/GameController.h"
-#include "Controller.h"
+#include "client/Controller.h"
 
 class GameWindow : public Handleable {
 public:
-	GameWindow(Controller& c, GameController& gc);
+	enum GameState : char { Play, Pause };
+
+	GameWindow(Controller& c);
 	virtual ~GameWindow();
 
 	void setViewZoom();
@@ -16,14 +20,23 @@ public:
 	sf::Vector2f getPlayerCenter();
 	sf::View getView();
 
+	void drawImgui();
+	void drawCharacterSelection();
+	void drawInfoPanel();
+	void drawPause();
+
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	Controller& m_controller;
+	Controller& m_c;
 	GameController& m_gc;
 	sf::View m_view;
 	sf::Vector2f m_viewDelta = sf::Vector2f(0, 0);
+
+	GameState m_gstate = GameState::Play;
+	bool m_showCharacterSelection = true;
+	bool m_showInfoPanel = false;
 };
 
 #endif

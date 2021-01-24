@@ -1,33 +1,30 @@
 #include <client/Controller.h>
 
-Controller::Controller(Settings& settings, sf::RenderWindow& w) : m_settings(settings), m_window(w) {
+Controller::Controller(Settings& settings, sf::RenderWindow& w) :
+	m_settings(settings),
+	m_window(w)
+{
 	m_window.setVerticalSyncEnabled(m_settings.isVerticalSyncEnabled());
 }
 
 Controller::~Controller() {}
 
-void Controller::setActiveMenu(ActiveMenu i) {
-	if (i > ActiveMenu::AW_LAST) {
-		m_activeMenu = ActiveMenu::AW_FIRST;
-	}
-	else {
-		m_activeMenu = i;
-	}
-}
-ActiveMenu Controller::getActiveMenu() {
-	return m_activeMenu;
+void Controller::pushState(State s)
+{
+	m_stateStack.push(s);
 }
 
-void Controller::setActiveGameWindow(ActiveGameWindow i) {
-	if (i > ActiveGameWindow::AGW_LAST) {
-		m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
-	}
-	else {
-		m_activeGameWindow = i;
-	}
+void Controller::popState()
+{
+	m_stateStack.pop();
 }
-ActiveGameWindow Controller::getActiveGameWindow() {
-	return m_activeGameWindow;
+
+Controller::State Controller::getState()
+{
+	if(m_stateStack.empty())
+		return State::MainMenu;
+	else
+		return m_stateStack.top();
 }
 
 Settings& Controller::getSettings() {
@@ -36,6 +33,17 @@ Settings& Controller::getSettings() {
 
 sf::RenderWindow& Controller::getWindow() {
 	return m_window;
+}
+
+GameController& Controller::getGameController()
+{
+	return m_gc;
+}
+
+void Controller::loadGame(Net::JoinLobbyAck jla)
+{
+	m_gc.loadScenery(m_settings.getResourceDirectory(), jla.fileCheck);
+	// TODO NetController
 }
 
 void Controller::setDefaultView() {

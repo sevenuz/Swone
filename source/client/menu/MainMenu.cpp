@@ -84,13 +84,13 @@ void MainMenu::setFont(sf::Font& font) {
 }
 
 void MainMenu::m_lokalPressed() {
-	m_controller.setActiveMenu(ActiveMenu::LOCAL);
+	m_controller.pushState(Controller::State::LocalMenu);
 }
 void MainMenu::m_onlinePressed() {
-	m_controller.setActiveMenu(ActiveMenu::ONLINE);
+	m_controller.pushState(Controller::State::OnlineMenu);
 }
 void MainMenu::m_settingsPressed() {
-	m_controller.setActiveMenu(ActiveMenu::SETTINGS);
+	m_controller.pushState(Controller::State::SettingsMenu);
 }
 void MainMenu::m_exitPressed() {
 	m_controller.stop();

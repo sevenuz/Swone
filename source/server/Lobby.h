@@ -22,7 +22,7 @@
 
 class Lobby {
 public:
-	static std::string generateIdentifier(std::string name);
+	static std::string generateCode(std::string name);
 
 	Lobby(SrvSettings& settings, Net::CreateLobbyReq m_lobbyData);
 	virtual ~Lobby();
@@ -54,7 +54,6 @@ private:
 
 	std::list<Player*> m_players;
 	GameController m_gc;
-	Scenery m_scenery;
 
 	bool m_run = false;
 };

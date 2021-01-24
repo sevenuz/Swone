@@ -2,8 +2,7 @@
 
 LocalMenu::LocalMenu(Controller& c) :
 	m_ps(100),
-	m_controller(c),
-	m_gameWindow(c, m_gameController)
+	m_controller(c)
 {
 	m_ps.setColor(sf::Color::White);
 	m_ps.setDrawingType(sf::Quads);
@@ -88,13 +87,9 @@ void LocalMenu::startGame() {
 	if (m_sceneriesFound) {
 		Scenery* s = m_sceneries[m_selectedScenery];
 		s->reset();
-		m_gameController.setScenery(s);
-		m_gameWindow.setViewZoom();
 		for(GameObjectSelection& gos : m_gamePlayers[m_selectedScenery])
 			if(gos.selected)
 				s->spawnPlayer(gos.key);
-		m_gameController.startGame();
-		m_controller.setActiveGameWindow(ActiveGameWindow::INGAME);
 	}
 	else {
 		Log::ger().log("No Scenery. Can't start the game.", Log::Label::Error);
@@ -105,70 +100,14 @@ void LocalMenu::event(sf::Event& event) {
 	sf::RenderWindow& w = m_controller.getWindow();
 	sf::Vector2i pixelPos = sf::Mouse::getPosition(w);
 	sf::Vector2f worldPos = w.mapPixelToCoords(pixelPos);
-
-	switch (m_controller.getActiveGameWindow()) {
-	case ActiveGameWindow::MAPSELECTION:
-		if (event.type == sf::Event::KeyPressed) {
-			if (event.key.code == sf::Keyboard::Escape) {
-				m_controller.setActiveMenu(ActiveMenu::MAIN);
-			}
-			if (event.key.code == sf::Keyboard::Left) {
-				setScenerySelection(m_selectedScenery - 1);
-			}
-			if (event.key.code == sf::Keyboard::Right) {
-				setScenerySelection(m_selectedScenery + 1);
-			}
-			if (event.key.code == sf::Keyboard::Down) {
-				setActionSelection(m_selectedAction++);
-			}
-			if (event.key.code == sf::Keyboard::Up) {
-				setActionSelection(m_selectedAction--);
-			}
-			if (event.key.code == sf::Keyboard::P) {
-				//Spawn Player
-			}
-			if (event.key.code == sf::Keyboard::Return) {//Enter
-				startGame();
-			}
-		}
-		else if (event.type == sf::Event::MouseButtonReleased) {
-			if (m_play.getGlobalBounds().contains(worldPos.x, worldPos.y)) {
-				startGame();
-			}
-			else if (m_switchLeft.getGlobalBounds().contains(worldPos.x, worldPos.y)) {
-				setScenerySelection(m_selectedScenery - 1);
-			}
-			else if (m_switchRight.getGlobalBounds().contains(worldPos.x, worldPos.y)) {
-				setScenerySelection(m_selectedScenery + 1);
-			}
-		}
-		break;
-	case ActiveGameWindow::INGAME:
-		m_gameWindow.event(event);
-		break;
-	default:
-		break;
-	}
 }
 
 void LocalMenu::update(sf::Time ellapsed) {
 	m_ps.update(ellapsed);
-	switch (m_controller.getActiveGameWindow()) {
-	case ActiveGameWindow::MAPSELECTION:
-		//m_sceneries[m_selectedScenery]->getSprite().setScale(sf::Vector2f(0.25, 0.25));
-		break;
-	case ActiveGameWindow::INGAME:
-		m_gameWindow.update(ellapsed);
-		break;
-	default:
-		break;
-	}
 }
 
 void LocalMenu::drawImgui()
 {
-	if(m_controller.getActiveGameWindow() != ActiveGameWindow::MAPSELECTION)
-		return;
 
 	// imgui.h:595 or imgui_demo.cpp:187
 	int window_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize |
@@ -195,46 +134,5 @@ void LocalMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;
 
-	switch (m_controller.getActiveGameWindow()) {
-	case ActiveGameWindow::MAPSELECTION:
-		if (m_sceneriesFound) {
-			// TODO Scenery Preview View
-			sf::View view(
-				sf::FloatRect(0, 0, m_sceneries[m_selectedScenery]->getMap()->getImageWidth(),
-				m_sceneries[m_selectedScenery]->getMap()->getImageHeight())
-			);
-			view.setViewport(sf::FloatRect(0.3, 0.3, 0.4, 0.4));
-			target.draw(m_ps, states);
-			target.setView(view);
-			// Scenery Preview Draw
-			m_sceneries[m_selectedScenery]->drawPreview(target, states);
-		}
-
-		m_controller.setDefaultView();
-		target.draw(m_play, states);
-		target.draw(m_sceneryName, states);
-		target.draw(m_switchLeft, states);
-		target.draw(m_switchRight, states);
-		break;
-	case ActiveGameWindow::INGAME:
-		target.draw(m_gameWindow, states);
-		break;
-	default:
-		m_controller.setActiveGameWindow(ActiveGameWindow::MAPSELECTION);
-		break;
-	}
 };
 
-const GameController& LocalMenu::getGameController() const {
-	return m_gameController;
-}
-
-GameObject* LocalMenu::getGameObjectById(const std::string& id) const
-{
-	return m_gameController.getGameObjectById(id);
-}
-
-void LocalMenu::updateLog() const
-{
-	m_gameController.updateLog();
-}

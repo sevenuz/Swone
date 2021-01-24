@@ -23,7 +23,6 @@
 #include "game/GameController.h"
 #include "game/GameReader.h"
 #include "Handleable.h"
-#include "client/GameWindow.h"
 #include "client/Settings.h"
 #include "client/Controller.h"
 #include "util/Log.h"
@@ -35,8 +34,6 @@ private:
 
 	ParticleSystem m_ps;
 	Controller& m_controller;
-	GameWindow m_gameWindow;
-	GameController m_gameController;
 
 	sf::Text m_play;
 

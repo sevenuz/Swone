@@ -2,8 +2,7 @@
 
 OnlineMenu::OnlineMenu(Controller& c) :
 	m_ps(100),
-	m_c(c),
-	m_gameWindow(c, m_gc)
+	m_c(c)
 {
 	m_header.setFont(m_c.getSettings().getFont());
 	m_header.setString("Online");
@@ -32,29 +31,13 @@ void OnlineMenu::event(sf::Event& event) {
 		return;
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Escape) {
-			switch(m_state) {
-				case State::Menu:
-					m_c.setActiveMenu(ActiveMenu::MAIN);
-					break;
-				case State::Game:
-					m_gstate = GameState::Pause;
-					break;
-			}
+			m_c.popState();
 		}
 	}
-	if(m_state == State::Game && m_gstate == GameState::Play)
-		m_gameWindow.event(event);
 }
 
 void OnlineMenu::update(sf::Time ellapsed) {
-	switch(m_state) {
-		case State::Menu:
-			m_ps.update(ellapsed);
-			break;
-		case State::Game:
-			m_gameWindow.update(ellapsed);
-			break;
-	}
+	m_ps.update(ellapsed);
 }
 
 void OnlineMenu::drawJoinWindow()
@@ -320,106 +303,17 @@ void OnlineMenu::handleJoinLobbyAck(sf::TcpSocket& socket, Net::JoinLobbyAck jla
 	// TODO implement join lobby
 	Net::handleGameFileCheck(socket, jla.fileCheck, m_c.getSettings().getDownloadDirectory());
 
-	std::string path = GameReader::getFile(jla.fileCheck.sceneryFile.second);
-	m_scenery = Scenery(m_c.getSettings().getResourceDirectory(), Helper::parseFileName(path), GameReader::getSceneryMap(path));
-	m_gc.setScenery(&m_scenery);
-
-	m_state = State::Game;
-	m_gstate = GameState::CharacterSelection;
+	m_c.loadGame(jla);
+	m_c.pushState(Controller::State::Game);
 
 	m_modalMessageStack.push("Join Lobby");
 }
 
-void OnlineMenu::drawPause()
-{
-	ImGui::OpenPopup("Pause:");
-	if(ImGui::BeginPopupModal("Pause:", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		if(ImGui::Button("Settings", ImVec2(120,0))) {
-			// TODO set Settings return window to OnlineMenu
-			m_c.setActiveMenu(ActiveMenu::SETTINGS);
-		}
-		if(ImGui::Button("Disconnect", ImVec2(120,0))) {
-			// TODO implement disconnect
-			ImGui::CloseCurrentPopup();
-		}
-
-		ImGui::Separator();
-
-		if(ImGui::Button("Return", ImVec2(120,0))) {
-			m_gstate = GameState::Play;
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::SetItemDefaultFocus();
-		ImGui::EndPopup();
-	}
-}
-
-void OnlineMenu::drawCharacterSelection()
-{
-	// imgui.h:595 or imgui_demo.cpp:187
-	int window_flags = ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoSavedSettings |
-		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoNav;
-	bool* w_open = NULL; // hides close option
-
-	auto window_pos = ImVec2(m_c.getSettings().toW(0.1f), m_c.getSettings().toH(0.2f));
-	auto window_size = ImVec2(m_c.getSettings().toW(0.4f), m_c.getSettings().toH(0.6f));
-
-	ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always);
-	ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
-	ImGui::Begin("Character-Selection Menu", w_open, window_flags);
-		ImGui::BeginGroup();
-		ImGui::Text("Select a Character");
-		ImGui::Separator();
-		ImGui::BeginChild("CharacterSelection", ImVec2(0, -2 * ImGui::GetFrameHeightWithSpacing())); // 2 lines at the bottom
-		for(auto& p : m_scenery.getPlayerSetupMaps()) {
-			ImGui::PushID(p.first.c_str());
-			std::string pname = p.second[Reader::DEFAULT_PARAGRAPH][GameObject::S_NAME];
-			if(ImGui::Selectable(pname.c_str(), m_selectedPlayer == p.first)) {
-				m_selectedPlayer = p.first;
-				sf::Color c = Helper::toColor(p.second[Reader::DEFAULT_PARAGRAPH][GameObject::S_COLOR]);
-				m_playerColor = ImColor(c.r, c.g, c.b, c.a);
-			}
-			ImGui::PopID();
-		}
-		ImGui::EndChild();
-		ImGui::Separator();
-		// TODO show more character infos
-		// TODO add multiple characters from one pc (ImGui Menu as class)
-		ImGui::InputText("Name", m_playerName, PLAYER_NAME_LENGTH);
-		ImVec2 size = ImGui::GetItemRectSize();
-		ImGui::SameLine();
-		ImGui::ColorEdit4("Character-Color", (float*)&m_playerColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
-
-		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 0.8f, 0.8f));
-
-		if(ImGui::Button("JOIN", size)) {
-			// TODO send character join
-		}
-		ImGui::PopStyleColor(3);
-		ImGui::EndGroup();
-	ImGui::End();
-}
 
 void OnlineMenu::drawImgui()
 {
-	switch(m_state) {
-		case State::Menu:
-			drawJoinWindow();
-			drawCreateWindow();
-			break;
-		case State::Game:
-			if(m_gstate == GameState::CharacterSelection)
-				drawCharacterSelection();
-			else if (m_gstate == GameState::Pause)
-				drawPause();
-			break;
-	}
+	drawJoinWindow();
+	drawCreateWindow();
 
 	if (!m_modalMessageStack.empty())
 			ImGui::OpenPopup("Message:");
@@ -441,14 +335,7 @@ void OnlineMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	states.texture = NULL;
 
-	switch(m_state) {
-		case State::Menu:
-			m_c.setDefaultView();
-			target.draw(m_ps, states);
-			target.draw(m_header, states);
-			break;
-		case State::Game:
-			target.draw(m_gameWindow, states);
-			break;
-	}
+	m_c.setDefaultView();
+	target.draw(m_ps, states);
+	target.draw(m_header, states);
 };

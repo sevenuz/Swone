@@ -1,8 +1,9 @@
 #ifndef SWONE_GAME_GAMECONTROLLER_H
 #define SWONE_GAME_GAMECONTROLLER_H
 
-#include <list>
+#include <vector>
 
+#include "game/Net.h"
 #include "game/Scenery.h"
 #include "util/Log.h"
 #include "physics/Scene.h"
@@ -12,7 +13,7 @@ public:
 	GameController();
 	virtual ~GameController();
 
-	Scenery* getScenery();
+	Scenery& getScenery();
 	Map* getMap();
 	const std::list<GameObject*>& getGameObjects() const;
 	GameObject* getGameObjectById(const std::string& id) const;
@@ -26,14 +27,15 @@ public:
 	void clearPlayers();
 	void startGame();
 
-	void setScenery(Scenery* s);
+	void loadScenery(std::string resDir, Net::GameFileCheck gfc);
 
 	const ph::Scene& getScene() const;
 	ph::Scene& getScene();
 protected:
 private:
-	Scenery* m_scenery = NULL;
-	std::list<GameObject*> m_players;
+	Scenery m_scenery;
+	std::vector<GameObject*> m_localPlayers;
+	std::vector<GameObject*> m_remotePlayers;
 
 	ph::Scene m_scene;
 	sf::Time m_clock;

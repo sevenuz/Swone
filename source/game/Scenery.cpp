@@ -5,15 +5,20 @@ Scenery::Scenery() {}
 Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap) :
 	m_setupMap(setupMap)
 {
-	// sceneryFile will not mapped and so it is not important to keep the original name
-	m_fileCheck.sceneryFile = std::make_pair(fileName, md5file(GameReader::getSceneryPath(resDir, fileName).c_str()));
 	bool gfcInjection = setupMap.count(Net::GFC_SCENERY_FILE);
 
 	if(gfcInjection) {
+		for(auto p : setupMap[Net::GFC_SCENERY_FILE])
+			m_fileCheck.sceneryFile = p;
 		for(auto p : setupMap[Net::GFC_MAP_FILE])
 			m_fileCheck.mapFile = p;
 		m_fileCheck.textureFileMap = setupMap[Net::GFC_TEXTURE_FILE_MAP];
 		m_fileCheck.objectFileMap = setupMap[Net::GFC_OBJECT_FILE_MAP];
+	} else {
+		m_fileCheck.sceneryFile = std::make_pair(
+				fileName,
+				md5file(GameReader::getSceneryPath(resDir, fileName).c_str())
+		);
 	}
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)) {
 		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
@@ -101,6 +106,11 @@ StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goN
 		texturePath = GameReader::getFile(m_fileCheck.textureFileMap[textureName]);
 	} else {
 		texturePath = GameReader::getTexturePath(resDir, textureName);
+	}
+
+	// prevent controls from gameobject files
+	if(goSetupMap.count(Extension::CONTROLS_PARAGRAPH)){
+		goSetupMap[Extension::CONTROLS_PARAGRAPH].clear();
 	}
 
 	// set texture path in setupMap

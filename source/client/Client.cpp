@@ -6,7 +6,8 @@ Client::Client() :
 	menu(controller),
 	localMenu(controller),
 	onlineMenu(controller),
-	settingsMenu(controller)
+	settingsMenu(controller),
+	gameWindow(controller)
 {}
 
 Client::~Client() {}
@@ -85,6 +86,7 @@ void Client::drawLog()
 
 void Client::renderObjectSelector()
 {
+	/*
 	const static std::list<GameObject*>& gameObjects = localMenu.getGameController().getGameObjects();
 
 	if(ImGui::TreeNode("GameObjects")) {
@@ -105,6 +107,7 @@ void Client::renderObjectSelector()
 		}
 		ImGui::TreePop();
 	}
+	*/
 }
 
 void Client::drawObjectViewer()
@@ -128,7 +131,7 @@ void Client::drawObjectViewer()
 	const static ValueDetailMap& value_detail_map = Log::ger().getValueMap();
 	const static std::vector<std::string>& inspected_obj_ids = Log::ger().getObjectIdentifiers();
 
-	localMenu.updateLog();
+	//localMenu.updateLog();
 	for(const std::string& id : inspected_obj_ids) {
 		bool open = true;
 		if(ImGui::CollapsingHeader(id.c_str(), &open)) {
@@ -169,7 +172,7 @@ void Client::drawObjectViewer()
 			value_detail_map.at(id).at("animation")->display(3.0);
 		}
 		if(!open) {
-			localMenu.getGameObjectById(id)->toggleLogging();
+			//localMenu.getGameObjectById(id)->toggleLogging();
 			Log::ger().toggleObjectInspect(id);
 		}
 	}
@@ -195,22 +198,25 @@ void Client::startMainLoop()
 				stop();
 			}
 
-			switch(controller.getActiveMenu()) {
-			case ActiveMenu::MAIN:
-				menu.event(event);
-				break;
-			case ActiveMenu::LOCAL:
-				localMenu.event(event);
-				break;
-			case ActiveMenu::ONLINE:
-				onlineMenu.event(event);
-				break;
-			case ActiveMenu::SETTINGS:
-				settingsMenu.event(event);
-				break;
-			default:
-				menu.event(event);
-				break;
+			switch(controller.getState()) {
+				case Controller::State::MainMenu:
+					menu.event(event);
+					break;
+				case Controller::State::LocalMenu:
+					localMenu.event(event);
+					break;
+				case Controller::State::OnlineMenu:
+					onlineMenu.event(event);
+					break;
+				case Controller::State::SettingsMenu:
+					settingsMenu.event(event);
+					break;
+				case Controller::State::Game:
+					gameWindow.event(event);
+					break;
+				default:
+					menu.event(event);
+					break;
 			}
 		}
 
@@ -220,30 +226,35 @@ void Client::startMainLoop()
 
 		ImGui::SFML::Update(window, ellapsed);
 
-		switch(controller.getActiveMenu()) {
-		case ActiveMenu::MAIN:
-			menu.update(ellapsed);
-			window.draw(menu);
-			break;
-		case ActiveMenu::LOCAL:
-			localMenu.update(ellapsed);
-			localMenu.drawImgui();
-			window.draw(localMenu);
-			break;
-		case ActiveMenu::ONLINE:
-			onlineMenu.update(ellapsed);
-			onlineMenu.drawImgui();
-			window.draw(onlineMenu);
-			break;
-		case ActiveMenu::SETTINGS:
-			settingsMenu.update(ellapsed);
-			settingsMenu.drawImgui();
-			window.draw(settingsMenu);
-			break;
-		default:
-			menu.update(ellapsed);
-			window.draw(menu);
-			break;
+		switch(controller.getState()) {
+			case Controller::State::MainMenu:
+				menu.update(ellapsed);
+				window.draw(menu);
+				break;
+			case Controller::State::LocalMenu:
+				localMenu.update(ellapsed);
+				localMenu.drawImgui();
+				window.draw(localMenu);
+				break;
+			case Controller::State::OnlineMenu:
+				onlineMenu.update(ellapsed);
+				onlineMenu.drawImgui();
+				window.draw(onlineMenu);
+				break;
+			case Controller::State::SettingsMenu:
+				settingsMenu.update(ellapsed);
+				settingsMenu.drawImgui();
+				window.draw(settingsMenu);
+				break;
+			case Controller::State::Game:
+				gameWindow.update(ellapsed);
+				gameWindow.drawImgui();
+				window.draw(gameWindow);
+				break;
+			default:
+				menu.update(ellapsed);
+				window.draw(menu);
+				break;
 		}
 
 		drawLog();

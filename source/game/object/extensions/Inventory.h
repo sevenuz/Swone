@@ -30,8 +30,8 @@ public:
 
 	Inventory(GameObject* obj, StringMapMap& setupMap);
 
-	void applyConfig(StringMapMap& setupMap);
-	void getConfig(StringMapMap& setupMap);
+	void applyConfig(StringMapMap& setupMap) override;
+	void getConfig(StringMapMap& setupMap) override;
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 	void event(sf::Event& e) override;

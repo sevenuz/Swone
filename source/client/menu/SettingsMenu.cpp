@@ -23,7 +23,7 @@ SettingsMenu::~SettingsMenu() {}
 void SettingsMenu::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Escape) {
-			m_controller.setActiveMenu(ActiveMenu::MAIN);
+			m_controller.popState();
 		}
 	}
 }
@@ -35,8 +35,12 @@ void SettingsMenu::update(sf::Time ellapsed) {
 void SettingsMenu::drawImgui()
 {
 	// imgui.h:595 or imgui_demo.cpp:187
-	int window_flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize |
-											ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoTitleBar;
+	int window_flags = ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoNav |
+		ImGuiWindowFlags_NoTitleBar;
 	bool* w_open = NULL; // hides close option
 
 	auto window_pos = ImVec2(m_controller.getSettings().toW(0.1f), m_controller.getSettings().toH(0.3f));

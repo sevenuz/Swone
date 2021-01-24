@@ -10,6 +10,7 @@
 #include "game/GameReader.h"
 #include "game/Map.h"
 #include "game/Net.h"
+#include "game/object/Extension.h"
 #include "game/object/GameObject.h"
 
 class Scenery : public Handleable {

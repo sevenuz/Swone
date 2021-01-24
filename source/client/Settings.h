@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 #include <string>
+#include <vector>
 #include "util/reader/Reader.h"
 #include "util/Log.h"
 #include "util/Helper.h"
@@ -22,6 +23,8 @@
 #define SETTINGS_CLEARING_COLOR "clearing_color"
 #define SETTINGS_SERVER "server"
 #define SETTINGS_PORT "port"
+
+#define SETTINGS_CONTROLS_PROFILE_PREFIX "controlsProfile_"
 
 class Settings {
 public:
@@ -68,6 +71,8 @@ public:
 	sf::IpAddress getServerIpAddress();
 	std::string getServerAndPort();
 
+	std::map<std::string, StringMap> getControlProfiles();
+
 	bool isChanged();
 	void setChanged(bool v);
 
@@ -100,6 +105,9 @@ private:
 
 	std::string m_server = "localhost";
 	unsigned short m_port = 61007;
+
+	// key: name of profile, value: control key codes
+	std::map<std::string, StringMap> m_controlProfiles;
 
 	// indicates if the settings changed compared to settings.ini
 	bool m_changed = false;

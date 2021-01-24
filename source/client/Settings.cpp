@@ -5,26 +5,35 @@ Settings::Settings()
 	try {
 		Log::ger().log("-----Settings-----");
 		Reader r(SETTINGS_FILE);
+		auto& setupMap = r.getParagraphMap();
+		if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
+			auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
+			if(global.count(SETTINGS_WIDTH))
+				setWidth(Helper::toLong(global[SETTINGS_WIDTH]));
+			if(global.count(SETTINGS_HEIGHT))
+				setHeight(Helper::toLong(global[SETTINGS_HEIGHT]));
+			if(global.count(SETTINGS_BITS_PER_PIXEL))
+				setBitsPerPixel(Helper::toLong(global[SETTINGS_BITS_PER_PIXEL]));
+			if(global.count(SETTINGS_VERTICAL_SYNC_ENABLED))
+				setVerticalSyncEnabled(Helper::toBool(global[SETTINGS_VERTICAL_SYNC_ENABLED]));
+			if(global.count(SETTINGS_RESOURCE_DIRECTORY))
+				setResourceDirectory(global[SETTINGS_RESOURCE_DIRECTORY]);
+			if(global.count(SETTINGS_DOWNLOAD_DIRECTORY))
+				setDownloadDirectory(global[SETTINGS_DOWNLOAD_DIRECTORY]);
+			if(global.count(SETTINGS_FONT_SOURCE))
+				setFontSource(global[SETTINGS_FONT_SOURCE]);
+			if(global.count(SETTINGS_CLEARING_COLOR))
+				setClearingColor(Helper::toColor(global[SETTINGS_CLEARING_COLOR]));
+		}
+
+		for(auto& m : setupMap) {
+			if(m.first.rfind(SETTINGS_CONTROLS_PROFILE_PREFIX, 0) == 0) {
+				m_controlProfiles[m.first.substr(m.first.find_first_of("_"))] = m.second;
+			}
+		}
+
 		r.forEach([&](std::string p, std::string k, std::string v){
 			Log::ger().log(k + " = " + v);
-			if(k==SETTINGS_WIDTH)
-				setWidth(Helper::toLong(v));
-			else if(k==SETTINGS_HEIGHT)
-				setHeight(Helper::toLong(v));
-			else if(k==SETTINGS_BITS_PER_PIXEL)
-				setBitsPerPixel(Helper::toLong(v));
-			else if(k==SETTINGS_VERTICAL_SYNC_ENABLED)
-				setVerticalSyncEnabled(Helper::toBool(v));
-			else if(k==SETTINGS_RESOURCE_DIRECTORY)
-				setResourceDirectory(v);
-			else if(k==SETTINGS_DOWNLOAD_DIRECTORY)
-				setDownloadDirectory(v);
-			else if(k==SETTINGS_FONT_SOURCE)
-				setFontSource(v);
-			else if(k==SETTINGS_CLEARING_COLOR)
-				setClearingColor(Helper::toColor(v));
-			else
-				Log::ger().log(k + " is not a settings option", Log::Label::Warning);
 		});
 		Log::ger().log("------------------");
 	} catch(const std::invalid_argument& ia) {

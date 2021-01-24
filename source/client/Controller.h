@@ -3,39 +3,29 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 #include <SFML/Graphics.hpp>
 
+#include "game/Net.h"
 #include "util/Log.h"
 #include "client/Settings.h"
+#include "game/GameController.h"
 
-// Prefix in front of First and Last is necessary to avoid name clash of the both enums
-enum ActiveMenu : char { MAIN, LOCAL, ONLINE, SETTINGS, AW_FIRST = MAIN, AW_LAST = SETTINGS };
-
-enum ActiveGameWindow : char { MAPSELECTION, INGAME, AGW_FIRST = MAPSELECTION, AGW_LAST = INGAME };
-
-/*
-//connection listener declare:
-enum close_reason {
-	close_reason_normal,
-	close_reason_drop
-};
-typedef std::function<void(void)> con_listener;
-
-typedef std::function<void(close_reason const& reason)> close_listener;
-*/
 class Controller {
 public:
+	enum State : char { MainMenu, LocalMenu, OnlineMenu, SettingsMenu, Game };
+
 	Controller(Settings& settings, sf::RenderWindow& w);
 	virtual ~Controller();
 
-	void setActiveMenu(ActiveMenu i);
-	ActiveMenu getActiveMenu();
-
-	void setActiveGameWindow(ActiveGameWindow i);
-	ActiveGameWindow getActiveGameWindow();
+	void popState();
+	void pushState(State i);
+	State getState();
 
 	Settings& getSettings();
 	sf::RenderWindow& getWindow();
+	GameController& getGameController();
+	void loadGame(Net::JoinLobbyAck jla);
 
 	void setDefaultView();
 
@@ -46,11 +36,11 @@ protected:
 private:
 	Settings& m_settings;
 	sf::RenderWindow& m_window;
+	GameController m_gc;
 
 	bool m_run = false;
 
-	ActiveMenu m_activeMenu = ActiveMenu::AW_FIRST;
-	ActiveGameWindow m_activeGameWindow = ActiveGameWindow::AGW_FIRST;
+	std::stack<State> m_stateStack;
 };
 
 #endif

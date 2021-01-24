@@ -1,18 +1,16 @@
 #include "server/Lobby.h"
 
-std::string Lobby::generateIdentifier(std::string name)
+std::string Lobby::generateCode(std::string name)
 {
 	return md5sum6(name + "#" + std::to_string(Helper::now()));
 }
 
 Lobby::Lobby(SrvSettings& settings, Net::CreateLobbyReq ld) :
-	m_code(generateIdentifier(ld.name)),
+	m_code(generateCode(ld.name)),
 	m_lobbyData(ld)
 {
 	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
-	std::string path = GameReader::getFile(ld.fileCheck.sceneryFile.second);
-	m_scenery = Scenery(settings.getResourceDirectory(), Helper::parseFileName(path), GameReader::getSceneryMap(path));
-	m_gc.setScenery(&m_scenery);
+	m_gc.loadScenery(settings.getResourceDirectory(), ld.fileCheck);
 }
 
 Lobby::~Lobby() {

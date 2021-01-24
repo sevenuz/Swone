@@ -13,6 +13,7 @@
 #include "client/menu/LocalMenu.h"
 #include "client/menu/OnlineMenu.h"
 #include "client/menu/SettingsMenu.h"
+#include "client/game/GameWindow.h"
 #include "client/Controller.h"
 #include "client/Settings.h"
 #include "graphics/ParticleSystem.h"
@@ -42,6 +43,7 @@ private:
 	LocalMenu localMenu;
 	OnlineMenu onlineMenu;
 	SettingsMenu settingsMenu;
+	GameWindow gameWindow;
 	Server server;
 
 	sf::Clock game_clock;

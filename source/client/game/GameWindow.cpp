@@ -1,7 +1,10 @@
-#include <client/GameWindow.h>
+#include <client/game/GameWindow.h>
 
-GameWindow::GameWindow(Controller& c, GameController& gc) : m_controller(c), m_gc(gc) {
-	m_view = m_controller.getWindow().getView();
+GameWindow::GameWindow(Controller& c) :
+	m_c(c),
+	m_gc(c.getGameController())
+{
+	m_view = m_c.getWindow().getView();
 }
 
 GameWindow::~GameWindow() {}
@@ -11,8 +14,8 @@ sf::View GameWindow::getView() {
 }
 
 void GameWindow::setViewZoom() {
-	float scaleW = (float)(m_controller.getSettings().getWidth()) / (float)(m_gc.getMap()->getImageWidth());
-	float scaleH = (float)(m_controller.getSettings().getHeight()) / (float)(m_gc.getMap()->getImageHeight());
+	float scaleW = (float)(m_c.getSettings().getWidth()) / (float)(m_gc.getMap()->getImageWidth());
+	float scaleH = (float)(m_c.getSettings().getHeight()) / (float)(m_gc.getMap()->getImageHeight());
 
 	float scale = (scaleW > scaleH) ? scaleH : scaleW;
 	m_view.zoom(1 / scale);
@@ -42,6 +45,55 @@ sf::Vector2f GameWindow::getPlayerCenter()
 	return ppos;
 }
 
+void GameWindow::drawImgui()
+{
+	switch(m_gstate) {
+		case GameState::Play:
+			if(m_showCharacterSelection)
+				drawCharacterSelection();
+			if(m_showInfoPanel)
+				drawInfoPanel();
+			break;
+		case GameState::Pause:
+			drawPause();
+			break;
+	}
+
+}
+
+void GameWindow::drawPause()
+{
+	ImGui::OpenPopup("Pause:");
+	if(ImGui::BeginPopupModal("Pause:", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		if(ImGui::Button("Settings", ImVec2(120,0))) {
+			// TODO set Settings return window to OnlineMenu
+			m_c.pushState(Controller::State::SettingsMenu);
+		}
+		if(ImGui::Button("Disconnect", ImVec2(120,0))) {
+			// TODO implement disconnect
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::Separator();
+
+		if(ImGui::Button("Return", ImVec2(120,0))) {
+			m_gstate = GameState::Play;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::EndPopup();
+	}
+}
+
+void GameWindow::drawCharacterSelection()
+{
+}
+
+void GameWindow::drawInfoPanel()
+{
+}
+
 void GameWindow::update(sf::Time ellapsed) {
 	m_gc.update(ellapsed);
 
@@ -52,11 +104,10 @@ void GameWindow::update(sf::Time ellapsed) {
 void GameWindow::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Escape) {
-			m_controller.setActiveGameWindow(ActiveGameWindow::MAPSELECTION);
-			return;
+			m_gstate = GameState::Pause;
 		}
 	}
-	sf::RenderWindow& w = m_controller.getWindow();
+	sf::RenderWindow& w = m_c.getWindow();
 	sf::Vector2i pixelPos = sf::Mouse::getPosition(w);
 	sf::Vector2f worldPos = w.mapPixelToCoords(pixelPos);
 		// TODO get numbers from settings
@@ -82,7 +133,7 @@ void GameWindow::event(sf::Event& event) {
 			for(ph::uint32 i = 0; i < count; ++i)
 				vertices[i].Set( ph::Random( -e, e ), ph::Random( -e, e ) );
 			poly.Set( vertices, count );
-			ph::Body *b = new ph::Body( ph::Body::Config{x : worldPos.x/64, y : worldPos.y/64}, &poly );
+			ph::Body *b = new ph::Body( ph::Body::Config{.x =  worldPos.x/64, .y =  worldPos.y/64}, &poly );
 			b->SetOrient( ph::Random( -ph::PI, ph::PI ) );
 			b->restitution = 0.2f;
 			b->dynamicFriction = 0.2f;
@@ -93,7 +144,7 @@ void GameWindow::event(sf::Event& event) {
 		else if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 		{
 			ph::Circle c( ph::Random( 0.1f, 1.0f ) );
-			ph::Body *b2 = new ph::Body( ph::Body::Config{x : worldPos.x/64, y : worldPos.y/64}, &c );
+			ph::Body *b2 = new ph::Body( ph::Body::Config{.x =  worldPos.x/64, .y =  worldPos.y/64}, &c );
 			m_gc.getScene().Add(b2);
 		}
 	}
@@ -105,7 +156,7 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	target.setView(m_view);
 
-	target.draw(*m_gc.getScenery(), states);
+	target.draw(m_gc.getScenery(), states);
 
 	// TODO toggle hitboxes
 	for (ph::Body* g : m_gc.getScene().bodies) {
