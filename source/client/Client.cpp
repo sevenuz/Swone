@@ -86,8 +86,7 @@ void Client::drawLog()
 
 void Client::renderObjectSelector()
 {
-	/*
-	const static std::list<GameObject*>& gameObjects = localMenu.getGameController().getGameObjects();
+	const static std::list<GameObject*>& gameObjects = controller.getGameController().getGameObjects();
 
 	if(ImGui::TreeNode("GameObjects")) {
 		if(ImGui::TreeNode("all")) {
@@ -107,7 +106,6 @@ void Client::renderObjectSelector()
 		}
 		ImGui::TreePop();
 	}
-	*/
 }
 
 void Client::drawObjectViewer()

@@ -19,10 +19,10 @@ void MovementX::applyConfig(StringMapMap& setupMap)
 			m_posVelX = Helper::toVector2f(setupMap[Reader::DEFAULT_PARAGRAPH][Extension::S_VELOCITY]).x;
 
 	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_LEFT_NAME))
-			m_key_left = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_LEFT_NAME]);
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_RIGHT_NAME))
-			m_key_right = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_RIGHT_NAME]);
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(Extension::CONTROLS_LEFT))
+			m_key_left = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][Extension::CONTROLS_LEFT]);
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(Extension::CONTROLS_RIGHT))
+			m_key_right = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][Extension::CONTROLS_RIGHT]);
 	}
 }
 

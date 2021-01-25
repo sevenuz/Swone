@@ -4,6 +4,8 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
+#include "game/GameReader.h"
+#include "util/Helper.h"
 #include "game/GameController.h"
 #include "client/Controller.h"
 
@@ -22,7 +24,7 @@ private:
 	std::string m_selectedPlayer;
 	char m_playerName[PLAYER_NAME_LENGTH];
 	ImVec4 m_playerColor = ImColor(114, 144, 154, 200);
-
+	int m_selectedControlProfile = 0;
 };
 
 #endif

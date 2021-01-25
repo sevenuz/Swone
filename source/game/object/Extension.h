@@ -9,6 +9,16 @@
 class Extension {
 public:
 	static constexpr const char* CONTROLS_PARAGRAPH = "controls";
+
+	static constexpr const char* CONTROLS_LEFT = "left";
+	static constexpr const char* CONTROLS_RIGHT = "right";
+	static constexpr const char* CONTROLS_UP = "up";
+	static constexpr const char* CONTROLS_DOWN = "down";
+	static constexpr const char* CONTROLS_INV1 = "inventory1";
+	static constexpr const char* CONTROLS_INV2 = "inventory2";
+	static constexpr const char* CONTROLS_INV3 = "inventory3";
+	static constexpr const char* CONTROLS_ACTION = "action";
+
 	static constexpr const char* S_VELOCITY = "velocity";
 
 	Extension(GameObject* obj) : m_obj(obj){};

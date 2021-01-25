@@ -9,6 +9,7 @@
 #include "util/reader/Reader.h"
 #include "util/Log.h"
 #include "util/Helper.h"
+#include "game/object/Extension.h"
 
 #define SETTINGS_FILE "../res/settings.ini"
 
@@ -71,7 +72,7 @@ public:
 	sf::IpAddress getServerIpAddress();
 	std::string getServerAndPort();
 
-	std::map<std::string, StringMap> getControlProfiles();
+	StringMapMap& getControlProfiles();
 
 	bool isChanged();
 	void setChanged(bool v);
@@ -107,7 +108,7 @@ private:
 	unsigned short m_port = 61007;
 
 	// key: name of profile, value: control key codes
-	std::map<std::string, StringMap> m_controlProfiles;
+	StringMapMap m_controlProfiles;
 
 	// indicates if the settings changed compared to settings.ini
 	bool m_changed = false;

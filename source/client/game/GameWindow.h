@@ -1,12 +1,16 @@
 #ifndef SWONE_CLIENT_GAME_GAMEWINDOW_H
 #define SWONE_CLIENT_GAME_GAMEWINDOW_H
 
+#include <vector>
+
 #include "imgui.h"
 #include "imgui-SFML.h"
 
 #include <SFML/Graphics/Drawable.hpp>
 #include "Handleable.h"
 #include "client/Controller.h"
+#include "client/game/CharacterSelection.h"
+#include "client/game/InfoPanel.h"
 
 class GameWindow : public Handleable {
 public:
@@ -21,8 +25,6 @@ public:
 	sf::View getView();
 
 	void drawImgui();
-	void drawCharacterSelection();
-	void drawInfoPanel();
 	void drawPause();
 
 	void update(sf::Time ellapsed);
@@ -37,6 +39,9 @@ private:
 	GameState m_gstate = GameState::Play;
 	bool m_showCharacterSelection = true;
 	bool m_showInfoPanel = false;
+
+	CharacterSelection m_characterSelection;
+	CharacterSelection m_infoPanel;
 };
 
 #endif

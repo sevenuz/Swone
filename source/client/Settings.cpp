@@ -28,8 +28,21 @@ Settings::Settings()
 
 		for(auto& m : setupMap) {
 			if(m.first.rfind(SETTINGS_CONTROLS_PROFILE_PREFIX, 0) == 0) {
-				m_controlProfiles[m.first.substr(m.first.find_first_of("_"))] = m.second;
+				m_controlProfiles[m.first] = m.second;
 			}
+		}
+		if(m_controlProfiles.size() == 0) {
+			//add default profile
+			m_controlProfiles[std::string(SETTINGS_CONTROLS_PROFILE_PREFIX) + "Default"] = {
+				StringPair(Extension::CONTROLS_LEFT, std::to_string(sf::Keyboard::A)),
+				StringPair(Extension::CONTROLS_RIGHT, std::to_string(sf::Keyboard::D)),
+				StringPair(Extension::CONTROLS_UP, std::to_string(sf::Keyboard::W)),
+				StringPair(Extension::CONTROLS_DOWN, std::to_string(sf::Keyboard::S)),
+				StringPair(Extension::CONTROLS_INV1, std::to_string(sf::Keyboard::Left)),
+				StringPair(Extension::CONTROLS_INV2, std::to_string(sf::Keyboard::Down)),
+				StringPair(Extension::CONTROLS_INV3, std::to_string(sf::Keyboard::Right)),
+				StringPair(Extension::CONTROLS_ACTION, std::to_string(sf::Keyboard::Up)),
+			};
 		}
 
 		r.forEach([&](std::string p, std::string k, std::string v){
@@ -50,6 +63,28 @@ Settings::~Settings()
 {
 	if(isChanged())
 		writeSettings();
+}
+
+void Settings::writeSettings()
+{
+	StringMapMap sm = {{"global", {
+		StringPair(SETTINGS_WIDTH, std::to_string(getWidth())),
+		StringPair(SETTINGS_HEIGHT, std::to_string(getHeight())),
+		StringPair(SETTINGS_BITS_PER_PIXEL, std::to_string(getBitsPerPixel())),
+		StringPair(SETTINGS_VERTICAL_SYNC_ENABLED, isVerticalSyncEnabled()?"true":"false"),
+		StringPair(SETTINGS_RESOURCE_DIRECTORY, getResourceDirectory()),
+		StringPair(SETTINGS_DOWNLOAD_DIRECTORY, getDownloadDirectory()),
+		StringPair(SETTINGS_FONT_SOURCE, getFontSource()),
+		StringPair(SETTINGS_CLEARING_COLOR, "Color(" +
+			std::to_string(getClearingColor().r) + "," +
+			std::to_string(getClearingColor().g) + "," +
+			std::to_string(getClearingColor().b) + ")"
+		),
+		StringPair(SETTINGS_SERVER, getServer()),
+		StringPair(SETTINGS_PORT, std::to_string(getPort()))
+	}}};
+	sm.insert(m_controlProfiles.begin(), m_controlProfiles.end());
+	Reader::write(SETTINGS_FILE, sm);
 }
 
 size_t Settings::getWidth()
@@ -187,6 +222,11 @@ std::string Settings::getServerAndPort()
 	return m_server + ":" + std::to_string(m_port);
 }
 
+StringMapMap& Settings::getControlProfiles()
+{
+	return m_controlProfiles;
+}
+
 bool Settings::isChanged()
 {
 	return m_changed;
@@ -195,26 +235,6 @@ bool Settings::isChanged()
 void Settings::setChanged(bool v)
 {
 	m_changed = v;
-}
-
-void Settings::writeSettings()
-{
-	Reader::write(SETTINGS_FILE, {{"global", {
-		StringPair(SETTINGS_WIDTH, std::to_string(getWidth())),
-		StringPair(SETTINGS_HEIGHT, std::to_string(getHeight())),
-		StringPair(SETTINGS_BITS_PER_PIXEL, std::to_string(getBitsPerPixel())),
-		StringPair(SETTINGS_VERTICAL_SYNC_ENABLED, isVerticalSyncEnabled()?"true":"false"),
-		StringPair(SETTINGS_RESOURCE_DIRECTORY, getResourceDirectory()),
-		StringPair(SETTINGS_DOWNLOAD_DIRECTORY, getDownloadDirectory()),
-		StringPair(SETTINGS_FONT_SOURCE, getFontSource()),
-		StringPair(SETTINGS_CLEARING_COLOR, "Color(" +
-			std::to_string(getClearingColor().r) + "," +
-			std::to_string(getClearingColor().g) + "," +
-			std::to_string(getClearingColor().b) + ")"
-		),
-		StringPair(SETTINGS_SERVER, getServer()),
-		StringPair(SETTINGS_PORT, std::to_string(getPort()))
-	}}});
 }
 
 int Settings::toW(float w){

@@ -2,7 +2,9 @@
 
 GameWindow::GameWindow(Controller& c) :
 	m_c(c),
-	m_gc(c.getGameController())
+	m_gc(c.getGameController()),
+	m_characterSelection(c),
+	m_infoPanel(c)
 {
 	m_view = m_c.getWindow().getView();
 }
@@ -50,9 +52,9 @@ void GameWindow::drawImgui()
 	switch(m_gstate) {
 		case GameState::Play:
 			if(m_showCharacterSelection)
-				drawCharacterSelection();
+				m_characterSelection.drawImgui();
 			if(m_showInfoPanel)
-				drawInfoPanel();
+				m_infoPanel.drawImgui();
 			break;
 		case GameState::Pause:
 			drawPause();
@@ -84,14 +86,6 @@ void GameWindow::drawPause()
 		ImGui::SetItemDefaultFocus();
 		ImGui::EndPopup();
 	}
-}
-
-void GameWindow::drawCharacterSelection()
-{
-}
-
-void GameWindow::drawInfoPanel()
-{
 }
 
 void GameWindow::update(sf::Time ellapsed) {

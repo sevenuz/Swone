@@ -20,8 +20,8 @@ void MultiJump::applyConfig(StringMapMap& setupMap)
 			m_posVelY = Helper::toVector2f(setupMap[Reader::DEFAULT_PARAGRAPH][Extension::S_VELOCITY]).y;
 
 	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_JUMP_NAME))
-			m_key_up = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_JUMP_NAME]);
+		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(Extension::CONTROLS_UP))
+			m_key_up = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][Extension::CONTROLS_UP]);
 	}
 }
 
