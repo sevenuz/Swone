@@ -2,20 +2,25 @@
 #define SWONE_GAME_NET_H
 
 #include <SFML/Config.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Network.hpp>
 #include <SFML/Network/TcpSocket.hpp>
+#include <SFML/System/Utf.hpp>
 #include <vector>
 
+#include "imgui.h"
 #include "util/reader/Reader.h"
 #include "util/Log.h"
 #include "util/Helper.h"
 #include "game/GameReader.h"
+#include "game/object/GameObject.h"
 
 namespace Net
 {
-	typedef unsigned short Port;
+	typedef sf::Uint16 Port;
+	typedef sf::Uint64 Timestamp;
 
-	// Packet Types
+	// Packet Types TCP
 	static const unsigned char T_VOID = 0;
 	static const unsigned char T_CREATE_LOBBY = 1;
 	static const unsigned char T_JOIN_LOBBY_REQ = 2;
@@ -24,6 +29,14 @@ namespace Net
 	static const unsigned char T_FILE_REQUEST = 5;
 	static const unsigned char T_ERROR = 6;
 	static const unsigned char T_LOBBY_REFRESH = 7;
+	// Packet Types UDP
+	static const unsigned char U_PLAYER_CONFIG_REQ = 8;
+	static const unsigned char U_PLAYER_CONFIG_ACK = 9;
+	static const unsigned char U_PLAYER_INPUT = 10;
+	static const unsigned char U_CHAT_MESSAGE_REQ = 11;
+	static const unsigned char U_CHAT_MESSAGE_ACK = 12;
+	static const unsigned char U_GAME_STATE = 13;
+	static const unsigned char U_GAME_CHAT = 14;
 
 	// Status Codes
 	static const unsigned char C_CONNECTION = 1;
@@ -35,14 +48,26 @@ namespace Net
 
 	class Packet : public sf::Packet {
 		private:
-			unsigned char m_type = T_VOID;
+			sf::Uint8 m_type = T_VOID;
 		public:
-			Packet(const unsigned char type);
+			Packet(const sf::Uint8 type);
 			Packet();
 			virtual const void* onSend(std::size_t& size);
 			virtual void onReceive(const void* data, std::size_t size);
 
-			const unsigned char getType();
+			const sf::Uint8 getType();
+	};
+
+	class TimePacket : public Net::Packet {
+		private:
+			Net::Timestamp m_stamp;
+		public:
+			TimePacket(const sf::Uint8 type);
+			TimePacket();
+			virtual const void* onSend(std::size_t& size);
+			virtual void onReceive(const void* data, std::size_t size);
+
+			const Net::Timestamp getTimestamp() const;
 	};
 
 	// Type: std::vector<T>
@@ -62,6 +87,14 @@ namespace Net
 	sf::Packet& operator <<(sf::Packet& packet, const std::map<T, K>& sm);
 	template<typename T, typename K>
 	sf::Packet& operator >>(sf::Packet& packet, std::map<T, K>& sm);
+
+	// Type: sf::Color
+	sf::Packet& operator <<(sf::Packet& packet, const sf::Color& sm);
+	sf::Packet& operator >>(sf::Packet& packet, sf::Color& sm);
+
+	// Type: GameObject::Config
+	sf::Packet& operator <<(sf::Packet& packet, const GameObject::Config& sm);
+	sf::Packet& operator >>(sf::Packet& packet, GameObject::Config& sm);
 
 	struct Status {
 		sf::Uint16 code;
@@ -139,6 +172,52 @@ namespace Net
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const LobbyRefresh& lr);
 	sf::Packet& operator >>(sf::Packet& packet, LobbyRefresh& lr);
+
+	struct ChatMessageReq {
+		std::string message;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const ChatMessageReq& f);
+	sf::Packet& operator >>(sf::Packet& packet, ChatMessageReq& f);
+
+	struct Acknowledgement {
+		sf::Uint64 stampCheck;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const Acknowledgement& f);
+	sf::Packet& operator >>(sf::Packet& packet, Acknowledgement& f);
+
+	struct PlayerConfigReq {
+		std::string selection;
+		std::string name;
+		sf::Color color;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const PlayerConfigReq& f);
+	sf::Packet& operator >>(sf::Packet& packet, PlayerConfigReq& f);
+
+	struct PlayerConfigAck : Acknowledgement {
+		std::string identifier;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const PlayerConfigAck& f);
+	sf::Packet& operator >>(sf::Packet& packet, PlayerConfigAck& f);
+
+	struct GameState {
+		std::vector<GameObject::Config> objects;
+		std::vector<GameObject::Config> players;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const GameState& f);
+	sf::Packet& operator >>(sf::Packet& packet, GameState& f);
+
+	struct PlayerInput {
+		std::string identifier;
+		sf::Uint8 inputs;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const PlayerInput& f);
+	sf::Packet& operator >>(sf::Packet& packet, PlayerInput& f);
+
+	struct GameChat {
+		std::map<Net::Timestamp, std::string> messages;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const GameChat& f);
+	sf::Packet& operator >>(sf::Packet& packet, GameChat& f);
 }
 
 #endif // NET_H
