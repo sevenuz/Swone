@@ -4,11 +4,13 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/Network.hpp>
 
+#include "game/Net.h"
+
 class Player {
 public:
 	struct Connection {
 		sf::IpAddress address;
-		unsigned short port = 0;
+		Net::Port port = 0;
 	};
 
 	Player(sf::Time lpt, Connection c);
