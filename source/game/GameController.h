@@ -15,7 +15,11 @@ public:
 
 	Scenery& getScenery();
 	Map* getMap();
-	const std::list<GameObject*>& getGameObjects() const;
+	const std::list<GameObject*>& getAll() const;
+	std::list<GameObject*>& getAll();
+	std::list<GameObject*>& getGameObjects();
+	std::list<GameObject*>& getLocalPlayers();
+	std::list<GameObject*>& getRemotePlayers();
 	GameObject* getGameObjectById(const std::string& id) const;
 
 	void updateLog() const;
@@ -23,19 +27,32 @@ public:
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
 
-	void pushPlayer(GameObject* p);
-	void clearPlayers();
-	void startGame();
+	void clearAll();
 
 	void loadScenery(std::string resDir, Net::GameFileCheck gfc);
 
 	const ph::Scene& getScene() const;
 	ph::Scene& getScene();
+
+	void removeFromGame(std::string identifier);
+
+	void spawnGameObject(std::string identifier, std::string key);
+	GameObject* spawnGameObject(std::string key);
+	GameObject* spawnLocalPlayer(std::string identifier, std::string key);
+	void spawnRemotePlayer(std::string identifier, std::string key);
+	void spawnRemotePlayer(std::string key);
+	void reset();
+	void sortAll();
+
+	void spawnStaticGameObjects();
+	void spawnBeginningGameObjects();
 protected:
 private:
 	Scenery m_scenery;
-	std::vector<GameObject*> m_localPlayers;
-	std::vector<GameObject*> m_remotePlayers;
+	std::list<GameObject*> m_localPlayers;
+	std::list<GameObject*> m_remotePlayers;
+	std::list<GameObject*> m_gameObjects;
+	std::list<GameObject*> m_all;
 
 	ph::Scene m_scene;
 	sf::Time m_clock;

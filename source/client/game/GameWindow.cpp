@@ -150,7 +150,16 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
 	target.setView(m_view);
 
-	target.draw(m_gc.getScenery(), states);
+	bool drawMap = true;
+	for (GameObject* g : m_gc.getAll()) {
+		if(g->getZindex() >= 0 && drawMap) {
+			target.draw(*m_gc.getMap(), states);
+			drawMap = false;
+		}
+		target.draw(*g, states);
+	}
+	if(drawMap)
+		target.draw(*m_gc.getMap(), states);
 
 	// TODO toggle hitboxes
 	for (ph::Body* g : m_gc.getScene().bodies) {

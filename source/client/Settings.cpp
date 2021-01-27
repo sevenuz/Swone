@@ -61,6 +61,7 @@ Settings::Settings()
 
 Settings::~Settings()
 {
+	// TODO fix: write settings always
 	if(isChanged())
 		writeSettings();
 }

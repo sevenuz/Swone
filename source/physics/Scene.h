@@ -37,6 +37,7 @@ struct Scene
 
   void Step( PHY_NS::real dt, PHY_NS::Vec2 gravity );
   void Add( PHY_NS::Body *body );
+  void Remove( PHY_NS::Body *body );
   void Clear( void );
 
   PHY_NS::uint32 m_iterations;

@@ -95,6 +95,7 @@ public:
 	GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density);
 	GameObject(std::string type, Config config, float radius, float density);
 	GameObject(StringMapMap& setupMap);
+	GameObject(std::string identifier, StringMapMap& setupMap);
 	virtual ~GameObject();
 
 	void applySetupMap(StringMapMap& setupMap);
@@ -102,9 +103,9 @@ public:
 	void applyConfig(Config config);
 	Config getConfig();
 
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	virtual void event(sf::Event& e);
-	virtual void update(sf::Time ellapsed);
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+	virtual void event(sf::Event& e) override;
+	virtual void update(sf::Time ellapsed) override;
 
 	virtual void onObjectCollision(ph::Manifold* manifold, GameObject* go);
 	virtual void onTileCollision(ph::Manifold* manifold, Tile* t);

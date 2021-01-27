@@ -14,29 +14,33 @@ std::string GameObject::generateIdentifier(std::string name)
 	return name + "#" + std::to_string(GameObject::Identifier_count);
 }
 
-GameObject::GameObject(std::string type, GameObject::Config config, ph::Shape* shape)
-	: m_type(type),
-		m_identifier(generateIdentifier(config.name))
+GameObject::GameObject(std::string type, GameObject::Config config, ph::Shape* shape) :
+	m_type(type),
+	m_identifier(generateIdentifier(config.name))
 {
 	initBody(config.body, shape);
 	applyConfig(config);
 }
 
-GameObject::GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density)
-	: GameObject(type, config, createPolyShape(vertices, density))
+GameObject::GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density) :
+	GameObject(type, config, createPolyShape(vertices, density))
 {}
 
-GameObject::GameObject(std::string type, Config config, float radius, float density)
-	: GameObject(type, config, createCircleShape(radius, density))
+GameObject::GameObject(std::string type, Config config, float radius, float density) :
+	GameObject(type, config, createCircleShape(radius, density))
 {}
 
-GameObject::GameObject(StringMapMap& setupMap)
-	: m_type(setupMap[Reader::DEFAULT_PARAGRAPH][S_TYPE]),
-		m_identifier(generateIdentifier(setupMap[Reader::DEFAULT_PARAGRAPH][S_NAME]))
+GameObject::GameObject(std::string identifier, StringMapMap& setupMap) :
+	m_type(setupMap[Reader::DEFAULT_PARAGRAPH][S_TYPE]),
+	m_identifier(identifier)
 {
 	initSetupMap(setupMap);
 	applySetupMap(setupMap);
 }
+
+GameObject::GameObject(StringMapMap& setupMap) :
+	GameObject(generateIdentifier(setupMap[Reader::DEFAULT_PARAGRAPH][S_NAME]), setupMap)
+{}
 
 GameObject::~GameObject() {
 	Log::ger().log("destroy " + getIdentifier());

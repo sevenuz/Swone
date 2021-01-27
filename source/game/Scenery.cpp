@@ -82,11 +82,8 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 	}
 }
 
-Scenery::~Scenery() {
-	for(GameObject* go : m_gameObjects)
-		delete go;
-	m_gameObjects.clear();
-}
+Scenery::~Scenery()
+{}
 
 StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goName, bool gfcInjection)
 {
@@ -118,87 +115,14 @@ StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goN
 	if(!gfcInjection)
 		m_fileCheck.textureFileMap[textureName] = md5file(texturePath.c_str());
 
+	// TODO spawn system!!!
+	if(Helper::toBool(goSetupMap[GameObject::S_HITBOX_PARAGRAPH][GameObject::S_SOLID])
+			&& Helper::toBool(goSetupMap[GameObject::S_HITBOX_PARAGRAPH][GameObject::S_COLLIDABLE_UNSOLID]))
+		m_staticGameObjects.push_back(goName);
+	else
+		m_beginningGameObjects.push_back(goName);
 	return goSetupMap;
 }
-
-void Scenery::sortGameObjects()
-{
-	// sort list with z-index
-	m_gameObjects.sort([](GameObject* a, GameObject* b) -> bool {
-		return a->getZindex() < b->getZindex();
-	});
-}
-
-void Scenery::spawnPlayer(std::string key)
-{
-	GameObject* go = new GameObject(m_playerSetupMaps[key]);
-	m_gameObjects.push_back(go);
-}
-
-void Scenery::spawnGameObjects()
-{
-	for(auto& osm : m_objectSetupMaps) {
-		std::string paragraph = osm.first;
-		StringMapMap& goSetupMap = osm.second;
-		for(int i = 1; m_setupMap[paragraph].count(std::to_string(i)); i++){
-			GameObject* go = new GameObject(goSetupMap);
-			go->setPos(Helper::toVector2f(m_setupMap[paragraph][std::to_string(i)]));
-			m_gameObjects.push_back(go);
-		}
-	}
-}
-
-void Scenery::reset()
-{
-	for(GameObject* go : m_gameObjects)
-		delete go;
-	m_gameObjects.clear();
-	spawnGameObjects();
-	sortGameObjects();
-}
-
-void Scenery::event(sf::Event& event)
-{
-	for (GameObject* g : getGameObjects()) {
-		g->event(event);
-	}
-}
-
-void Scenery::update(sf::Time ellapsed)
-{
-	for (GameObject* g : getGameObjects()) {
-		g->apply();
-		g->update(ellapsed);
-	}
-
-	sortGameObjects();
-}
-
-void Scenery::drawPreview(sf::RenderTarget& target, sf::RenderStates states) const {
-	states.transform *= getTransform();
-	states.texture = NULL;
-
-	target.draw(*getMap(), states);
-	for (GameObject* g : getGameObjects())
-		if(g->getType() != GameObject::S_PLAYER_TYPE && g->getZindex() > 0)
-			target.draw(*g, states);
-};
-
-void Scenery::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	states.transform *= getTransform();
-	states.texture = NULL;
-
-	bool drawMap = true;
-	for (GameObject* g : getGameObjects()) {
-		if(g->getZindex() >= 0 && drawMap) {
-			target.draw(*getMap(), states);
-			drawMap = false;
-		}
-		target.draw(*g, states);
-	}
-	if(drawMap)
-		target.draw(*getMap(), states);
-};
 
 Map* Scenery::getMap()
 {
@@ -210,14 +134,9 @@ const Map* Scenery::getMap() const
 	return m_map;
 }
 
-std::list<GameObject*>& Scenery::getGameObjects()
+StringMapMap& Scenery::getSetupMap()
 {
-	return m_gameObjects;
-}
-
-const std::list<GameObject*>& Scenery::getGameObjects() const
-{
-	return m_gameObjects;
+	return m_setupMap;
 }
 
 std::map<std::string, StringMapMap>& Scenery::getPlayerSetupMaps()
@@ -235,12 +154,17 @@ const Net::GameFileCheck& Scenery::getFileCheck() const
 	return m_fileCheck;
 }
 
-void Scenery::setName(std::string n)
+std::vector<std::string>& Scenery::getBeginningGameObjects()
 {
-	m_name = n;
+	return m_beginningGameObjects;
 }
 
-std::string Scenery::getName()
+std::vector<std::string>& Scenery::getStaticGameObjects()
+{
+	return m_staticGameObjects;
+}
+
+const std::string& Scenery::getName() const
 {
 	return m_name;
 }

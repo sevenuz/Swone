@@ -119,6 +119,14 @@ void PHY_NS::Scene::Add( PHY_NS::Body *body )
   bodies.push_back( body );
 }
 
+void PHY_NS::Scene::Remove( PHY_NS::Body *body )
+{
+  assert( body );
+  assert( body->shape );
+
+  bodies.remove_if( [&](const Body* b) -> bool {return b==body;} );
+}
+
 void PHY_NS::Scene::Clear( )
 {
   bodies.clear();
