@@ -13,6 +13,7 @@
 #define SRVSETTINGS_PORT "port"
 #define SRVSETTINGS_TICK_RATE "tick-rate"
 #define SRVSETTINGS_RESOURCE_DIRECTORY "resource_directory"
+#define SRVSETTINGS_LOBBY_MAXIMUM "lobby_maximum"
 
 class SrvSettings {
 public:
@@ -30,12 +31,16 @@ public:
 
 	std::string getResourceDirectory();
 	void setResourceDirectory(std::string s);
+
+	unsigned int getLobbyMaximum();
+	void setLobbyMaximum(unsigned int v);
 protected:
 private:
 	std::string m_domain = "localhost"; // TODO necessary?
 	unsigned short m_port = 61007;
 	unsigned short m_tickRate = 20; // updates per second
 	std::string m_resource_directory = "../res/";
+	unsigned int m_lobbyMaximum = 100;
 };
 
 #endif

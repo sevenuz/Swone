@@ -300,7 +300,6 @@ void OnlineMenu::sendCreateLobbyReq(Net::CreateLobbyReq clr)
 
 void OnlineMenu::handleJoinLobbyAck(sf::TcpSocket& socket, Net::JoinLobbyAck jla)
 {
-	// TODO implement join lobby
 	Net::handleGameFileCheck(socket, jla.fileCheck, m_c.getSettings().getDownloadDirectory());
 
 	m_c.loadGame(jla);

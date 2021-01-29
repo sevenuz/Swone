@@ -21,25 +21,30 @@ const sf::Uint8 Net::Packet::getType()
 	return m_type;
 }
 
-Net::TimePacket::TimePacket(const sf::Uint8 type) : Net::Packet::Packet(type)
+Net::GamePacket::GamePacket(const sf::Uint8 type, const std::string& code) : Net::Packet::Packet(type)
 {
 	m_stamp = Helper::now();
-	*this << m_stamp;
+	m_code = code;
+	*this << m_stamp << m_code;
 }
-Net::TimePacket::TimePacket() : Net::Packet::Packet(T_VOID)
+Net::GamePacket::GamePacket() : Net::Packet::Packet(T_VOID)
 {}
-const void* Net::TimePacket::TimePacket::onSend(std::size_t& size)
+const void* Net::GamePacket::GamePacket::onSend(std::size_t& size)
 {
 	return Net::Packet::onSend(size);
 }
-void Net::TimePacket::onReceive(const void* data, std::size_t size)
+void Net::GamePacket::onReceive(const void* data, std::size_t size)
 {
 	Net::Packet::onReceive(data, size);
-	*this >> m_stamp;
+	*this >> m_stamp >> m_code;
 }
-const Net::Timestamp Net::TimePacket::getTimestamp() const
+const Net::Timestamp Net::GamePacket::getTimestamp() const
 {
 	return m_stamp;
+}
+const std::string Net::GamePacket::getCode() const
+{
+	return m_code;
 }
 
 // Type: std::vector<T>
@@ -108,26 +113,6 @@ sf::Packet& Net::operator <<(sf::Packet& packet, const sf::Color& sm)
 sf::Packet& Net::operator >>(sf::Packet& packet, sf::Color& sm)
 {
 	return packet >> sm.r >> sm.g >> sm.b >> sm.a;
-}
-
-// Type: GameObject::Config TODO optimizing!
-sf::Packet& Net::operator <<(sf::Packet& packet, const GameObject::Config& sm)
-{
-	return packet << sm.body.av << sm.body.collidableSolid << sm.body.collidableUnsolid
-		<< sm.body.dynamicFriction << sm.body.ft << sm.body.fx << sm.body.fy
-		<< sm.body.orient << sm.body.restitution << sm.body.rotatable << sm.body.skip
-		<< sm.body.solid << sm.body.staticFriction << sm.body.vx << sm.body.vy
-		<< sm.body.x << sm.body.y << sm.color << sm.extensionMap << sm.name
-		<< sm.visible << sm.zindex;
-}
-sf::Packet& Net::operator >>(sf::Packet& packet, GameObject::Config& sm)
-{
-	return packet >> sm.body.av >> sm.body.collidableSolid >> sm.body.collidableUnsolid
-		>> sm.body.dynamicFriction >> sm.body.ft >> sm.body.fx >> sm.body.fy
-		>> sm.body.orient >> sm.body.restitution >> sm.body.rotatable >> sm.body.skip
-		>> sm.body.solid >> sm.body.staticFriction >> sm.body.vx >> sm.body.vy
-		>> sm.body.x >> sm.body.y >> sm.color >> sm.extensionMap >> sm.name
-		>> sm.visible >> sm.zindex;
 }
 
 void Net::handleGameFileCheck(sf::TcpSocket& socket, const GameFileCheck& gfc, const std::string& resDir)
@@ -317,11 +302,11 @@ sf::Packet& Net::operator >>(sf::Packet& packet, JoinLobbyReq& lr)
 // Type: JoinLobbyAck
 sf::Packet& Net::operator <<(sf::Packet& packet, const JoinLobbyAck& lr)
 {
-	return packet << lr.port << lr.fileCheck;
+	return packet << lr.code << lr.fileCheck;
 }
 sf::Packet& Net::operator >>(sf::Packet& packet, JoinLobbyAck& lr)
 {
-	return packet >> lr.port >> lr.fileCheck;
+	return packet >> lr.code >> lr.fileCheck;
 }
 
 // Type: LobbyStatus
@@ -353,31 +338,44 @@ sf::Packet& Net::operator >>(sf::Packet& packet, ChatMessageReq& f)
 	return packet >> f.message;
 }
 
-sf::Packet& Net::operator <<(sf::Packet& packet, const Acknowledgement& f)
+sf::Packet& Net::operator <<(sf::Packet& packet, const ChatMessageAck& f)
 {
 	return packet << f.stampCheck;
 }
-sf::Packet& Net::operator >>(sf::Packet& packet, Acknowledgement& f)
+sf::Packet& Net::operator >>(sf::Packet& packet, ChatMessageAck& f)
 {
 	return packet >> f.stampCheck;
 }
 
 sf::Packet& Net::operator <<(sf::Packet& packet, const PlayerConfigReq& f)
 {
-	return packet << f.selection << f.name << f.color;
+	return packet << f.identifier << f.selection << f.name << f.color;
 }
 sf::Packet& Net::operator >>(sf::Packet& packet, PlayerConfigReq& f)
 {
-	return packet >> f.selection >> f.name >> f.color;
+	return packet >> f.identifier >> f.selection >> f.name >> f.color;
 }
 
 sf::Packet& Net::operator <<(sf::Packet& packet, const PlayerConfigAck& f)
 {
-	return packet << f.stampCheck << f.identifier;
+	return packet << f.stampCheck << f.identifier << f.selection;
 }
 sf::Packet& Net::operator >>(sf::Packet& packet, PlayerConfigAck& f)
 {
-	return packet >> f.stampCheck >> f.identifier;
+	return packet >> f.stampCheck >> f.identifier >> f.selection;
+}
+
+sf::Packet& Net::operator <<(sf::Packet& packet, const GameObjectState& f)
+{
+	return packet << f.identifier << f.key << f.name << f.visible << f.color << f.zindex << f.extensionMap
+		<< f.collidableSolid << f.collidableUnsolid << f.rotatable << f.solid << f.skip
+		<< f.x << f.y << f.orient << f.vx << f.vy << f.av;
+}
+sf::Packet& Net::operator >>(sf::Packet& packet, GameObjectState& f)
+{
+	return packet >> f.identifier >> f.key >> f.name >> f.visible >> f.color >> f.zindex >> f.extensionMap
+		>> f.collidableSolid >> f.collidableUnsolid >> f.rotatable >> f.solid >> f.skip
+		>> f.x >> f.y >> f.orient >> f.vx >> f.vy >> f.av;
 }
 
 sf::Packet& Net::operator <<(sf::Packet& packet, const GameState& f)

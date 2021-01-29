@@ -34,11 +34,9 @@ sf::Vector2f GameWindow::getPlayerCenter()
 {
 	sf::Vector2f ppos = sf::Vector2f(0,0);
 	size_t pcount = 0;
-	for (GameObject* g : m_gc.getGameObjects()) {
-		if(g->getType() == GameObject::S_PLAYER_TYPE) {
-			ppos += g->getPos();
-			pcount++;
-		}
+	for (GameObject* g : m_gc.getLocalPlayers()) {
+		ppos += g->getPos();
+		pcount++;
 	}
 	if(pcount > 0) {
 		ppos.x /= pcount;
@@ -69,11 +67,12 @@ void GameWindow::drawPause()
 	if(ImGui::BeginPopupModal("Pause:", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		if(ImGui::Button("Settings", ImVec2(120,0))) {
-			// TODO set Settings return window to OnlineMenu
 			m_c.pushState(Controller::State::SettingsMenu);
 		}
 		if(ImGui::Button("Disconnect", ImVec2(120,0))) {
-			// TODO implement disconnect
+			m_c.getNetController().disconnect();
+			m_gstate = GameState::Play;
+			m_c.popState();
 			ImGui::CloseCurrentPopup();
 		}
 

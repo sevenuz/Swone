@@ -11,6 +11,7 @@ Lobby::Lobby(SrvSettings& settings, Net::CreateLobbyReq ld) :
 {
 	m_tickDt = sf::seconds(1.0f / (float)settings.getTickRate());
 	m_gc.loadScenery(settings.getResourceDirectory(), ld.fileCheck);
+	m_gc.spawnBeginningGameObjects();
 }
 
 Lobby::~Lobby() {
@@ -24,6 +25,7 @@ void Lobby::startMainLoop()
 		m_tickT += ellapsed;
 		m_chatT += ellapsed;
 
+		m_mtx.lock();
 		m_gc.update(ellapsed);
 
 		if(m_tickT >= m_tickDt) {
@@ -34,116 +36,196 @@ void Lobby::startMainLoop()
 			m_chatT -= m_chatDt;
 			sendChat();
 		}
+		m_mtx.unlock();
 	}
 }
 
-void Lobby::handleUdpConnections()
+void Lobby::handlePackets()
 {
 	while(m_run) {
-		Net::TimePacket reqPacket;
-		Player::Connection conncetion;
-		if(m_socket.receive(reqPacket, conncetion.address, conncetion.port) == sf::Socket::Done)
+		if(!m_packetsReceive.empty())
 		{
-			if(registerClient(conncetion))
-				Log::ger().log("player registered.");
-			switch(reqPacket.getType()) {
+			auto pp = m_packetsReceive.front();
+			Player& p = registerClient(pp.connection);
+			switch(pp.packet.getType()) {
+				case Net::U_DISCONNECT:
+					receiveDisconnect(pp.packet, p);
+					break;
 				case Net::U_CHAT_MESSAGE_REQ:
-					receiveChatMessageReq(reqPacket, conncetion);
+					receiveChatMessageReq(pp.packet, p);
 					break;
 				case Net::U_PLAYER_CONFIG_REQ:
-					receivePlayerConfigReq(reqPacket, conncetion);
+					receivePlayerConfigReq(pp.packet, p);
 					break;
 				case Net::U_PLAYER_INPUT:
-					receivePlayerInput(reqPacket);
+					receivePlayerInput(pp.packet);
 					break;
 			}
+			m_packetsReceive.pop();
 		}
 	}
 }
 
-bool Lobby::registerClient(Player::Connection connection)
+void Lobby::send(Net::GamePacket packet, Player::Connection connection)
+{
+	m_packetsSend.push(PacketPair{packet, connection});
+}
+
+void Lobby::pushPacketPair(Net::GamePacket packet, Player::Connection connection)
+{
+	m_packetsReceive.push(PacketPair{packet, connection});
+}
+
+bool Lobby::hasPacketPair()
+{
+	return !m_packetsSend.empty();
+}
+
+Lobby::PacketPair Lobby::popPacketPair()
+{
+	auto pp = m_packetsSend.front();
+	m_packetsSend.pop();
+	return pp;
+}
+
+Player& Lobby::registerClient(Player::Connection connection)
 {
 	// TODO improve player registration
 	for(Player* c : m_players) {
 		if(c->getConnection().address == connection.address && c->getConnection().port == connection.port)
-			return false;
+			return *c;
 	}
 	Player* player = new Player(sf::seconds(Helper::now()), connection);
+
+	m_mtx.lock();
 	m_players.push_back(player);
-	return true;
+	m_mtx.unlock();
+
+	Log::ger().log("player registered.");
+	return *player;
 }
 
-void Lobby::receiveChatMessageReq(Net::TimePacket packet, Player::Connection c)
+void Lobby::receiveDisconnect(Net::GamePacket packet, Player& c) // TODO
+{
+	m_mtx.lock();
+	for(GameObject* go : c.getPlayers()) {
+		m_gc.removeFromGame(go->getIdentifier());
+	}
+	m_players.remove(&c);
+	delete &c;
+	m_mtx.unlock();
+}
+
+void Lobby::receiveChatMessageReq(Net::GamePacket packet, Player& c)
 {
 	Net::ChatMessageReq cmr;
 	packet >> cmr;
+	Log::ger().log("Lobby: got msg: " + cmr.message );
 	m_gameChat[packet.getTimestamp()] = cmr;
-	Net::TimePacket resPacket(Net::U_CHAT_MESSAGE_ACK);
-	m_socket.send(resPacket, c.address, c.port);
+	Net::GamePacket resPacket(Net::U_CHAT_MESSAGE_ACK, m_code);
+	resPacket << Net::ChatMessageAck{
+		packet.getTimestamp()
+	};
+	send(resPacket, c.getConnection());
 }
 
-void Lobby::receivePlayerConfigReq(Net::TimePacket packet, Player::Connection c)
+void Lobby::receivePlayerConfigReq(Net::GamePacket packet, Player& c)
 {
 	Net::PlayerConfigReq pcr;
 	packet >> pcr;
 	m_playerConfigs[packet.getTimestamp()] = pcr;
-	Net::TimePacket resPacket(Net::U_PLAYER_CONFIG_ACK);
-	// TODO send game object player identifier, update go
-	m_socket.send(resPacket, c.address, c.port);
+	Net::GamePacket resPacket(Net::U_PLAYER_CONFIG_ACK, m_code);
+
+	m_mtx.lock();
+	resPacket << Net::PlayerConfigAck{
+		packet.getTimestamp(),
+		c.createOrUpdatePlayer(m_gc, pcr),
+		pcr.selection
+	};
+	m_mtx.unlock();
+
+	send(resPacket, c.getConnection());
 }
 
-void Lobby::receivePlayerInput(Net::TimePacket packet)
+void Lobby::receivePlayerInput(Net::GamePacket packet)
 {
+	m_mtx.lock();
 	Net::PlayerInput pi;
 	packet >> pi;
 	m_playerInputs[packet.getTimestamp()] = pi;
 	// TODO handle player input in gamecontroller
-}
-
-std::list<Player*>& Lobby::getPlayers()
-{
-	return m_players;
+	m_mtx.unlock();
 }
 
 void Lobby::start()
 {
 	m_run = true;
-	if(m_socket.bind(sf::Socket::AnyPort) != sf::Socket::Done) {
-		Log::ger().log("Lobby: failed to bind Port", Log::Label::Error);
-	}
-	m_socket.setBlocking(false);
-	m_port = m_socket.getLocalPort();
-	std::thread udpThread(&Lobby::handleUdpConnections, this);
 	Log::ger().log("Lobby#" + m_code + " is listening.");
+	std::thread(&Lobby::handlePackets, this).detach();
 	startMainLoop();
-	udpThread.join();
 }
 
 void Lobby::stop()
 {
 	m_run = false;
-	m_socket.unbind();
+}
+
+Net::GameObjectState Lobby::getGameObjectState(GameObject* go)
+{
+		auto c = go->getConfig();
+		return Net::GameObjectState{
+			go->getIdentifier(),
+			m_gc.getGameObejctKey(go->getIdentifier()),
+			c.name,
+			c.visible,
+			c.color,
+			c.zindex,
+			c.extensionMap,
+			c.body.collidableSolid,
+			c.body.collidableUnsolid,
+			c.body.rotatable,
+			c.body.solid,
+			c.body.skip,
+			c.body.x,
+			c.body.y,
+			c.body.orient,
+			c.body.vx,
+			c.body.vy,
+			c.body.av
+		};
 }
 
 void Lobby::sendState()
 {
-	//for(Player* p : m_players) {
-		// TODO sendLobbyState...
-		// socket.send(packet, p->getConnection().address, p->getConnection().port);
-	//}
+	Net::GameState gs;
+	for(GameObject* go : m_gc.getGameObjects()) {
+		gs.objects.push_back(getGameObjectState(go));
+	}
+	for(GameObject* go : m_gc.getRemotePlayers()) {
+		gs.players.push_back(getGameObjectState(go));
+	}
+	Net::GamePacket packet(Net::U_GAME_STATE, m_code);
+	packet << gs;
+	if((double)packet.getDataSize() / sf::UdpSocket::MaxDatagramSize >= UDP_DATA_THRESHOLD)
+		Log::ger().log("Packet exceeds Data-Threshold", Log::Label::Warning);
+	for(Player* p : m_players) {
+		send(packet, p->getConnection());
+	}
 }
 
 void Lobby::sendChat()
 {
-	//for(Player* p : m_players) {
-		// TODO sendLobbyState...
-		// socket.send(packet, p->getConnection().address, p->getConnection().port);
-	//}
-}
-
-const std::string Lobby::getCode() const
-{
-	return m_code;
+	Net::GameChat gc;
+	// send last N messages
+	if(m_gameChat.size() > 5)
+		gc.messages.insert(std::prev(std::prev(std::prev(std::prev(std::prev(m_gameChat.end()))))), m_gameChat.end()); // TODO
+	else
+		gc.messages.insert(m_gameChat.begin(), m_gameChat.end());
+	Net::GamePacket packet(Net::U_GAME_CHAT, m_code);
+	packet << gc;
+	for(Player* p : m_players) {
+		send(packet, p->getConnection());
+	}
 }
 
 bool Lobby::verifyJoinLobbyReq(Net::JoinLobbyReq jlr)
@@ -159,7 +241,7 @@ bool Lobby::verifyJoinLobbyReq(Net::JoinLobbyReq jlr)
 
 Net::JoinLobbyAck Lobby::getJoinLobbyAck()
 {
-	return Net::JoinLobbyAck{ m_port, m_lobbyData.fileCheck };
+	return Net::JoinLobbyAck{ m_code, m_lobbyData.fileCheck };
 }
 
 Net::LobbyStatus Lobby::getLobbyStatus()
@@ -171,3 +253,14 @@ Net::LobbyStatus Lobby::getLobbyStatus()
 		(sf::Uint8)m_players.size()
 	};
 }
+
+const std::string Lobby::getCode() const
+{
+	return m_code;
+}
+
+std::list<Player*>& Lobby::getPlayers()
+{
+	return m_players;
+}
+

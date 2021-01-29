@@ -15,6 +15,8 @@ SrvSettings::SrvSettings()
 				setTickRate((ushort)Helper::toLong(v));
 			else if(k==SRVSETTINGS_RESOURCE_DIRECTORY)
 				setResourceDirectory(v);
+			else if(k==SRVSETTINGS_LOBBY_MAXIMUM)
+				setLobbyMaximum(Helper::toInt(v));
 			else
 				Log::ger().log(k + " is not a srvsettings option", Log::Label::Warning);
 		});
@@ -26,6 +28,7 @@ SrvSettings::SrvSettings()
 			StringPair(SRVSETTINGS_PORT, std::to_string(getPort())),
 			StringPair(SRVSETTINGS_TICK_RATE, std::to_string(getTickRate())),
 			StringPair(SRVSETTINGS_RESOURCE_DIRECTORY, getResourceDirectory()),
+			StringPair(SRVSETTINGS_LOBBY_MAXIMUM, std::to_string(getLobbyMaximum())),
 		}}});
 		Log::ger().log("Write Default-SrvSettings. Try to restart.");
 	}
@@ -71,4 +74,14 @@ std::string SrvSettings::getResourceDirectory()
 void SrvSettings::setResourceDirectory(std::string s)
 {
 	m_resource_directory = s;
+}
+
+unsigned int SrvSettings::getLobbyMaximum()
+{
+	return m_lobbyMaximum;
+}
+
+void SrvSettings::setLobbyMaximum(unsigned int s)
+{
+	m_lobbyMaximum = s;
 }

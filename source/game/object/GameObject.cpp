@@ -78,10 +78,10 @@ void GameObject::initSetupMap(StringMapMap& setupMap)
 	ph::Body::Config config{hasHitbox, hasHitbox, hasHitbox, !hasHitbox, !hasHitbox};
 	if(hasHitbox) {
 		float density = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH][S_DENSITY], 1);
-		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_TYPE) {
+		if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_CIRCLE_FORM) {
 			float radius = Helper::toFloat(setupMap[S_HITBOX_PARAGRAPH]["1"]);
 			initBody(config, createCircleShape(radius, density));
-		} else if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_POLYGON_TYPE) {
+		} else if(setupMap[S_HITBOX_PARAGRAPH][S_TYPE] == S_POLYGON_FORM) {
 			std::vector<ph::Vec2> vertices;
 			for(int i = 1; setupMap[S_HITBOX_PARAGRAPH].count(std::to_string(i)); i++){
 				sf::Vector2f v = Helper::toVector2f(setupMap[S_HITBOX_PARAGRAPH][std::to_string(i)]);

@@ -2,7 +2,8 @@
 
 Controller::Controller(Settings& settings, sf::RenderWindow& w) :
 	m_settings(settings),
-	m_window(w)
+	m_window(w),
+	m_nc(m_gc)
 {
 	m_window.setVerticalSyncEnabled(m_settings.isVerticalSyncEnabled());
 }
@@ -40,10 +41,16 @@ GameController& Controller::getGameController()
 	return m_gc;
 }
 
+NetController& Controller::getNetController()
+{
+	return m_nc;
+}
+
 void Controller::loadGame(Net::JoinLobbyAck jla)
 {
+	Log::ger().log("loadGame " + jla.code);
 	m_gc.loadScenery(m_settings.getResourceDirectory(), jla.fileCheck);
-	// TODO NetController
+	std::thread(&NetController::start, &m_nc, jla.code, m_settings.getServerIpAddress(), m_settings.getPort()).detach();
 }
 
 void Controller::setDefaultView() {

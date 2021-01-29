@@ -34,6 +34,8 @@ private:
 
 	void sendTcpJoinLobbyAck(sf::TcpSocket& socket, Net::JoinLobbyAck jla);
 
+	void runUdpSocket();
+
 	SrvSettings settings;
 
 	sf::TcpListener listener;

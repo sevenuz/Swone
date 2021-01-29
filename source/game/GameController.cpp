@@ -29,70 +29,76 @@ void GameController::sortAll()
 
 void GameController::removeFromGame(std::string identifier)
 {
-	auto fn = [&](GameObject* go) -> bool {
-		return go->getIdentifier() == identifier;
-	};
-	m_localPlayers.remove_if(fn);
-	m_remotePlayers.remove_if(fn);
-	m_gameObjects.remove_if(fn);
-	m_all.remove_if([&](GameObject* go) -> bool {
-		if(go->getIdentifier() == identifier) {
-			m_scene.Remove(go->getBody());
-			delete go;
-			return true;
-		} else {
-			return false;
-		}
-	});
+	GameObject* go = getGameObejctPointer(identifier);
+	m_localPlayers.remove(go);
+	m_remotePlayers.remove(go);
+	m_staticGameObjects.remove(go);
+	m_gameObjects.remove(go);
+	m_all.remove(go);
+
+	m_scene.Remove(go->getBody());
+	m_goPointers.erase(identifier);
+	m_goKeys.erase(identifier);
+	delete go;
 }
 
-void GameController::spawnGameObject(std::string identifier, std::string key)
+// is only called if object comes from server and so it is never static
+GameObject* GameController::spawnGameObject(std::string identifier, std::string key)
 {
 	GameObject* go = new GameObject(identifier, m_scenery.getObjectSetupMaps()[key]);
+	m_goPointers[go->getIdentifier()] = go;
+	m_goKeys[go->getIdentifier()] = key;
 	m_gameObjects.push_back(go);
 	m_scene.Add(go->getBody());
 	m_all.push_back(go);
+	return go;
 }
 
-GameObject* GameController::spawnGameObject(std::string key)
+GameObject* GameController::spawnGameObject(std::string key, bool isStatic)
 {
 	GameObject* go = new GameObject(m_scenery.getObjectSetupMaps()[key]);
-	m_gameObjects.push_back(go);
+	m_goPointers[go->getIdentifier()] = go;
+	m_goKeys[go->getIdentifier()] = key;
+	if(isStatic)
+		m_staticGameObjects.push_back(go);
+	else
+		m_gameObjects.push_back(go);
 	m_scene.Add(go->getBody());
 	m_all.push_back(go);
 	return go;
 }
 
-GameObject* GameController::spawnLocalPlayer(std::string identifier, std::string key)
+GameObject* GameController::spawnPlayer(std::string identifier, std::string key, bool isLocal)
 {
 	GameObject* go = new GameObject(identifier, m_scenery.getPlayerSetupMaps()[key]);
-	m_localPlayers.push_back(go);
+	m_goPointers[go->getIdentifier()] = go;
+	m_goKeys[go->getIdentifier()] = key;
+	if(isLocal)
+		m_localPlayers.push_back(go);
+	else
+		m_remotePlayers.push_back(go);
 	m_scene.Add(go->getBody());
 	m_all.push_back(go);
 	return go;
 }
 
-void GameController::spawnRemotePlayer(std::string identifier, std::string key)
-{
-	GameObject* go = new GameObject(identifier, m_scenery.getPlayerSetupMaps()[key]);
-	m_remotePlayers.push_back(go);
-	m_scene.Add(go->getBody());
-	m_all.push_back(go);
-}
-
-void GameController::spawnRemotePlayer(std::string key)
+// is only called from lobby and so always a remotePlayer
+GameObject* GameController::spawnPlayer(std::string key)
 {
 	GameObject* go = new GameObject(m_scenery.getPlayerSetupMaps()[key]);
+	m_goPointers[go->getIdentifier()] = go;
+	m_goKeys[go->getIdentifier()] = key;
 	m_remotePlayers.push_back(go);
 	m_scene.Add(go->getBody());
 	m_all.push_back(go);
+	return go;
 }
 
 void GameController::spawnStaticGameObjects()
 {
 	for(auto& key : m_scenery.getStaticGameObjects()) {
 		for(int i = 1; m_scenery.getSetupMap()[key].count(std::to_string(i)); i++){
-			GameObject* go = spawnGameObject(key);
+			GameObject* go = spawnGameObject(key, true);
 			go->setPos(Helper::toVector2f(m_scenery.getSetupMap()[key][std::to_string(i)]));
 		}
 	}
@@ -115,8 +121,10 @@ void GameController::clearAll()
 		delete go;
 	m_localPlayers.clear();
 	m_remotePlayers.clear();
+	m_staticGameObjects.clear();
 	m_gameObjects.clear();
 	m_all.clear();
+	m_goKeys.clear();
 }
 
 void GameController::event(sf::Event& event)
@@ -143,6 +151,16 @@ void GameController::update(sf::Time ellapsed) {
 	sortAll();
 }
 
+GameObject* GameController::getGameObejctPointer(std::string identifier)
+{
+	return m_goPointers.at(identifier);
+}
+
+std::string GameController::getGameObejctKey(std::string identifier)
+{
+	return m_goKeys.at(identifier);
+}
+
 Scenery& GameController::getScenery() {
 	return m_scenery;
 }
@@ -158,6 +176,11 @@ std::list<GameObject*>& GameController::getLocalPlayers()
 std::list<GameObject*>& GameController::getRemotePlayers()
 {
 	return m_remotePlayers;
+}
+
+std::list<GameObject*>& GameController::getStaticGameObjects()
+{
+	return m_staticGameObjects;
 }
 
 std::list<GameObject*>& GameController::getGameObjects()

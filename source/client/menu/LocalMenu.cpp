@@ -84,16 +84,7 @@ void LocalMenu::setActionSelection(char i) {
 }
 
 void LocalMenu::startGame() {
-	if (m_sceneriesFound) {
-		Scenery* s = m_sceneries[m_selectedScenery];
-		s->reset();
-		for(GameObjectSelection& gos : m_gamePlayers[m_selectedScenery])
-			if(gos.selected)
-				s->spawnPlayer(gos.key);
-	}
-	else {
-		Log::ger().log("No Scenery. Can't start the game.", Log::Label::Error);
-	}
+	Log::ger().log("No Scenery. Can't start the game.", Log::Label::Error);
 }
 
 void LocalMenu::event(sf::Event& event) {

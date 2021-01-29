@@ -8,6 +8,7 @@
 #include "util/Helper.h"
 #include "game/GameController.h"
 #include "client/Controller.h"
+#include "client/game/NetController.h"
 
 #define PLAYER_NAME_LENGTH 11
 
@@ -20,6 +21,7 @@ public:
 private:
 	Controller& m_c;
 	GameController& m_gc;
+	NetController& m_nc;
 
 	std::string m_selectedPlayer;
 	char m_playerName[PLAYER_NAME_LENGTH];

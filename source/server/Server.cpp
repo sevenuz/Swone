@@ -32,6 +32,8 @@ void Server::runTcpConnection(sf::TcpSocket& socket)
 
 void Server::handleTcpCreateLobby(sf::TcpSocket& socket, Net::Packet& reqPacket)
 {
+	if(lobbies.size() == settings.getLobbyMaximum())
+		throw Net::Status{Net::C_INVALID, "handleTcpCreateLobby: Server reached maximum amount of lobbies."};
 	Net::CreateLobbyReq req;
 	reqPacket >> req;
 
@@ -84,6 +86,30 @@ void Server::sendTcpJoinLobbyAck(sf::TcpSocket& socket, Net::JoinLobbyAck jla)
 	}
 }
 
+void Server::runUdpSocket()
+{
+	sf::UdpSocket socket;
+	if (socket.bind(settings.getPort()) != sf::Socket::Done) {
+		Log::ger().log("runUdpSocket: Failed to bind Port " + std::to_string(settings.getPort()), Log::Label::Error);
+	}
+	socket.setBlocking(false);
+	while(m_run) {
+		Net::GamePacket reqPacket;
+		Player::Connection conncetion;
+
+		for(auto& p : lobbies) {
+			if(p.second->hasPacketPair()) {
+				auto pp = p.second->popPacketPair();
+				socket.send(pp.packet, pp.connection.address, pp.connection.port);
+			}
+		}
+		if(socket.receive(reqPacket, conncetion.address, conncetion.port) == sf::Socket::Done) {
+			lobbies[reqPacket.getCode()]->pushPacketPair(reqPacket, conncetion);
+		}
+	}
+	socket.unbind();
+}
+
 int Server::start()
 {
 	if (listener.listen(settings.getPort()) != sf::Socket::Done) {
@@ -92,6 +118,7 @@ int Server::start()
 	listener.setBlocking(false);
 
 	m_run = true;
+	std::thread(&Server::runUdpSocket, this).detach();
 	while(m_run) {
 		sf::TcpSocket client;
 		if (listener.accept(client) == sf::Socket::Done) {

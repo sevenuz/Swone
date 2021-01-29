@@ -2,7 +2,8 @@
 
 CharacterSelection::CharacterSelection(Controller& c) :
 	m_c(c),
-	m_gc(c.getGameController())
+	m_gc(c.getGameController()),
+	m_nc(c.getNetController())
 {}
 
 CharacterSelection::~CharacterSelection()
@@ -61,7 +62,7 @@ void CharacterSelection::drawImgui()
 		ImGui::InputText("Name", m_playerName, PLAYER_NAME_LENGTH);
 		ImVec2 size = ImGui::GetItemRectSize();
 		ImGui::SameLine();
-		ImGui::ColorEdit4("Character-Color", (float*)&m_playerColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+		ImGui::ColorEdit3("Character-Color", (float*)&m_playerColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
 
 		// TODO create profile name array once only
 		const char* controlProfileNames[m_c.getSettings().getControlProfiles().size()];
@@ -70,14 +71,19 @@ void CharacterSelection::drawImgui()
 			controlProfileNames[controlProfileCount] = c.first.substr(c.first.find_first_of("_")+1).c_str();
 			controlProfileCount++;
 		}
-                ImGui::Combo("Controls", &m_selectedControlProfile, controlProfileNames, controlProfileCount);
+		ImGui::Combo("Controls", &m_selectedControlProfile, controlProfileNames, controlProfileCount);
 
 		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 0.8f, 0.8f));
 
 		if(ImGui::Button("JOIN", size)) {
-			// TODO send character join
+			m_nc.sendPlayerConfigReq(Net::PlayerConfigReq{
+				"0",// TODO set identifier if known, use callback to receive GameObject*
+				m_selectedPlayer,
+				m_playerName,
+				sf::Color(m_playerColor.x*255, m_playerColor.y*255, m_playerColor.z*255)
+			});
 		}
 		ImGui::PopStyleColor(3);
 		ImGui::EndGroup();

@@ -39,6 +39,7 @@ public:
 	static constexpr const char* S_PLAYER_TYPE = "player";
 	static constexpr const char* S_OBJECT_TYPE = "object";
 	static constexpr const char* S_ITEM_TYPE = "item";
+	static constexpr const char* S_STATIC_TYPE = "static"; // these objects are not synced with the server
 
 	static constexpr const char* S_NAME = "name";
 	static constexpr const char* S_COLOR = "color";
@@ -50,8 +51,8 @@ public:
 	static constexpr const char* S_HITBOX_PARAGRAPH = "hitbox";
 	// Shape
 	static constexpr const char* S_DENSITY = "density";
-	static constexpr const char* S_CIRCLE_TYPE = "circle";
-	static constexpr const char* S_POLYGON_TYPE = "polygon";
+	static constexpr const char* S_CIRCLE_FORM = "circle";
+	static constexpr const char* S_POLYGON_FORM = "polygon";
 	// Body
 	static constexpr const char* S_INITIAL_POS = "initial_position";
 	static constexpr const char* S_SOLID = "solid";
@@ -185,7 +186,7 @@ private:
 	const std::string m_type;
 	const std::string m_identifier;
 	std::string m_name;
-	sf::Color m_color;
+	sf::Color m_color = sf::Color::White;
 	int m_zindex = 1;
 
 	ph::Body* m_body = NULL;

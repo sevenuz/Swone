@@ -9,6 +9,7 @@
 #include "game/Net.h"
 #include "util/Log.h"
 #include "client/Settings.h"
+#include "client/game/NetController.h"
 #include "game/GameController.h"
 
 class Controller {
@@ -25,6 +26,7 @@ public:
 	Settings& getSettings();
 	sf::RenderWindow& getWindow();
 	GameController& getGameController();
+	NetController& getNetController();
 	void loadGame(Net::JoinLobbyAck jla);
 
 	void setDefaultView();
@@ -37,6 +39,7 @@ private:
 	Settings& m_settings;
 	sf::RenderWindow& m_window;
 	GameController m_gc;
+	NetController m_nc;
 
 	bool m_run = false;
 

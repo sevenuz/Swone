@@ -7,6 +7,8 @@
 #include <string>
 #include <list>
 #include <map>
+#include <queue>
+#include <mutex>
 #include <thread>
 
 #include <md5.h>
@@ -19,14 +21,24 @@
 #include "game/Scenery.h"
 #include "game/Net.h"
 
+#define UDP_DATA_THRESHOLD 0.8
 #define MAX_PLAYER_COUNT 10
 
 class Lobby {
 public:
 	static std::string generateCode(std::string name);
 
+	struct PacketPair {
+		Net::GamePacket packet;
+		Player::Connection connection;
+	};
+
 	Lobby(SrvSettings& settings, Net::CreateLobbyReq m_lobbyData);
 	virtual ~Lobby();
+
+	void pushPacketPair(Net::GamePacket packet, Player::Connection connection);
+	bool hasPacketPair();
+	PacketPair popPacketPair();
 
 	std::list<Player*>& getPlayers();
 	void start();
@@ -39,22 +51,28 @@ public:
 	Net::LobbyStatus getLobbyStatus();
 private:
 	void startMainLoop();
-	void handleUdpConnections();
-	void receiveChatMessageReq(Net::TimePacket packet, Player::Connection c);
-	void receivePlayerConfigReq(Net::TimePacket packet, Player::Connection c);
-	void receivePlayerInput(Net::TimePacket packet);
+	void handlePackets();
+	void receiveDisconnect(Net::GamePacket packet, Player& c);
+	void receiveChatMessageReq(Net::GamePacket packet, Player& c);
+	void receivePlayerConfigReq(Net::GamePacket packet, Player& c);
+	void receivePlayerInput(Net::GamePacket packet);
 
-	bool registerClient(Player::Connection connection);
+	Player& registerClient(Player::Connection connection);
+	Net::GameObjectState getGameObjectState(GameObject* go);
 	void sendState();
 	void sendChat();
+
+	std::mutex m_mtx;
+
+	void send(Net::GamePacket packet, Player::Connection connection);
+	std::queue<PacketPair> m_packetsReceive;
+	std::queue<PacketPair> m_packetsSend;
 
 	sf::Clock clock;
 	sf::Time m_tickT;
 	sf::Time m_tickDt = sf::seconds(1.0f/20.0f);
 	sf::Time m_chatT;
 	sf::Time m_chatDt = sf::seconds(7.0f); // TODO from Srvsettings?
-
-	sf::UdpSocket m_socket;
 
 	const std::string m_code;
 	Net::CreateLobbyReq m_lobbyData;

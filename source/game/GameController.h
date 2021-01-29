@@ -1,7 +1,8 @@
 #ifndef SWONE_GAME_GAMECONTROLLER_H
 #define SWONE_GAME_GAMECONTROLLER_H
 
-#include <vector>
+#include <map>
+#include <list>
 
 #include "game/Net.h"
 #include "game/Scenery.h"
@@ -17,6 +18,7 @@ public:
 	Map* getMap();
 	const std::list<GameObject*>& getAll() const;
 	std::list<GameObject*>& getAll();
+	std::list<GameObject*>& getStaticGameObjects();
 	std::list<GameObject*>& getGameObjects();
 	std::list<GameObject*>& getLocalPlayers();
 	std::list<GameObject*>& getRemotePlayers();
@@ -36,11 +38,12 @@ public:
 
 	void removeFromGame(std::string identifier);
 
-	void spawnGameObject(std::string identifier, std::string key);
-	GameObject* spawnGameObject(std::string key);
-	GameObject* spawnLocalPlayer(std::string identifier, std::string key);
-	void spawnRemotePlayer(std::string identifier, std::string key);
-	void spawnRemotePlayer(std::string key);
+	GameObject* spawnGameObject(std::string identifier, std::string key);
+	GameObject* spawnGameObject(std::string key, bool isStatic = false);
+	GameObject* spawnPlayer(std::string identifier, std::string key, bool isLocal = false);
+	GameObject* spawnPlayer(std::string key);
+	GameObject* getGameObejctPointer(std::string identifier);
+	std::string getGameObejctKey(std::string identifier);
 	void reset();
 	void sortAll();
 
@@ -49,10 +52,14 @@ public:
 protected:
 private:
 	Scenery m_scenery;
-	std::list<GameObject*> m_localPlayers;
-	std::list<GameObject*> m_remotePlayers;
-	std::list<GameObject*> m_gameObjects;
+	std::list<GameObject*> m_localPlayers; // subset of m_all
+	std::list<GameObject*> m_remotePlayers; // subset of m_all
+	std::list<GameObject*> m_staticGameObjects; // subset of m_all, are not synced between players
+	std::list<GameObject*> m_gameObjects; // subset of m_all
 	std::list<GameObject*> m_all;
+
+	std::map<std::string, GameObject*> m_goPointers; // associate gameobject id with the pointer
+	std::map<std::string, std::string> m_goKeys; // associate gameobject id with the key of the setupMap
 
 	ph::Scene m_scene;
 	sf::Time m_clock;

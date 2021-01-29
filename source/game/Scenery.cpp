@@ -58,6 +58,8 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 		for(int i = 1; setupMap[Scenery::S_PLAYER_PARAGRAPH].count(std::to_string(i)); i++) {
 			std::string pName = setupMap[Scenery::S_PLAYER_PARAGRAPH][std::to_string(i)];
 			m_playerSetupMaps[pName] = getGameObjectSetupMap(resDir, pName, gfcInjection);
+			if(m_playerSetupMaps[pName][Reader::DEFAULT_PARAGRAPH][GameObject::S_TYPE] != GameObject::S_PLAYER_TYPE)
+				throw std::invalid_argument("All Files in Player-Paragraph have to be from type player.");
 		}
 	} else {
 		throw std::invalid_argument("Player-Paragraph missing.");
@@ -79,6 +81,11 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 			continue;
 
 		m_objectSetupMaps[paragraph] = getGameObjectSetupMap(resDir, paragraph, gfcInjection);
+		// TODO spawn system!!!
+		if(m_objectSetupMaps[paragraph][Reader::DEFAULT_PARAGRAPH][GameObject::S_TYPE] == GameObject::S_STATIC_TYPE)
+			m_staticGameObjects.push_back(paragraph);
+		else
+			m_beginningGameObjects.push_back(paragraph);
 	}
 }
 
@@ -115,12 +122,6 @@ StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goN
 	if(!gfcInjection)
 		m_fileCheck.textureFileMap[textureName] = md5file(texturePath.c_str());
 
-	// TODO spawn system!!!
-	if(Helper::toBool(goSetupMap[GameObject::S_HITBOX_PARAGRAPH][GameObject::S_SOLID])
-			&& Helper::toBool(goSetupMap[GameObject::S_HITBOX_PARAGRAPH][GameObject::S_COLLIDABLE_UNSOLID]))
-		m_staticGameObjects.push_back(goName);
-	else
-		m_beginningGameObjects.push_back(goName);
 	return goSetupMap;
 }
 

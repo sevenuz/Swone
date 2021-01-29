@@ -37,6 +37,7 @@ namespace Net
 	static const unsigned char U_CHAT_MESSAGE_ACK = 12;
 	static const unsigned char U_GAME_STATE = 13;
 	static const unsigned char U_GAME_CHAT = 14;
+	static const unsigned char U_DISCONNECT = 15;
 
 	// Status Codes
 	static const unsigned char C_CONNECTION = 1;
@@ -58,16 +59,18 @@ namespace Net
 			const sf::Uint8 getType();
 	};
 
-	class TimePacket : public Net::Packet {
+	class GamePacket : public Net::Packet {
 		private:
 			Net::Timestamp m_stamp;
+			std::string m_code;
 		public:
-			TimePacket(const sf::Uint8 type);
-			TimePacket();
+			GamePacket(const sf::Uint8 type, const std::string& code);
+			GamePacket();
 			virtual const void* onSend(std::size_t& size);
 			virtual void onReceive(const void* data, std::size_t size);
 
 			const Net::Timestamp getTimestamp() const;
+			const std::string getCode() const;
 	};
 
 	// Type: std::vector<T>
@@ -91,10 +94,6 @@ namespace Net
 	// Type: sf::Color
 	sf::Packet& operator <<(sf::Packet& packet, const sf::Color& sm);
 	sf::Packet& operator >>(sf::Packet& packet, sf::Color& sm);
-
-	// Type: GameObject::Config
-	sf::Packet& operator <<(sf::Packet& packet, const GameObject::Config& sm);
-	sf::Packet& operator >>(sf::Packet& packet, GameObject::Config& sm);
 
 	struct Status {
 		sf::Uint16 code;
@@ -152,7 +151,7 @@ namespace Net
 	sf::Packet& operator >>(sf::Packet& packet, JoinLobbyReq& lr);
 
 	struct JoinLobbyAck {
-		Port port;
+		std::string code;
 		GameFileCheck fileCheck;
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const JoinLobbyAck& lr);
@@ -179,13 +178,15 @@ namespace Net
 	sf::Packet& operator <<(sf::Packet& packet, const ChatMessageReq& f);
 	sf::Packet& operator >>(sf::Packet& packet, ChatMessageReq& f);
 
-	struct Acknowledgement {
+	struct ChatMessageAck {
 		sf::Uint64 stampCheck;
 	};
-	sf::Packet& operator <<(sf::Packet& packet, const Acknowledgement& f);
-	sf::Packet& operator >>(sf::Packet& packet, Acknowledgement& f);
+	sf::Packet& operator <<(sf::Packet& packet, const ChatMessageAck& f);
+	sf::Packet& operator >>(sf::Packet& packet, ChatMessageAck& f);
 
 	struct PlayerConfigReq {
+		// is used to update config, if not set, the server creates a player and returns new identifier in Ack
+		std::string identifier;
 		std::string selection;
 		std::string name;
 		sf::Color color;
@@ -193,15 +194,38 @@ namespace Net
 	sf::Packet& operator <<(sf::Packet& packet, const PlayerConfigReq& f);
 	sf::Packet& operator >>(sf::Packet& packet, PlayerConfigReq& f);
 
-	struct PlayerConfigAck : Acknowledgement {
+	struct PlayerConfigAck {
+		sf::Uint64 stampCheck;
 		std::string identifier;
+		std::string selection;
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const PlayerConfigAck& f);
 	sf::Packet& operator >>(sf::Packet& packet, PlayerConfigAck& f);
 
+	struct GameObjectState {
+		std::string identifier; // key to the setupMap in scenery
+		std::string key; // key to the setupMap in scenery
+		std::string name;
+		bool visible;
+		sf::Color color;
+		int zindex;
+		StringMapMap extensionMap;
+		// body properties
+		bool collidableSolid = true;
+		bool collidableUnsolid = true;
+		bool rotatable = true;
+		bool solid = false;
+		bool skip = false;
+		float x = 0, y = 0;
+		float orient = 0;
+		float vx = 0, vy = 0, av = 0;
+	};
+	sf::Packet& operator <<(sf::Packet& packet, const GameObjectState& f);
+	sf::Packet& operator >>(sf::Packet& packet, GameObjectState& f);
+
 	struct GameState {
-		std::vector<GameObject::Config> objects;
-		std::vector<GameObject::Config> players;
+		std::vector<GameObjectState> objects;
+		std::vector<GameObjectState> players;
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const GameState& f);
 	sf::Packet& operator >>(sf::Packet& packet, GameState& f);
@@ -214,7 +238,7 @@ namespace Net
 	sf::Packet& operator >>(sf::Packet& packet, PlayerInput& f);
 
 	struct GameChat {
-		std::map<Net::Timestamp, std::string> messages;
+		std::map<Net::Timestamp, ChatMessageReq> messages;
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const GameChat& f);
 	sf::Packet& operator >>(sf::Packet& packet, GameChat& f);
