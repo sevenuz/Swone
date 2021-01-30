@@ -88,7 +88,9 @@ void GameWindow::drawPause()
 }
 
 void GameWindow::update(sf::Time ellapsed) {
+	m_c.gameMutex.lock();
 	m_gc.update(ellapsed);
+	m_c.gameMutex.unlock();
 
 	setViewCenter(getPlayerCenter());
 	// TODO set View Zoom if player are far away from each other
@@ -142,7 +144,9 @@ void GameWindow::event(sf::Event& event) {
 		}
 	}
 
+	m_c.gameMutex.lock();
 	m_gc.event(event);
+	m_c.gameMutex.unlock();
 }
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {

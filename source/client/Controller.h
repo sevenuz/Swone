@@ -2,6 +2,7 @@
 #define SWONE_CLIENT_CONTROLLER_H
 
 #include <string>
+#include <mutex>
 #include <vector>
 #include <stack>
 #include <SFML/Graphics.hpp>
@@ -34,6 +35,8 @@ public:
 	bool isRunning();
 	void start();
 	void stop();
+
+	std::mutex gameMutex;
 protected:
 private:
 	Settings& m_settings;

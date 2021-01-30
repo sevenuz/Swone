@@ -17,9 +17,11 @@
 #define MAX_ATTEMPTS 5
 #define TIMEOUT 10 // in seconds
 
+class Controller;
+
 class NetController {
 public:
-	NetController(GameController& gc);
+	NetController(Controller& c);
 	virtual ~NetController();
 
 	void start(std::string lobbyCode, sf::IpAddress srvIp, Net::Port srvPort);
@@ -39,6 +41,7 @@ private:
 
 	void applyGameObjectState(GameObject* go, Net::GameObjectState gos);
 
+	Controller& m_c;
 	GameController& m_gc;
 	sf::UdpSocket m_socket;
 	bool m_run = false;

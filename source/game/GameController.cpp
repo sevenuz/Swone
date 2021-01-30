@@ -42,6 +42,22 @@ void GameController::removeFromGame(std::string identifier)
 	delete go;
 }
 
+void GameController::clearAll()
+{
+	for(GameObject* go : m_all) {
+		//m_scene.Remove(go->getBody());
+		delete go;
+	}
+	m_scene.Clear();
+	m_localPlayers.clear();
+	m_remotePlayers.clear();
+	m_staticGameObjects.clear();
+	m_gameObjects.clear();
+	m_all.clear();
+	m_goPointers.clear();
+	m_goKeys.clear();
+}
+
 // is only called if object comes from server and so it is never static
 GameObject* GameController::spawnGameObject(std::string identifier, std::string key)
 {
@@ -112,19 +128,6 @@ void GameController::spawnBeginningGameObjects()
 			go->setPos(Helper::toVector2f(m_scenery.getSetupMap()[key][std::to_string(i)]));
 		}
 	}
-}
-
-void GameController::clearAll()
-{
-	m_scene.Clear();
-	for(GameObject* go : m_all)
-		delete go;
-	m_localPlayers.clear();
-	m_remotePlayers.clear();
-	m_staticGameObjects.clear();
-	m_gameObjects.clear();
-	m_all.clear();
-	m_goKeys.clear();
 }
 
 void GameController::event(sf::Event& event)

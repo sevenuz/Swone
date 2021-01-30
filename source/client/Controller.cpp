@@ -3,7 +3,7 @@
 Controller::Controller(Settings& settings, sf::RenderWindow& w) :
 	m_settings(settings),
 	m_window(w),
-	m_nc(m_gc)
+	m_nc(*this)
 {
 	m_window.setVerticalSyncEnabled(m_settings.isVerticalSyncEnabled());
 }

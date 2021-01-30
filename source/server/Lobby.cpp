@@ -232,9 +232,9 @@ bool Lobby::verifyJoinLobbyReq(Net::JoinLobbyReq jlr)
 {
 	if(m_players.size() >= MAX_PLAYER_COUNT)
 		throw Net::Status{Net::C_INVALID, "verifyJoinLobbyReq: Lobby is full."};
-	if(jlr.code == m_code)
+	if(jlr.code != m_code)
 		throw Net::Status{Net::C_INVALID, "verifyJoinLobbyReq: Lobby-code wrong."};
-	if(jlr.password == m_lobbyData.password)
+	if(jlr.password != m_lobbyData.password)
 		throw Net::Status{Net::C_INVALID, "verifyJoinLobbyReq: Lobby-password wrong."};
 	return true;
 }

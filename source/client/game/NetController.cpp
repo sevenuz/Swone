@@ -1,7 +1,9 @@
 #include <client/game/NetController.h>
+#include <client/Controller.h>
 
-NetController::NetController(GameController& gc) :
-	m_gc(gc)
+NetController::NetController(Controller& c) :
+	m_c(c),
+	m_gc(c.getGameController())
 {}
 
 NetController::~NetController()
@@ -103,10 +105,13 @@ void NetController::receivePlayerConfigAck(Net::GamePacket packet)
 	packet >> pca;
 	Log::ger().log("receive PlayerConfigAck " + pca.identifier);
 	deleteAcknowledgement(pca.stampCheck);
+
+	m_c.gameMutex.lock();
 	for(GameObject* go : m_gc.getLocalPlayers())
 		if(go->getIdentifier() == pca.identifier)
 			return;
 	m_gc.spawnPlayer(pca.identifier, pca.selection, true);
+	m_c.gameMutex.unlock();
 }
 
 void NetController::applyGameObjectState(GameObject* go, Net::GameObjectState gos)
@@ -136,6 +141,7 @@ void NetController::receiveGameState(Net::GamePacket packet)
 	Net::GameState gs;
 	packet >> gs;
 	m_gameStates[packet.getTimestamp()] = gs;
+	m_c.gameMutex.lock();
 	for(Net::GameObjectState gos : gs.objects) {
 		GameObject* go;
 		try {
@@ -154,6 +160,7 @@ void NetController::receiveGameState(Net::GamePacket packet)
 		}
 		applyGameObjectState(go, gos);
 	}
+	m_c.gameMutex.unlock();
 }
 
 void NetController::receiveGameChat(Net::GamePacket packet)
@@ -193,5 +200,11 @@ void NetController::disconnect()
 void NetController::stop()
 {
 	m_run = false;
+	m_ackChecks.clear();
+	m_chatReqs.clear();
+	m_playerConfigReqs.clear();
+	m_playerInputs.clear();
+	m_gameStates.clear();
+	m_gameChat.clear();
 	m_socket.unbind();
 }
