@@ -1,6 +1,7 @@
 #ifndef SWONE_CLIENT_CONTROLLER_H
 #define SWONE_CLIENT_CONTROLLER_H
 
+#include <queue>
 #include <string>
 #include <mutex>
 #include <vector>
@@ -23,6 +24,9 @@ public:
 	void popState();
 	void pushState(State i);
 	State getState();
+
+	std::queue<std::string>& getModalMessageQueue();
+	void pushMessage(std::string s);
 
 	Settings& getSettings();
 	sf::RenderWindow& getWindow();
@@ -47,6 +51,7 @@ private:
 	bool m_run = false;
 
 	std::stack<State> m_stateStack;
+	std::queue<std::string> m_modalMessageQueue;
 };
 
 #endif

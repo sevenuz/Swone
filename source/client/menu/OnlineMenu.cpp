@@ -27,8 +27,6 @@ OnlineMenu::OnlineMenu(Controller& c) :
 OnlineMenu::~OnlineMenu() {}
 
 void OnlineMenu::event(sf::Event& event) {
-	if(!m_modalMessageStack.empty())
-		return;
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Escape) {
 			m_c.popState();
@@ -121,7 +119,7 @@ void OnlineMenu::sendLobbyRefresh()
 				throw s;
 			}
 		} catch(Net::Status s) {
-			m_modalMessageStack.push(s.message);
+			m_c.pushMessage(s.message);
 			Log::ger().log(std::to_string(s.code) + ": " + s.message, Log::Label::Error);
 		}
 		socket.disconnect();
@@ -132,7 +130,7 @@ void OnlineMenu::joinLobby()
 {
 	if(m_joinLobbyCode.empty()) {
 		std::string err = "You have to enter a Lobby-Code to join a Lobby.";
-		m_modalMessageStack.push(err);
+		m_c.pushMessage(err);
 		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
@@ -172,7 +170,7 @@ void OnlineMenu::sendJoinLobbyReq(Net::JoinLobbyReq jlr)
 			throw s;
 		}
 	} catch(Net::Status s) {
-		m_modalMessageStack.push(s.message);
+		m_c.pushMessage(s.message);
 		Log::ger().log(std::to_string(s.code) + ": " + s.message, Log::Label::Error);
 	}
 	socket.disconnect();
@@ -227,14 +225,14 @@ void OnlineMenu::createLobby()
 {
 	if(m_selectedScenery.empty()) {
 		std::string err = "You have to select a Scenery to create a Lobby.";
-		m_modalMessageStack.push(err);
+		m_c.pushMessage(err);
 		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
 	std::string lobbyName = Helper::trim(std::string(m_lobbyName));
 	if(lobbyName.empty()) {
 		std::string err = "You have to choose a Lobby-Name to create a Lobby.";
-		m_modalMessageStack.push(err);
+		m_c.pushMessage(err);
 		Log::ger().log(err, Log::Label::Error);
 		return;
 	}
@@ -272,7 +270,7 @@ void OnlineMenu::sendCreateLobbyReq(Net::CreateLobbyReq clr)
 		if(resPacket.getType() == Net::T_FILE_REQUEST) {
 			Net::GameFileCheckAnswer res;
 			resPacket >> res;
-			m_modalMessageStack.push("Server needs files...");
+			m_c.pushMessage("Server needs files...");
 			Net::sendMissingFiles(socket, clr.fileCheck, res);
 			resPacket = Net::Packet();
 			if(socket.receive(resPacket) != sf::Socket::Done) {
@@ -292,7 +290,7 @@ void OnlineMenu::sendCreateLobbyReq(Net::CreateLobbyReq clr)
 			throw s;
 		}
 	} catch(Net::Status s) {
-		m_modalMessageStack.push(s.message);
+		m_c.pushMessage(s.message);
 		Log::ger().log(std::to_string(s.code) + ": " + s.message, Log::Label::Error);
 	}
 	socket.disconnect();
@@ -305,7 +303,7 @@ void OnlineMenu::handleJoinLobbyAck(sf::TcpSocket& socket, Net::JoinLobbyAck jla
 	m_c.loadGame(jla);
 	m_c.pushState(Controller::State::Game);
 
-	m_modalMessageStack.push("Join Lobby");
+	m_c.pushMessage("Join Lobby");
 }
 
 
@@ -313,21 +311,6 @@ void OnlineMenu::drawImgui()
 {
 	drawJoinWindow();
 	drawCreateWindow();
-
-	if (!m_modalMessageStack.empty())
-			ImGui::OpenPopup("Message:");
-	if (ImGui::BeginPopupModal("Message:", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-			ImGui::Text(m_modalMessageStack.top().c_str());
-			ImGui::Separator();
-
-			if (ImGui::Button("OK", ImVec2(120,0))) {
-				m_modalMessageStack.pop();
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::SetItemDefaultFocus();
-			ImGui::EndPopup();
-	}
 }
 
 void OnlineMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const {

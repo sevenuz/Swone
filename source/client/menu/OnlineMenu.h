@@ -49,8 +49,6 @@ private:
 	char m_lobbyPassword[LOBBY_PASSWORD_LENGTH];
 	bool m_lobbyPrivate = false;
 
-	std::stack<std::string> m_modalMessageStack;
-
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	void drawJoinWindow();
 	void drawCreateWindow();

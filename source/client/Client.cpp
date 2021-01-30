@@ -255,6 +255,22 @@ void Client::startMainLoop()
 				break;
 		}
 
+		// draw Popup: Model to show Message-Queue from Controller
+		if (!controller.getModalMessageQueue().empty())
+				ImGui::OpenPopup("Message:");
+		if (ImGui::BeginPopupModal("Message:", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+				ImGui::Text("%s", controller.getModalMessageQueue().front().c_str());
+				ImGui::Separator();
+
+				if (ImGui::Button("OK", ImVec2(120,0))) {
+					controller.getModalMessageQueue().pop();
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::SetItemDefaultFocus();
+				ImGui::EndPopup();
+		}
+
 		drawLog();
 		if(demo_window_activated) {
 			ImGui::ShowDemoWindow();

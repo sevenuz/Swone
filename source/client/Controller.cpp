@@ -10,6 +10,16 @@ Controller::Controller(Settings& settings, sf::RenderWindow& w) :
 
 Controller::~Controller() {}
 
+std::queue<std::string>& Controller::getModalMessageQueue()
+{
+	return m_modalMessageQueue;
+}
+
+void Controller::pushMessage(std::string s)
+{
+	m_modalMessageQueue.push(s);
+}
+
 void Controller::pushState(State s)
 {
 	m_stateStack.push(s);
