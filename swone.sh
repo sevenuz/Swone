@@ -35,6 +35,15 @@ run(){
 	fi
 }
 
+debug(){
+	if [ -z "$FAILED" ]
+	then
+		cd $BUILDDIR
+		gdb -ex=r --args ./swone
+		cd ..
+	fi
+}
+
 todo(){
 	grep -rn TODO source/
 }
@@ -45,6 +54,7 @@ help(){
 	echo 'clean : reset build/ directory'
 	echo 'build : create build/ if not exists and build project'
 	echo 'run : runs the project, if build was not failing'
+	echo 'debug : runs the project with gdb, if build was not failing'
 	echo 'todo : shows TODO in source/ folder'
 	echo '---------'
 	echo 'all commands can be combined. ex.: ./swone.sh build run'
