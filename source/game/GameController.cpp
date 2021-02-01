@@ -27,30 +27,27 @@ void GameController::sortAll()
 	});
 }
 
-void GameController::removeFromGame(std::string identifier)
+void GameController::removeFromGame(GameObject* go)
 {
-	GameObject* go = getGameObejctPointer(identifier);
-	m_localPlayers.remove(go);
-	m_remotePlayers.remove(go);
+	m_players.remove(go);
 	m_staticGameObjects.remove(go);
 	m_gameObjects.remove(go);
 	m_all.remove(go);
 
 	m_scene.Remove(go->getBody());
-	m_goPointers.erase(identifier);
-	m_goKeys.erase(identifier);
+	m_goPointers.erase(go->getIdentifier());
+	m_goKeys.erase(go->getIdentifier());
 	delete go;
 }
 
 void GameController::clearAll()
 {
+	// dont use removeFromGame to make subclassing possible // TODO true?
 	for(GameObject* go : m_all) {
-		//m_scene.Remove(go->getBody());
 		delete go;
 	}
 	m_scene.Clear();
-	m_localPlayers.clear();
-	m_remotePlayers.clear();
+	m_players.clear();
 	m_staticGameObjects.clear();
 	m_gameObjects.clear();
 	m_all.clear();
@@ -84,15 +81,12 @@ GameObject* GameController::spawnGameObject(std::string key, bool isStatic)
 	return go;
 }
 
-GameObject* GameController::spawnPlayer(std::string identifier, std::string key, bool isLocal)
+GameObject* GameController::spawnPlayer(std::string identifier, std::string key)
 {
 	GameObject* go = new GameObject(identifier, m_scenery.getPlayerSetupMaps()[key]);
 	m_goPointers[go->getIdentifier()] = go;
 	m_goKeys[go->getIdentifier()] = key;
-	if(isLocal)
-		m_localPlayers.push_back(go);
-	else
-		m_remotePlayers.push_back(go);
+	m_players.push_back(go);
 	m_scene.Add(go->getBody());
 	m_all.push_back(go);
 	return go;
@@ -104,7 +98,7 @@ GameObject* GameController::spawnPlayer(std::string key)
 	GameObject* go = new GameObject(m_scenery.getPlayerSetupMaps()[key]);
 	m_goPointers[go->getIdentifier()] = go;
 	m_goKeys[go->getIdentifier()] = key;
-	m_remotePlayers.push_back(go);
+	m_players.push_back(go);
 	m_scene.Add(go->getBody());
 	m_all.push_back(go);
 	return go;
@@ -130,7 +124,7 @@ void GameController::spawnBeginningGameObjects()
 	}
 }
 
-void GameController::event(sf::Event& event)
+void GameController::event(GameObject::Event event)
 {
 	for (GameObject* g : getAll()) {
 		g->event(event);
@@ -172,13 +166,9 @@ Map* GameController::getMap() {
 	return m_scenery.getMap();
 }
 
-std::list<GameObject*>& GameController::getLocalPlayers()
+std::list<GameObject*>& GameController::getPlayers()
 {
-	return m_localPlayers;
-}
-std::list<GameObject*>& GameController::getRemotePlayers()
-{
-	return m_remotePlayers;
+	return m_players;
 }
 
 std::list<GameObject*>& GameController::getStaticGameObjects()

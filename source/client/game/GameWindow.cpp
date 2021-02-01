@@ -3,6 +3,7 @@
 GameWindow::GameWindow(Controller& c) :
 	m_c(c),
 	m_gc(c.getGameController()),
+	m_nc(c.getNetController()),
 	m_characterSelection(c),
 	m_infoPanel(c)
 {
@@ -144,9 +145,38 @@ void GameWindow::event(sf::Event& event) {
 		}
 	}
 
-	m_c.gameMutex.lock();
-	m_gc.event(event);
-	m_c.gameMutex.unlock();
+	if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
+		m_c.gameMutex.lock();
+		for(GameObject* go : m_gc.getLocalPlayers()) {
+			auto& k = m_gc.getLocalPlayerKeybinding(go);
+			if (event.key.code == k.left	||
+				event.key.code == k.right	||
+				event.key.code == k.up		||
+				event.key.code == k.down	||
+				event.key.code == k.action1 ||
+				event.key.code == k.action2 ||
+				event.key.code == k.action3 ||
+				event.key.code == k.action4	)
+			{
+				GameObject::Event event = {
+					sf::Keyboard::isKeyPressed(k.left),
+					sf::Keyboard::isKeyPressed(k.right),
+					sf::Keyboard::isKeyPressed(k.up),
+					sf::Keyboard::isKeyPressed(k.down),
+					sf::Keyboard::isKeyPressed(k.action1),
+					sf::Keyboard::isKeyPressed(k.action2),
+					sf::Keyboard::isKeyPressed(k.action3),
+					sf::Keyboard::isKeyPressed(k.action4)
+				};
+				go->event(event);
+				m_nc.sendPlayerInput(Net::PlayerInput{
+						go->getIdentifier(),
+						event
+				});
+			}
+		}
+		m_c.gameMutex.unlock();
+	}
 }
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {

@@ -112,11 +112,6 @@ StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goN
 		texturePath = GameReader::getTexturePath(resDir, textureName);
 	}
 
-	// prevent controls from gameobject files
-	if(goSetupMap.count(Extension::CONTROLS_PARAGRAPH)){
-		goSetupMap[Extension::CONTROLS_PARAGRAPH].clear();
-	}
-
 	// set texture path in setupMap
 	goSetupMap[Reader::DEFAULT_PARAGRAPH][GameObject::S_TEXTURE_PATH] = texturePath;
 	if(!gfcInjection)

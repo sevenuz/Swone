@@ -12,7 +12,7 @@
 #include "util/Log.h"
 #include "client/Settings.h"
 #include "client/game/NetController.h"
-#include "game/GameController.h"
+#include "client/game/ClientGameController.h"
 
 class Controller {
 public:
@@ -30,7 +30,7 @@ public:
 
 	Settings& getSettings();
 	sf::RenderWindow& getWindow();
-	GameController& getGameController();
+	ClientGameController& getGameController();
 	NetController& getNetController();
 	void loadGame(Net::JoinLobbyAck jla);
 
@@ -45,7 +45,7 @@ protected:
 private:
 	Settings& m_settings;
 	sf::RenderWindow& m_window;
-	GameController m_gc;
+	ClientGameController m_gc;
 	NetController m_nc;
 
 	bool m_run = false;

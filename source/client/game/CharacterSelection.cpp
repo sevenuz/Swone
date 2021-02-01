@@ -64,25 +64,27 @@ void CharacterSelection::drawImgui()
 		ImGui::SameLine();
 		ImGui::ColorEdit3("Character-Color", (float*)&m_playerColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
 
-		// TODO create profile name array once only
-		const char* controlProfileNames[m_c.getSettings().getControlProfiles().size()];
-		size_t controlProfileCount = 0;
-		for(auto c : m_c.getSettings().getControlProfiles()){
-			controlProfileNames[controlProfileCount] = c.first.substr(c.first.find_first_of("_")+1).c_str();
-			controlProfileCount++;
+		const char* keybindingProfileNames[m_c.getSettings().getKeybindings().size()];
+		size_t keybindingProfileCount = 0;
+		for(auto c : m_c.getSettings().getKeybindings()){
+			keybindingProfileNames[keybindingProfileCount] = c.first.c_str();
+			keybindingProfileCount++;
 		}
-		ImGui::Combo("Controls", &m_selectedControlProfile, controlProfileNames, controlProfileCount);
+		ImGui::Combo("Controls", &m_selectedKeybindingProfile, keybindingProfileNames, keybindingProfileCount);
 
 		ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 0.8f, 0.8f));
 
 		if(ImGui::Button("JOIN", size)) {
+			std::string keybindingName = keybindingProfileNames[m_selectedKeybindingProfile];
 			m_nc.sendPlayerConfigReq(Net::PlayerConfigReq{
 				"0",// TODO set identifier if known, use callback to receive GameObject*
 				m_selectedPlayer,
 				m_playerName,
 				sf::Color(m_playerColor.x*255, m_playerColor.y*255, m_playerColor.z*255)
+			}, [&, keybindingName](GameObject* go) {
+				m_gc.setLocalPlayerKeybinding(go, m_c.getSettings().getKeybinding(keybindingName));
 			});
 		}
 		ImGui::PopStyleColor(3);

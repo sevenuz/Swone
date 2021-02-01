@@ -3,14 +3,17 @@
 
 #include <vector>
 
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Window/Keyboard.hpp>
+
 #include "imgui.h"
 #include "imgui-SFML.h"
 
-#include <SFML/Graphics/Drawable.hpp>
 #include "Handleable.h"
 #include "client/Controller.h"
 #include "client/game/CharacterSelection.h"
 #include "client/game/InfoPanel.h"
+#include "game/Net.h"
 
 class GameWindow : public Handleable {
 public:
@@ -31,8 +34,11 @@ public:
 	void event(sf::Event& e);
 private:
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+
 	Controller& m_c;
-	GameController& m_gc;
+	ClientGameController& m_gc;
+	NetController& m_nc;
+
 	sf::View m_view;
 	sf::Vector2f m_viewDelta = sf::Vector2f(0, 0);
 
@@ -41,7 +47,7 @@ private:
 	bool m_showInfoPanel = false;
 
 	CharacterSelection m_characterSelection;
-	CharacterSelection m_infoPanel;
+	InfoPanel  m_infoPanel;
 };
 
 #endif

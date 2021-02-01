@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 
-#include "Handleable.h"
+#include "Updateable.h"
 #include "game/Map.h"
 #include "game/GameReader.h"
 #include "graphics/Animation.h"
@@ -29,9 +29,21 @@
 // forward declaration to avoid dependency cyclus
 class Extension;
 
-class GameObject : public Handleable, public ph::Body::Callback {
+class GameObject : public sf::Drawable, public sf::Transformable, public Updateable, public ph::Body::Callback {
 public:
 	enum MovementAnimation : char { Up, Left, Right, Down, Steady };
+
+	struct Event {
+		bool left = false;
+		bool right = false;
+		bool up = false;
+		bool down = false;
+		bool action1 = false;
+		bool action2 = false;
+		bool action3 = false;
+		bool action4 = false;
+	};
+
 	// S_ for Settings :)
 	// gameobject property names
 	// global
@@ -105,8 +117,8 @@ public:
 	Config getConfig();
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-	virtual void event(sf::Event& e) override;
 	virtual void update(sf::Time ellapsed) override;
+	virtual void event(Event e);
 
 	virtual void onObjectCollision(ph::Manifold* manifold, GameObject* go);
 	virtual void onTileCollision(ph::Manifold* manifold, Tile* t);

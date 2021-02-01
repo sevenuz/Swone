@@ -18,11 +18,8 @@ public:
 	MovementX(GameObject* obj, StringMapMap& setupMap);
 	void applyConfig(StringMapMap& setupMap) override;
 
-	void event(sf::Event& e) override;
+	void event(GameObject::Event e) override;
 private:
-	sf::Keyboard::Key m_key_left = sf::Keyboard::Left;
-	sf::Keyboard::Key m_key_right = sf::Keyboard::Right;
-
 	float m_posVelX = 0;
 };
 

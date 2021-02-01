@@ -35,15 +35,6 @@ Inventory::Inventory(GameObject* obj, StringMapMap& setupMap) : Extension(obj)
 
 void Inventory::applyConfig(StringMapMap& setupMap)
 {
-	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_1))
-			m_key_inv1 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_1]);
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_2))
-			m_key_inv2 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_2]);
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(CONTROLS_INVENTORY_3))
-			m_key_inv3 = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][CONTROLS_INVENTORY_3]);
-	}
-
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i)
 		m_rectangles[i]->setOutlineColor(m_obj->getColor());
 }
@@ -53,35 +44,28 @@ void Inventory::getConfig(StringMapMap& extensionMap)
 	// TODO write inventory to extensionMap?
 }
 
-void Inventory::event(sf::Event& e)
+void Inventory::event(GameObject::Event e)
 {
-	if (e.type == sf::Event::KeyPressed) {
-		if (e.key.code == m_key_inv1) {
-			m_selection[0] = true;
-			if(m_items[0])
-				Log::ger().log("activate " + m_items[0]->getName());
-		}
-		if (e.key.code == m_key_inv2) {
-			m_selection[1] = true;
-			if(m_items[1])
-				Log::ger().log("activate " + m_items[1]->getName());
-		}
-		if (e.key.code == m_key_inv3) {
-			m_selection[2] = true;
-			if(m_items[2])
-				Log::ger().log("activate " + m_items[2]->getName());
-		}
+	if (e.action1) {
+		m_selection[0] = true;
+		if(m_items[0])
+			Log::ger().log("activate " + m_items[0]->getName());
+	} else {
+		m_selection[0] = false;
 	}
-	else if (e.type == sf::Event::KeyReleased) {
-		if (e.key.code == m_key_inv1) {
-			m_selection[0] = false;
-		}
-		if (e.key.code == m_key_inv2) {
-			m_selection[1] = false;
-		}
-		if (e.key.code == m_key_inv3) {
-			m_selection[2] = false;
-		}
+	if (e.action2) {
+		m_selection[1] = true;
+		if(m_items[1])
+			Log::ger().log("activate " + m_items[1]->getName());
+	} else {
+		m_selection[1] = false;
+	}
+	if (e.action3) {
+		m_selection[2] = true;
+		if(m_items[2])
+			Log::ger().log("activate " + m_items[2]->getName());
+	} else {
+		m_selection[2] = false;
 	}
 }
 

@@ -20,27 +20,25 @@ public:
 	std::list<GameObject*>& getAll();
 	std::list<GameObject*>& getStaticGameObjects();
 	std::list<GameObject*>& getGameObjects();
-	std::list<GameObject*>& getLocalPlayers();
-	std::list<GameObject*>& getRemotePlayers();
+	std::list<GameObject*>& getPlayers();
 	GameObject* getGameObjectById(const std::string& id) const;
 
 	void updateLog() const;
 
 	void update(sf::Time ellapsed);
-	void event(sf::Event& e);
+	void event(GameObject::Event e);
 
-	void clearAll();
+	virtual void clearAll();
+	virtual void removeFromGame(GameObject* go);
 
 	void loadScenery(std::string resDir, Net::GameFileCheck gfc);
 
 	const ph::Scene& getScene() const;
 	ph::Scene& getScene();
 
-	void removeFromGame(std::string identifier);
-
 	GameObject* spawnGameObject(std::string identifier, std::string key);
 	GameObject* spawnGameObject(std::string key, bool isStatic = false);
-	GameObject* spawnPlayer(std::string identifier, std::string key, bool isLocal = false);
+	GameObject* spawnPlayer(std::string identifier, std::string key);
 	GameObject* spawnPlayer(std::string key);
 	GameObject* getGameObejctPointer(std::string identifier);
 	std::string getGameObejctKey(std::string identifier);
@@ -52,8 +50,7 @@ public:
 protected:
 private:
 	Scenery m_scenery;
-	std::list<GameObject*> m_localPlayers; // subset of m_all
-	std::list<GameObject*> m_remotePlayers; // subset of m_all
+	std::list<GameObject*> m_players; // subset of m_all
 	std::list<GameObject*> m_staticGameObjects; // subset of m_all, are not synced between players
 	std::list<GameObject*> m_gameObjects; // subset of m_all
 	std::list<GameObject*> m_all;

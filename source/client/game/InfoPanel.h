@@ -14,7 +14,7 @@ public:
 	void drawImgui();
 private:
 	Controller& m_controller;
-	GameController& m_gc;
+	ClientGameController& m_gc;
 };
 
 #endif

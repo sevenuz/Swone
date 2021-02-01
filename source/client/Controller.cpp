@@ -46,7 +46,7 @@ sf::RenderWindow& Controller::getWindow() {
 	return m_window;
 }
 
-GameController& Controller::getGameController()
+ClientGameController& Controller::getGameController()
 {
 	return m_gc;
 }

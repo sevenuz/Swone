@@ -6,11 +6,12 @@
 #include <map>
 #include <string>
 #include <list>
+#include <functional>
 
 #include <SFML/Network/IpAddress.hpp>
 #include <SFML/Network/UdpSocket.hpp>
 
-#include "game/GameController.h"
+#include "client/game/ClientGameController.h"
 #include "game/Net.h"
 #include "util/Helper.h"
 
@@ -29,7 +30,7 @@ public:
 	void disconnect();
 	void sendPlayerInput(Net::PlayerInput gi);
 	void sendChatMessageReq(Net::ChatMessageReq cma);
-	void sendPlayerConfigReq(Net::PlayerConfigReq pca);
+	void sendPlayerConfigReq(Net::PlayerConfigReq pca, std::function<void(GameObject*)>);
 private:
 	void handleUdpConnection();
 	void deleteAcknowledgement(Net::Timestamp t);
@@ -42,7 +43,8 @@ private:
 	void applyGameObjectState(GameObject* go, Net::GameObjectState gos);
 
 	Controller& m_c;
-	GameController& m_gc;
+	ClientGameController& m_gc;
+
 	sf::UdpSocket m_socket;
 	bool m_run = false;
 	std::string m_lobbyCode;
@@ -57,6 +59,7 @@ private:
 	};
 	std::list<AckCheck> m_ackChecks;
 	std::map<Net::Timestamp, Net::ChatMessageReq> m_chatReqs;
+	std::map<Net::Timestamp, std::function<void(GameObject*)>> m_playerConfigReqCbs;
 	std::map<Net::Timestamp, Net::PlayerConfigReq> m_playerConfigReqs;
 
 	std::map<Net::Timestamp, Net::PlayerInput> m_playerInputs;

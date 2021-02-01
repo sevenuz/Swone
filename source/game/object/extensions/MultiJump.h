@@ -19,7 +19,7 @@ public:
 	MultiJump(GameObject* obj, StringMapMap& setupMap);
 	void applyConfig(StringMapMap& setupMap) override;
 
-	void event(sf::Event& e) override;
+	void event(GameObject::Event e) override;
 	void update(sf::Time ellapsed) override;
 
 	void jump();
@@ -31,8 +31,6 @@ private:
 
 	unsigned int m_jumpsPossible = 2; // possible jumps without landing
 	unsigned int m_jumps = 0; // count of current jumps
-
-	sf::Keyboard::Key m_key_up = sf::Keyboard::Up;
 
 	float m_posVelY = 0;
 };

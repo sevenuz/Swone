@@ -344,7 +344,7 @@ void GameObject::update(sf::Time ellapsed) {
 	for(auto& e : m_extensions) e.second->update(ellapsed);
 }
 
-void GameObject::event(sf::Event& ev) {
+void GameObject::event(Event ev) {
 	for(auto& e : m_extensions) e.second->event(ev);
 }
 

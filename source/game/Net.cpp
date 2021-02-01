@@ -389,11 +389,30 @@ sf::Packet& Net::operator >>(sf::Packet& packet, GameState& f)
 
 sf::Packet& Net::operator <<(sf::Packet& packet, const PlayerInput& f)
 {
-	return packet << f.identifier << f.inputs;
+	sf::Uint8 i = 0;
+	i |= f.inputs.left * 0b1;
+	i |= f.inputs.right * 0b10;
+	i |= f.inputs.up * 0b100;
+	i |= f.inputs.down * 0b1000;
+	i |= f.inputs.action1 * 0b10000;
+	i |= f.inputs.action2 * 0b100000;
+	i |= f.inputs.action3 * 0b1000000;
+	i |= f.inputs.action4 * 0b10000000;
+	return packet << f.identifier << i;
 }
 sf::Packet& Net::operator >>(sf::Packet& packet, PlayerInput& f)
 {
-	return packet >> f.identifier >> f.inputs;
+	sf::Uint8 i = 0;
+	packet >> f.identifier >> i;
+	f.inputs.left = i & 0b1;
+	f.inputs.right = i & 0b10;
+	f.inputs.up = i & 0b100;
+	f.inputs.down = i & 0b1000;
+	f.inputs.action1 = i & 0b10000;
+	f.inputs.action2 = i & 0b100000;
+	f.inputs.action3 = i & 0b1000000;
+	f.inputs.action4 = i & 0b10000000;
+	return packet;
 }
 
 sf::Packet& Net::operator <<(sf::Packet& packet, const GameChat& f)

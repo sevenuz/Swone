@@ -37,6 +37,7 @@ src = [
 	'source/client/game/CharacterSelection.cpp',
 	'source/client/game/InfoPanel.cpp',
 	'source/client/game/NetController.cpp',
+	'source/client/game/ClientGameController.cpp',
 	'source/client/game/GameWindow.cpp',
 	'source/client/Settings.cpp',
 	'source/server/Server.cpp',

@@ -6,8 +6,8 @@
 
 #include "game/GameReader.h"
 #include "util/Helper.h"
-#include "game/GameController.h"
 #include "client/Controller.h"
+#include "client/game/ClientGameController.h"
 #include "client/game/NetController.h"
 
 #define PLAYER_NAME_LENGTH 11
@@ -20,13 +20,13 @@ public:
 	void drawImgui();
 private:
 	Controller& m_c;
-	GameController& m_gc;
+	ClientGameController& m_gc;
 	NetController& m_nc;
 
 	std::string m_selectedPlayer;
 	char m_playerName[PLAYER_NAME_LENGTH];
 	ImVec4 m_playerColor = ImColor(114, 144, 154, 200);
-	int m_selectedControlProfile = 0;
+	int m_selectedKeybindingProfile = 0;
 };
 
 #endif

@@ -18,11 +18,6 @@ void MultiJump::applyConfig(StringMapMap& setupMap)
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH))
 		if(setupMap[Reader::DEFAULT_PARAGRAPH].count(Extension::S_VELOCITY))
 			m_posVelY = Helper::toVector2f(setupMap[Reader::DEFAULT_PARAGRAPH][Extension::S_VELOCITY]).y;
-
-	if(setupMap.count(Extension::CONTROLS_PARAGRAPH)){
-		if(setupMap[Extension::CONTROLS_PARAGRAPH].count(Extension::CONTROLS_UP))
-			m_key_up = (sf::Keyboard::Key)Helper::toInt(setupMap[Extension::CONTROLS_PARAGRAPH][Extension::CONTROLS_UP]);
-	}
 }
 
 void MultiJump::jump() {
@@ -33,11 +28,9 @@ void MultiJump::jump() {
 	}
 }
 
-void MultiJump::event(sf::Event& event) {
-	if (event.type == sf::Event::KeyPressed) {
-		if (event.key.code == m_key_up) {
-			jump();
-		}
+void MultiJump::event(GameObject::Event event) {
+	if (event.up) {
+		jump();
 	}
 }
 

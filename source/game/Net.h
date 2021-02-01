@@ -230,9 +230,9 @@ namespace Net
 	sf::Packet& operator <<(sf::Packet& packet, const GameState& f);
 	sf::Packet& operator >>(sf::Packet& packet, GameState& f);
 
-	struct PlayerInput {
+	struct PlayerInput { // TODO smaller then min packet size?
 		std::string identifier;
-		sf::Uint8 inputs;
+		GameObject::Event inputs;
 	};
 	sf::Packet& operator <<(sf::Packet& packet, const PlayerInput& f);
 	sf::Packet& operator >>(sf::Packet& packet, PlayerInput& f);

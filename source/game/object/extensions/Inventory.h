@@ -23,18 +23,13 @@
 
 class Inventory : public Extension {
 public:
-	// in controls paragraph
-	static constexpr const char* CONTROLS_INVENTORY_1 = "inventory1";
-	static constexpr const char* CONTROLS_INVENTORY_2 = "inventory2";
-	static constexpr const char* CONTROLS_INVENTORY_3 = "inventory3";
-
 	Inventory(GameObject* obj, StringMapMap& setupMap);
 
 	void applyConfig(StringMapMap& setupMap) override;
 	void getConfig(StringMapMap& setupMap) override;
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-	void event(sf::Event& e) override;
+	void event(GameObject::Event e) override;
 	void update(sf::Time ellapsed) override;
 	void onObjectCollision(ph::Manifold* manifold, GameObject* go) override;
 
@@ -42,10 +37,6 @@ public:
 
 	static int Inventory_count;
 private:
-	sf::Keyboard::Key m_key_inv1 = sf::Keyboard::Comma;
-	sf::Keyboard::Key m_key_inv2 = sf::Keyboard::Period;
-	sf::Keyboard::Key m_key_inv3 = sf::Keyboard::Hyphen;
-
 	std::array<bool, INVENTORY_SIZE> m_selection = {};
 	std::array<sf::RectangleShape*, INVENTORY_SIZE> m_rectangles;
 	std::array<ParticleSystem*, INVENTORY_SIZE> m_particleSystems;

@@ -58,10 +58,11 @@ void NetController::sendChatMessageReq(Net::ChatMessageReq cma)
 	m_socket.send(packet, m_serverIpAddress, m_serverPort);
 }
 
-void NetController::sendPlayerConfigReq(Net::PlayerConfigReq pca)
+void NetController::sendPlayerConfigReq(Net::PlayerConfigReq pca, std::function<void(GameObject*)> cb)
 {
 	Net::GamePacket packet(Net::U_PLAYER_CONFIG_REQ, m_lobbyCode);
 	packet << pca;
+	m_playerConfigReqCbs[packet.getTimestamp()] = cb;
 	m_playerConfigReqs[packet.getTimestamp()] = pca;
 	m_ackChecks.push_back(AckCheck{packet, packet.getTimestamp(), 1});
 	m_socket.send(packet, m_serverIpAddress, m_serverPort);
@@ -107,10 +108,16 @@ void NetController::receivePlayerConfigAck(Net::GamePacket packet)
 	deleteAcknowledgement(pca.stampCheck);
 
 	m_c.gameMutex.lock();
-	for(GameObject* go : m_gc.getLocalPlayers())
-		if(go->getIdentifier() == pca.identifier)
-			return;
-	m_gc.spawnPlayer(pca.identifier, pca.selection, true);
+	GameObject* go;
+	try {
+		// better performace if we iterate only over localPlayer?
+		go = m_gc.getGameObejctPointer(pca.identifier);
+	} catch(std::out_of_range& e) {
+		// PlayerConfig is applied on the server and synchronized over GameState
+		go = m_gc.spawnLocalPlayer(pca.identifier, pca.selection);
+	}
+	m_playerConfigReqCbs[pca.stampCheck](go);
+	m_playerConfigReqCbs.erase(pca.stampCheck);
 	m_c.gameMutex.unlock();
 }
 

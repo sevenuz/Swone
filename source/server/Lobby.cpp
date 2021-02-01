@@ -109,7 +109,7 @@ void Lobby::receiveDisconnect(Net::GamePacket packet, Player& c) // TODO
 {
 	m_mtx.lock();
 	for(GameObject* go : c.getPlayers()) {
-		m_gc.removeFromGame(go->getIdentifier());
+		m_gc.removeFromGame(go);
 	}
 	m_players.remove(&c);
 	delete &c;
@@ -153,7 +153,7 @@ void Lobby::receivePlayerInput(Net::GamePacket packet)
 	Net::PlayerInput pi;
 	packet >> pi;
 	m_playerInputs[packet.getTimestamp()] = pi;
-	// TODO handle player input in gamecontroller
+	m_gc.getGameObejctPointer(pi.identifier)->event(pi.inputs);
 	m_mtx.unlock();
 }
 
@@ -201,7 +201,7 @@ void Lobby::sendState()
 	for(GameObject* go : m_gc.getGameObjects()) {
 		gs.objects.push_back(getGameObjectState(go));
 	}
-	for(GameObject* go : m_gc.getRemotePlayers()) {
+	for(GameObject* go : m_gc.getPlayers()) {
 		gs.players.push_back(getGameObjectState(go));
 	}
 	Net::GamePacket packet(Net::U_GAME_STATE, m_code);

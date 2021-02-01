@@ -27,21 +27,30 @@ Settings::Settings()
 		}
 
 		for(auto& m : setupMap) {
-			if(m.first.rfind(SETTINGS_CONTROLS_PROFILE_PREFIX, 0) == 0) {
-				m_controlProfiles[m.first] = m.second;
+			if(m.first.rfind(SETTINGS_KEYBINDING_PROFILE_PREFIX, 0) == 0) {
+				m_keybindingProfiles[m.first.substr(m.first.find_first_of("_")+1)] = Keybinding{
+					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_LEFT]),
+					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_RIGHT]),
+					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_UP]),
+					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_DOWN]),
+					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION1]),
+					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION2]),
+					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION3]),
+					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION4])
+				};
 			}
 		}
-		if(m_controlProfiles.size() == 0) {
+		if(m_keybindingProfiles.size() == 0) {
 			//add default profile
-			m_controlProfiles[std::string(SETTINGS_CONTROLS_PROFILE_PREFIX) + "Default"] = {
-				StringPair(Extension::CONTROLS_LEFT, std::to_string(sf::Keyboard::A)),
-				StringPair(Extension::CONTROLS_RIGHT, std::to_string(sf::Keyboard::D)),
-				StringPair(Extension::CONTROLS_UP, std::to_string(sf::Keyboard::W)),
-				StringPair(Extension::CONTROLS_DOWN, std::to_string(sf::Keyboard::S)),
-				StringPair(Extension::CONTROLS_INV1, std::to_string(sf::Keyboard::Left)),
-				StringPair(Extension::CONTROLS_INV2, std::to_string(sf::Keyboard::Down)),
-				StringPair(Extension::CONTROLS_INV3, std::to_string(sf::Keyboard::Right)),
-				StringPair(Extension::CONTROLS_ACTION, std::to_string(sf::Keyboard::Up)),
+			m_keybindingProfiles["Default"] = {
+				sf::Keyboard::A,
+				sf::Keyboard::D,
+				sf::Keyboard::W,
+				sf::Keyboard::S,
+				sf::Keyboard::Left,
+				sf::Keyboard::Down,
+				sf::Keyboard::Right,
+				sf::Keyboard::Up,
 			};
 		}
 
@@ -66,6 +75,29 @@ Settings::~Settings()
 		writeSettings();
 }
 
+void Settings::addKeybinding(std::string name, Keybinding k)
+{
+	m_keybindingProfiles[name] = k;
+}
+
+StringMapMap Settings::serializeKeybindings()
+{
+	StringMapMap k;
+	for(auto& p : m_keybindingProfiles) {
+		k[std::string(SETTINGS_KEYBINDING_PROFILE_PREFIX) + p.first] = {
+			StringPair(SETTINGS_KEYBINDING_LEFT, std::to_string(p.second.left)),
+			StringPair(SETTINGS_KEYBINDING_RIGHT, std::to_string(p.second.right)),
+			StringPair(SETTINGS_KEYBINDING_UP, std::to_string(p.second.up)),
+			StringPair(SETTINGS_KEYBINDING_DOWN, std::to_string(p.second.down)),
+			StringPair(SETTINGS_KEYBINDING_ACTION1, std::to_string(p.second.action1)),
+			StringPair(SETTINGS_KEYBINDING_ACTION2, std::to_string(p.second.action2)),
+			StringPair(SETTINGS_KEYBINDING_ACTION3, std::to_string(p.second.action3)),
+			StringPair(SETTINGS_KEYBINDING_ACTION4, std::to_string(p.second.action4)),
+		};
+	}
+	return k;
+}
+
 void Settings::writeSettings()
 {
 	StringMapMap sm = {{"global", {
@@ -84,7 +116,8 @@ void Settings::writeSettings()
 		StringPair(SETTINGS_SERVER, getServer()),
 		StringPair(SETTINGS_PORT, std::to_string(getPort()))
 	}}};
-	sm.insert(m_controlProfiles.begin(), m_controlProfiles.end());
+	StringMapMap k = serializeKeybindings();
+	sm.insert(k.begin(), k.end());
 	Reader::write(SETTINGS_FILE, sm);
 }
 
@@ -223,9 +256,14 @@ std::string Settings::getServerAndPort()
 	return m_server + ":" + std::to_string(m_port);
 }
 
-StringMapMap& Settings::getControlProfiles()
+std::map<std::string, Settings::Keybinding>& Settings::getKeybindings()
 {
-	return m_controlProfiles;
+	return m_keybindingProfiles;
+}
+
+Settings::Keybinding Settings::getKeybinding(std::string name)
+{
+	return m_keybindingProfiles.at(name);
 }
 
 bool Settings::isChanged()
