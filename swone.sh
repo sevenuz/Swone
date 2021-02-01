@@ -6,6 +6,7 @@ clean(){
 	echo "clean..."
 	rm -r $BUILDDIR
 	git restore $BUILDDIR
+	meson $BUILDDIR
 }
 
 build(){

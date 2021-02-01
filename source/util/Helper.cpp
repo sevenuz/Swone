@@ -1,9 +1,46 @@
 #include "Helper.h"
 
+std::string Helper::getSavePath(const std::string& s)
+{
+	std::string path;
+	bool isEmpty = true;
+#if defined _WIN64 || defined _WIN32
+	path = getenv("APPDATA");
+	isEmpty = path.empty();
+	path += "/" + PROJECT_NAME + "/";
+#elif __APPLE__
+	path = getenv("HOME");
+	isEmpty = path.empty();
+	path += "/" + PROJECT_NAME + "/";
+#elif __linux
+	path = getenv("HOME");
+	isEmpty = path.empty();
+	path += "/." + std::string(PROJECT_NAME) + "/";
+#endif
+	if(isEmpty)
+		throw "No Directory to save Files could be found!";
+	path += s;
+	return path;
+}
+
+void Helper::openLinkOrFile(std::string s) // TODO for windows and ios
+{
+#if defined _WIN64 || defined _WIN32
+#elif __APPLE__
+#elif __linux
+	if (system(NULL)) {
+		s = "xdg-open " + s;
+		system(s.c_str());
+	} else {
+		Log::ger().log("Could not open, no command processor found.", Log::Label::Error);
+	}
+#endif
+}
+
 long Helper::now()
 {
 	auto now = std::chrono::system_clock::now().time_since_epoch();
-	long time = std::chrono::duration_cast<std::chrono::seconds>(now).count();
+	long time = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
 	return time;
 }
 

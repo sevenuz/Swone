@@ -1,6 +1,7 @@
 #ifndef SWONE_UTIL_HELPER_H
 #define SWONE_UTIL_HELPER_H
 
+#include <stdlib.h>
 #include <vector>
 #include <map>
 #include <functional>
@@ -10,16 +11,7 @@
 #include <chrono>
 #include <iostream>
 #include <fstream>
-
-// include filesystem also for older standards then c++17
-// https://stackoverflow.com/a/53366603
-//#ifdef __cpp_lib_filesystem
-//    #include <filesystem>
-//    namespace fs = std::filesystem;
-//#elif __cpp_lib_experimental_filesystem
-//    #include <experimental/filesystem>
-//    namespace fs = std::experimental::filesystem;
-//#endif
+#include <filesystem>
 
 #include <tinydir.h>
 
@@ -30,9 +22,15 @@
 
 #include "physics/IEMath.h"
 
+static constexpr const char* PROJECT_NAME = "swone";
+
 namespace Helper
 {
-	// return time since epoch (1970?) in seconds
+	// return path for saving files
+	std::string getSavePath(const std::string& file = "");
+	// use xdg-open
+	void openLinkOrFile(std::string);
+	// return time since epoch (1970?) in milliseconds
 	long now();
 	std::string parseFileName(std::string path);
 
