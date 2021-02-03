@@ -23,6 +23,8 @@ namespace GameReader {
 	Map* getMap(std::string file, std::function<std::string(std::string textureName)> textureMapper);
 	StringMapMap& getGameObjectMap(std::string file);
 
+	void initResDir(const std::string& s);
+
 	std::string getTexturePath(std::string resDir, std::string name = "");
 	std::string getSceneryPath(std::string resDir, std::string name = "");
 	std::string getMapPath(std::string resDir, std::string name = "");

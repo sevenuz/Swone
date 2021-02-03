@@ -2,35 +2,23 @@
 
 SrvSettings::SrvSettings()
 {
+	std::string p = Helper::getSavePath(SRVSETTINGS_FILE);
 	try {
 		Log::ger().log("-----SrvSettings-----");
-		Reader r(SRVSETTINGS_FILE);
-		r.forEach([&](std::string p, std::string k, std::string v){
-			Log::ger().log(k + " = " + v);
-			if(k==SRVSETTINGS_DOMAIN)
-				setDomain(v);
-			else if(k==SRVSETTINGS_PORT)
-				setPort((ushort)Helper::toLong(v));
-			else if(k==SRVSETTINGS_TICK_RATE)
-				setTickRate((ushort)Helper::toLong(v));
-			else if(k==SRVSETTINGS_RESOURCE_DIRECTORY)
-				setResourceDirectory(v);
-			else if(k==SRVSETTINGS_LOBBY_MAXIMUM)
-				setLobbyMaximum(Helper::toInt(v));
-			else
-				Log::ger().log(k + " is not a srvsettings option", Log::Label::Warning);
-		});
+		read(p);
 		Log::ger().log("---------------------");
 	} catch(const std::invalid_argument& ia) {
 		Log::ger().log(ia.what(), Log::Label::Error);
-		Reader::write(SRVSETTINGS_FILE, {{"global", {
+		std::filesystem::create_directories(Helper::getSavePath());
+		Reader::write(p, {{"global", {
 			StringPair(SRVSETTINGS_DOMAIN, getDomain()),
 			StringPair(SRVSETTINGS_PORT, std::to_string(getPort())),
 			StringPair(SRVSETTINGS_TICK_RATE, std::to_string(getTickRate())),
 			StringPair(SRVSETTINGS_RESOURCE_DIRECTORY, getResourceDirectory()),
 			StringPair(SRVSETTINGS_LOBBY_MAXIMUM, std::to_string(getLobbyMaximum())),
 		}}});
-		Log::ger().log("Write Default-SrvSettings. Try to restart.");
+		read(p);
+		Log::ger().log("Write Default-SrvSettings.");
 	}
 }
 
@@ -39,6 +27,26 @@ SrvSettings::~SrvSettings() {}
 std::string SrvSettings::getDomain()
 {
 	return m_domain;
+}
+
+void SrvSettings::read(const std::string& s)
+{
+	Reader r(s);
+	r.forEach([&](std::string p, std::string k, std::string v){
+		Log::ger().log(k + " = " + v);
+		if(k==SRVSETTINGS_DOMAIN)
+			setDomain(v);
+		else if(k==SRVSETTINGS_PORT)
+			setPort((ushort)Helper::toLong(v));
+		else if(k==SRVSETTINGS_TICK_RATE)
+			setTickRate((ushort)Helper::toLong(v));
+		else if(k==SRVSETTINGS_RESOURCE_DIRECTORY)
+			setResourceDirectory(v);
+		else if(k==SRVSETTINGS_LOBBY_MAXIMUM)
+			setLobbyMaximum(Helper::toInt(v));
+		else
+			Log::ger().log(k + " is not a srvsettings option", Log::Label::Warning);
+	});
 }
 
 void SrvSettings::setDomain(std::string v)
@@ -73,7 +81,8 @@ std::string SrvSettings::getResourceDirectory()
 
 void SrvSettings::setResourceDirectory(std::string s)
 {
-	m_resource_directory = s;
+	m_resource_directory = Helper::getSavePath(s);
+	GameReader::initResDir(m_resource_directory);
 }
 
 unsigned int SrvSettings::getLobbyMaximum()

@@ -2,25 +2,27 @@
 
 std::string Helper::getSavePath(const std::string& s)
 {
-	std::string path;
-	bool isEmpty = true;
+	std::filesystem::path p = s;
+	if(p.is_relative()) {
+		bool isEmpty = true;
 #if defined _WIN64 || defined _WIN32
-	path = getenv("APPDATA");
-	isEmpty = path.empty();
-	path += "/" + PROJECT_NAME + "/";
+		p = getenv("APPDATA");
+		isEmpty = path.empty();
+		p += "/" + PROJECT_NAME + "/";
 #elif __APPLE__
-	path = getenv("HOME");
-	isEmpty = path.empty();
-	path += "/" + PROJECT_NAME + "/";
+		p = getenv("HOME");
+		isEmpty = path.empty();
+		p += "/" + PROJECT_NAME + "/";
 #elif __linux
-	path = getenv("HOME");
-	isEmpty = path.empty();
-	path += "/." + std::string(PROJECT_NAME) + "/";
+		p = getenv("HOME");
+		isEmpty = p.empty();
+		p += "/." + std::string(PROJECT_NAME) + "/";
 #endif
-	if(isEmpty)
-		throw "No Directory to save Files could be found!";
-	path += s;
-	return path;
+		if(isEmpty)
+			throw "No Directory to save Files could be found!";
+		p += s;
+	}
+	return p;
 }
 
 void Helper::openLinkOrFile(std::string s) // TODO for windows and ios

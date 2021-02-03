@@ -58,7 +58,6 @@ public:
 	void log(std::string msg, Label label = Default, bool visible = true)
 	{
 		m_logs.push_back({msg, label, visible});
-		// TODO remove?
 		if(visible)
 			std::cout << msg << std::endl;
 	}
@@ -135,7 +134,7 @@ public:
 
 	const std::vector<std::string>& getObjectIdentifiers() const;
 	const ValueDetailMap& getValueMap() const;
-	
+
 	Log(Log const&)				= delete;
 	void operator=(Log const&)	= delete;
 private:

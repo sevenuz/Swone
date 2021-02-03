@@ -1,66 +1,18 @@
+#include "game/GameReader.h"
 #include <client/Settings.h>
 
 Settings::Settings()
 {
 	try {
 		Log::ger().log("-----Settings-----");
-		Reader r(SETTINGS_FILE);
-		auto& setupMap = r.getParagraphMap();
-		if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
-			auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
-			if(global.count(SETTINGS_WIDTH))
-				setWidth(Helper::toLong(global[SETTINGS_WIDTH]));
-			if(global.count(SETTINGS_HEIGHT))
-				setHeight(Helper::toLong(global[SETTINGS_HEIGHT]));
-			if(global.count(SETTINGS_BITS_PER_PIXEL))
-				setBitsPerPixel(Helper::toLong(global[SETTINGS_BITS_PER_PIXEL]));
-			if(global.count(SETTINGS_VERTICAL_SYNC_ENABLED))
-				setVerticalSyncEnabled(Helper::toBool(global[SETTINGS_VERTICAL_SYNC_ENABLED]));
-			if(global.count(SETTINGS_RESOURCE_DIRECTORY))
-				setResourceDirectory(global[SETTINGS_RESOURCE_DIRECTORY]);
-			if(global.count(SETTINGS_DOWNLOAD_DIRECTORY))
-				setDownloadDirectory(global[SETTINGS_DOWNLOAD_DIRECTORY]);
-			if(global.count(SETTINGS_FONT_SOURCE))
-				setFontSource(global[SETTINGS_FONT_SOURCE]);
-			if(global.count(SETTINGS_CLEARING_COLOR))
-				setClearingColor(Helper::toColor(global[SETTINGS_CLEARING_COLOR]));
-		}
-
-		for(auto& m : setupMap) {
-			if(m.first.rfind(SETTINGS_KEYBINDING_PROFILE_PREFIX, 0) == 0) {
-				m_keybindingProfiles[m.first.substr(m.first.find_first_of("_")+1)] = Keybinding{
-					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_LEFT]),
-					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_RIGHT]),
-					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_UP]),
-					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_DOWN]),
-					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION1]),
-					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION2]),
-					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION3]),
-					(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION4])
-				};
-			}
-		}
-		if(m_keybindingProfiles.size() == 0) {
-			//add default profile
-			m_keybindingProfiles["Default"] = {
-				sf::Keyboard::A,
-				sf::Keyboard::D,
-				sf::Keyboard::W,
-				sf::Keyboard::S,
-				sf::Keyboard::Left,
-				sf::Keyboard::Down,
-				sf::Keyboard::Right,
-				sf::Keyboard::Up,
-			};
-		}
-
-		r.forEach([&](std::string p, std::string k, std::string v){
-			Log::ger().log(k + " = " + v);
-		});
+		read(Helper::getSavePath(SETTINGS_FILE));
 		Log::ger().log("------------------");
 	} catch(const std::invalid_argument& ia) {
 		Log::ger().log(ia.what(), Log::Label::Error);
+		std::filesystem::create_directories(Helper::getSavePath());
 		writeSettings();
+		Log::ger().log("Write Default-Settings.");
+		read(Helper::getSavePath(SETTINGS_FILE));
 	}
 	// set flag to false again to indicate that the settings in the file
 	// are the settings here, the flag will changed on next changes again
@@ -73,6 +25,63 @@ Settings::~Settings()
 	// TODO fix: write settings always
 	if(isChanged())
 		writeSettings();
+}
+
+void Settings::read(const std::string& s)
+{
+	Reader r(s);
+	auto& setupMap = r.getParagraphMap();
+	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
+		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
+		if(global.count(SETTINGS_WIDTH))
+			setWidth(Helper::toLong(global[SETTINGS_WIDTH]));
+		if(global.count(SETTINGS_HEIGHT))
+			setHeight(Helper::toLong(global[SETTINGS_HEIGHT]));
+		if(global.count(SETTINGS_BITS_PER_PIXEL))
+			setBitsPerPixel(Helper::toLong(global[SETTINGS_BITS_PER_PIXEL]));
+		if(global.count(SETTINGS_VERTICAL_SYNC_ENABLED))
+			setVerticalSyncEnabled(Helper::toBool(global[SETTINGS_VERTICAL_SYNC_ENABLED]));
+		if(global.count(SETTINGS_RESOURCE_DIRECTORY))
+			setResourceDirectory(global[SETTINGS_RESOURCE_DIRECTORY]);
+		if(global.count(SETTINGS_DOWNLOAD_DIRECTORY))
+			setDownloadDirectory(global[SETTINGS_DOWNLOAD_DIRECTORY]);
+		if(global.count(SETTINGS_FONT_SOURCE))
+			setFontSource(global[SETTINGS_FONT_SOURCE]);
+		if(global.count(SETTINGS_CLEARING_COLOR))
+			setClearingColor(Helper::toColor(global[SETTINGS_CLEARING_COLOR]));
+	}
+
+	for(auto& m : setupMap) {
+		if(m.first.rfind(SETTINGS_KEYBINDING_PROFILE_PREFIX, 0) == 0) {
+			m_keybindingProfiles[m.first.substr(m.first.find_first_of("_")+1)] = Keybinding{
+				(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_LEFT]),
+				(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_RIGHT]),
+				(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_UP]),
+				(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_DOWN]),
+				(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION1]),
+				(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION2]),
+				(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION3]),
+				(sf::Keyboard::Key)Helper::toInt(m.second[SETTINGS_KEYBINDING_ACTION4])
+			};
+		}
+	}
+	if(m_keybindingProfiles.size() == 0) {
+		//add default profile
+		m_keybindingProfiles["Default"] = {
+			sf::Keyboard::A,
+			sf::Keyboard::D,
+			sf::Keyboard::W,
+			sf::Keyboard::S,
+			sf::Keyboard::Left,
+			sf::Keyboard::Down,
+			sf::Keyboard::Right,
+			sf::Keyboard::Up,
+		};
+	}
+
+	r.forEach([&](std::string p, std::string k, std::string v){
+		Log::ger().log(k + " = " + v);
+	});
 }
 
 void Settings::addKeybinding(std::string name, Keybinding k)
@@ -118,7 +127,7 @@ void Settings::writeSettings()
 	}}};
 	StringMapMap k = serializeKeybindings();
 	sm.insert(k.begin(), k.end());
-	Reader::write(SETTINGS_FILE, sm);
+	Reader::write(Helper::getSavePath(SETTINGS_FILE), sm);
 }
 
 size_t Settings::getWidth()
@@ -172,8 +181,8 @@ std::string Settings::getResourceDirectory()
 
 void Settings::setResourceDirectory(std::string s)
 {
-	m_resource_directory = s;
-	// TODO fs::create_directories(m_resource_directory);
+	m_resource_directory = Helper::getSavePath(s);
+	GameReader::initResDir(m_resource_directory);
 	setChanged(true);
 }
 
@@ -184,9 +193,8 @@ std::string Settings::getDownloadDirectory()
 
 void Settings::setDownloadDirectory(std::string s)
 {
-	m_download_directory = s;
-	// TODO fs::create_directories(m_download_directory);
-	// also for obj/ scenery/ map/ texture/
+	m_download_directory = Helper::getSavePath(s);
+	GameReader::initResDir(m_download_directory);
 	setChanged(true);
 }
 
@@ -197,7 +205,7 @@ std::string Settings::getFontSource()
 
 void Settings::setFontSource(std::string s)
 {
-	m_font_src = s;
+	m_font_src = Helper::getSavePath(s);
 	setChanged(true);
 }
 
@@ -209,6 +217,7 @@ sf::Font& Settings::getFont()
 void Settings::loadFont()
 {
 	if (!m_font.loadFromFile(m_font_src)) {
+		Log::ger().log("font not found", Log::Label::Error);
 		throw std::invalid_argument("font not found");
 	}
 }

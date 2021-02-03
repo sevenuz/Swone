@@ -37,5 +37,5 @@ void ClientGameController::setLocalPlayerKeybinding(GameObject* go, Settings::Ke
 
 const Settings::Keybinding& ClientGameController::getLocalPlayerKeybinding(GameObject* go)
 {
-	m_playerKeybindings[go];
+	return m_playerKeybindings.at(go);
 }

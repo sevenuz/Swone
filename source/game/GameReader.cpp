@@ -2,6 +2,15 @@
 #include "game/Map.h"
 #include "util/reader/MapReader.h"
 
+void GameReader::initResDir(const std::string& s)
+{
+	std::filesystem::create_directories(s);
+	std::filesystem::create_directories(GameReader::getSceneryPath(s));
+	std::filesystem::create_directories(GameReader::getMapPath(s));
+	std::filesystem::create_directories(GameReader::getGameObjectPath(s));
+	std::filesystem::create_directories(GameReader::getTexturePath(s));
+}
+
 std::string GameReader::getTexturePath(std::string resDir, std::string name)
 {
 	return resDir + RES_DIR_TEXTURE + name;

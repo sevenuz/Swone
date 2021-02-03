@@ -10,8 +10,10 @@
 #include "util/reader/Reader.h"
 #include "util/Log.h"
 #include "util/Helper.h"
+#include "game/GameReader.h"
+#include "util/Helper.h"
 
-#define SETTINGS_FILE "../res/settings.ini"
+#define SETTINGS_FILE "settings.ini"
 
 // settings property names
 #define SETTINGS_WIDTH "width"
@@ -51,6 +53,7 @@ public:
 
 	Settings();
 	virtual ~Settings();
+	void read(const std::string& s);
 
 	void writeSettings();
 
@@ -120,10 +123,10 @@ private:
 	size_t m_bits_per_pixel = 32;
 	bool m_vertical_sync_enabled = true;
 
-	std::string m_resource_directory = "../res/";
-	std::string m_download_directory = "../res/download/";
+	std::string m_resource_directory = "res/";
+	std::string m_download_directory = "res/download/";
 
-	std::string m_font_src = "../res/Roboto-Medium.ttf";
+	std::string m_font_src = "Roboto-Medium.ttf";
 	sf::Font m_font;
 	sf::Color m_clearing_color = sf::Color::Black;
 
