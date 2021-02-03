@@ -1,6 +1,6 @@
-#include "game/GameReader.h"
 #include <client/Settings.h>
 
+const char* find_embedded_file(const char* file_name, size_t* size);
 Settings::Settings()
 {
 	try {
@@ -10,6 +10,9 @@ Settings::Settings()
 	} catch(const std::invalid_argument& ia) {
 		Log::ger().log(ia.what(), Log::Label::Error);
 		std::filesystem::create_directories(Helper::getSavePath());
+		size_t size;
+		const char* data = find_embedded_file(SETTINGS_FONT_FILE, &size);
+		Helper::writeFileBytes(Helper::getSavePath(SETTINGS_FONT_FILE), size, data);
 		writeSettings();
 		Log::ger().log("Write Default-Settings.");
 		read(Helper::getSavePath(SETTINGS_FILE));

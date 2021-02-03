@@ -38,7 +38,7 @@ namespace Helper
 	void readDirectory(std::string path, std::function<void(tinydir_file& file)> fn, bool recursive = false);
 
 	void readFileBytes(std::string file, std::function<void(size_t length, char* data)> fn);
-	void writeFileBytes(std::string file, size_t length, char* data);
+	void writeFileBytes(std::string file, size_t length, const char* data);
 
 	std::string replaceIllegalCharacters(std::string s, std::string illegalCharacters, char replace);
 	void replaceAll(std::string& s, std::string toReplace, std::string replacement);

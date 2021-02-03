@@ -100,7 +100,7 @@ void Helper::readFileBytes(std::string file, std::function<void(size_t length, c
 	fl.close();
 }
 
-void Helper::writeFileBytes(std::string file, size_t length, char* data)
+void Helper::writeFileBytes(std::string file, size_t length, const char* data)
 {
 	std::ofstream(file, std::ios::binary).write(data, length);
 }

@@ -14,6 +14,7 @@
 #include "util/Helper.h"
 
 #define SETTINGS_FILE "settings.ini"
+#define SETTINGS_FONT_FILE "Font.ttf"
 
 // settings property names
 #define SETTINGS_WIDTH "width"
@@ -126,7 +127,7 @@ private:
 	std::string m_resource_directory = "res/";
 	std::string m_download_directory = "res/download/";
 
-	std::string m_font_src = "Roboto-Medium.ttf";
+	std::string m_font_src = SETTINGS_FONT_FILE;
 	sf::Font m_font;
 	sf::Color m_clearing_color = sf::Color::Black;
 

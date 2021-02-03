@@ -58,6 +58,7 @@ src = [
 	'source/util/reader/MapReader.cpp',
 	'source/util/Log.cpp',
 	'source/util/Helper.cpp',
+	'source/util/embedded_data.cpp',
 	'source/graphics/ParticleSystem.cpp',
 	'source/graphics/Animation.cpp',
 	'source/graphics/AnimatedSprite.cpp'
