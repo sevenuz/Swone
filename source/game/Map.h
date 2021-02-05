@@ -46,7 +46,7 @@ public:
 	std::string getName();
 
 	void setTileTexturePath(std::string);
-	std::string getTileTexturePath();
+	std::string getTileTexturePath() const;
 
 	void setTileTextureName(std::string);
 	std::string getTileTextureName();
@@ -59,12 +59,13 @@ public:
 	void setWidth(size_t);
 	void setHeight(size_t);
 	void setBorder(MapTile);
-	size_t getWidth();
-	size_t getHeight();
+	size_t getWidth() const;
+	size_t getHeight() const;
 	const size_t getImageWidth() const;
 	const size_t getImageHeight() const;
 
 	MapTile getBorder();
+	const Tile& getTile(int h, int w) const;
 	const Tile& getTile(int h, int w);
 	void setMapDataValue(size_t h, size_t w, MapTile v);
 	std::map<int, std::map<int, Tile*>>& getMapData();

@@ -21,7 +21,9 @@
 #define INVENTORY_WIDTH 40
 #define INVENTORY_HEIGHT 40
 
+class InventoryDrawing;
 class Inventory : public Extension {
+	friend InventoryDrawing;
 public:
 	Inventory(GameObject* obj, StringMapMap& setupMap);
 

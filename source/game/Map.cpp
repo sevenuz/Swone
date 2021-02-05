@@ -36,7 +36,7 @@ std::string Map::getName() {
 void Map::setTileTexturePath(std::string n) {
 	m_tileTexturePath = n;
 }
-std::string Map::getTileTexturePath() {
+std::string Map::getTileTexturePath() const {
 	return m_tileTexturePath;
 }
 
@@ -70,11 +70,11 @@ void Map::setBorder(MapTile b) {
 	m_border = b;
 }
 
-size_t Map::getWidth() {
+size_t Map::getWidth() const {
 	return m_width;
 }
 
-size_t Map::getHeight() {
+size_t Map::getHeight() const {
 	return m_height;
 }
 
@@ -88,6 +88,10 @@ const size_t Map::getImageHeight() const {
 
 MapTile Map::getBorder() {
 	return m_border;
+}
+
+const Tile& Map::getTile(int h, int w) const {
+	return *m_mapData.at(h).at(w);
 }
 
 const Tile& Map::getTile(int h, int w) {

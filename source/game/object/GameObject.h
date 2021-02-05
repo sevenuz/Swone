@@ -144,7 +144,7 @@ public:
 	sf::Color getColor();
 	void setColor(sf::Color s);
 
-	std::string getTexturePath();
+	std::string getTexturePath() const;
 	void setTexturePath(std::string s);
 
 	const sf::Vector2f getVel() const;
@@ -166,15 +166,16 @@ public:
 	bool isMovementAnimationAutomatic();
 	void setMovementAnimationAutomatic(bool s, bool looped = true);
 
-	bool isMoving();
-	bool isFalling();
-	bool isRising();
+	bool isMoving() const;
+	bool isFalling() const;
+	bool isRising() const;
 	// changes moving, falling, rising flags
 	void updateFlags();
 
 	void apply();
 
 	sf::Vector2f getSpritePos();
+	const Extension& getExtension(const std::string& name) const;
 
 	// sets animation depending on obj state
 	void setMovementAnimationAutomatic();

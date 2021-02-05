@@ -415,7 +415,7 @@ void GameObject::setColor(sf::Color s)
 	m_sprite.setColor(s);
 }
 
-std::string GameObject::getTexturePath()
+std::string GameObject::getTexturePath() const
 {
 	return m_texturePath;
 }
@@ -473,15 +473,15 @@ void GameObject::setMovementAnimationAutomatic(bool s, bool looped)
 	m_sprite.setLooped(looped);
 }
 
-bool GameObject::isMoving() {
+bool GameObject::isMoving() const {
 	return m_isMoving;
 }
 
-bool GameObject::isRising() {
+bool GameObject::isRising() const {
 	return m_isRising;
 }
 
-bool GameObject::isFalling() {
+bool GameObject::isFalling() const {
 	return m_isFalling;
 }
 
@@ -524,3 +524,9 @@ void GameObject::setVelY(float pos)
 sf::Vector2f GameObject::getSpritePos() {
 	return m_sprite.getPosition();
 }
+
+const Extension& GameObject::getExtension(const std::string& name) const
+{
+	return *m_extensions.at(name);
+}
+
