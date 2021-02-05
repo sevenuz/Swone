@@ -1,3 +1,4 @@
+#include "util/Helper.h"
 #include <client/Settings.h>
 
 const char* find_embedded_file(const char* file_name, size_t* size);
@@ -52,6 +53,10 @@ void Settings::read(const std::string& s)
 			setFontSource(global[SETTINGS_FONT_SOURCE]);
 		if(global.count(SETTINGS_CLEARING_COLOR))
 			setClearingColor(Helper::toColor(global[SETTINGS_CLEARING_COLOR]));
+		if(global.count(SETTINGS_SERVER))
+			setServer(global[SETTINGS_SERVER]);
+		if(global.count(SETTINGS_PORT))
+			setPort(Helper::toInt(global[SETTINGS_PORT]));
 	}
 
 	for(auto& m : setupMap) {
