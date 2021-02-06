@@ -1,8 +1,13 @@
 #ifndef SWONE_CLIENT_GAME_OBJECT_DRAWING_H
 #define SWONE_CLIENT_GAME_OBJECT_DRAWING_H
 
+#include <functional>
+
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Transformable.hpp>
+
+#include "graphics/Animation.h"
+#include "graphics/AnimatedSprite.h"
 
 #include "Updateable.h"
 
@@ -14,7 +19,7 @@ class GameObjectDrawing : public Updateable, public sf::Drawable, public sf::Tra
 public:
 	enum MovementAnimation : char { Up, Left, Right, Down, Steady };
 
-	GameObjectDrawing(const GameObject& go, StringMapMap& setupMap);
+	GameObjectDrawing(const GameObject& go, StringMapMap& setupMap, std::function<GameObjectDrawing*(GameObject*)> goGodMapper);
 	virtual ~GameObjectDrawing();
 
 	void applySetupMap(StringMapMap& setupMap);
@@ -27,9 +32,15 @@ public:
 	void playAnimationOnce(Animation& animation, std::function<void()> endCb = NULL);
 	void setAnimationFrames(Animation& animation, StringMap& frames);
 
+	sf::Vector2f getSpriteScaleTo(sf::Vector2f v);
+
 	bool isMovementAnimationAutomatic();
 	void setMovementAnimationAutomatic(bool s, bool looped = true);
 
+	std::string getTexturePath() const;
+	void setTexturePath(std::string s);
+
+	const AnimatedSprite& getAnimatedSprite() const;
 	const GameObject& getGameObject() const;
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -38,8 +49,12 @@ private:
 	void initSetupMap(StringMapMap& setupMap);
 	void initExtension(std::string extensionName, StringMapMap& setupMap);
 
+	std::function<GameObjectDrawing*(GameObject*)> m_goGodMapper;
+
 	const GameObject& m_obj;
 	std::map<std::string, ExtensionDrawing*> m_extensions;
+
+	std::string m_texturePath;
 
 	Animation m_ani_up;
 	Animation m_ani_left;

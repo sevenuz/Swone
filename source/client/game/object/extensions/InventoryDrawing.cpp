@@ -8,8 +8,10 @@
 
 int InventoryDrawing::Inventory_count = 0;
 
-InventoryDrawing::InventoryDrawing(const Inventory& inv, StringMapMap& setupMap) : m_inventory(inv)
+InventoryDrawing::InventoryDrawing(const Inventory& inv, StringMapMap& setupMap, std::function<GameObjectDrawing*(GameObject*)> goGodMapper) :
+	m_inventory(inv)
 {
+	m_goGodMapper = goGodMapper;
 	sf::Vector2f sizeVct = sf::Vector2f(INVENTORY_WIDTH, INVENTORY_HEIGHT);
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
 		sf::Vector2f posVct = sf::Vector2f(1 + i * INVENTORY_WIDTH, InventoryDrawing::Inventory_count * INVENTORY_SIZE * INVENTORY_HEIGHT);
@@ -58,8 +60,8 @@ void InventoryDrawing::draw(sf::RenderTarget& target, sf::RenderStates states) c
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
 		if(m_inventory.m_items[i] != NULL) {
 			states.transform = sf::Transform::Identity * m_rectangles[i]->getTransform();
-			states.transform.scale(m_inventory.m_items[i]->getSpriteScaleTo(sf::Vector2f(INVENTORY_WIDTH, INVENTORY_HEIGHT)));
-			target.draw(*m_inventory.m_items[i]->getAnimatedSprite(), states);
+			states.transform.scale(m_goGodMapper(m_inventory.m_items[i])->getSpriteScaleTo(sf::Vector2f(INVENTORY_WIDTH, INVENTORY_HEIGHT)));
+			target.draw(m_goGodMapper(m_inventory.m_items[i])->getAnimatedSprite(), states);
 		}
 		states.transform = sf::Transform::Identity;
 		target.draw(*m_rectangles[i], states);

@@ -17,8 +17,6 @@
 #include "client/game/object/ExtensionDrawing.h"
 #include "game/object/extensions/Inventory.h"
 
-#define INVENTORY_SIZE 3
-
 #define INVENTORY_WIDTH 40
 #define INVENTORY_HEIGHT 40
 
@@ -26,7 +24,7 @@ class InventoryDrawing : public ExtensionDrawing {
 public:
 	static int Inventory_count;
 
-	InventoryDrawing(const Inventory& inv, StringMapMap& setupMap);
+	InventoryDrawing(const Inventory& inv, StringMapMap& setupMap, std::function<GameObjectDrawing*(GameObject*)> goGodMapper);
 	virtual ~InventoryDrawing();
 
 	void applyConfig(StringMapMap& setupMap) override;
@@ -34,6 +32,7 @@ public:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 	void update(sf::Time ellapsed) override;
 private:
+	std::function<GameObjectDrawing*(GameObject*)> m_goGodMapper;
 	const Inventory& m_inventory;
 	std::array<sf::RectangleShape*, INVENTORY_SIZE> m_rectangles;
 	std::array<ParticleSystem*, INVENTORY_SIZE> m_particleSystems;

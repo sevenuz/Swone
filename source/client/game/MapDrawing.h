@@ -17,6 +17,7 @@ public:
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 private:
+	sf::Vector2i getTileTexturePosition(MapTile t);
 	const Map& m_map;
 
 	size_t m_imgWidth = 0;

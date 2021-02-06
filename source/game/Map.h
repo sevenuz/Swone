@@ -4,9 +4,7 @@
 #include <string>
 #include <stdexcept>
 #include <memory>
-#include <SFML/Graphics/Image.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/Sprite.hpp>
+
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -27,9 +25,11 @@
 enum MapTile : char { SHARP = 0, UNDERSCORE = 1, W = 2, SPACE = 3, DEFAULT = SPACE };
 
 struct Tile;
+class MapDrawing;
 
-class Map : public sf::Drawable
+class Map
 {
+	friend MapDrawing;
 public:
 	static const size_t TILE_WIDTH = 64;
 	static const size_t TILE_HEIGHT = 64;
@@ -69,13 +69,8 @@ public:
 	const Tile& getTile(int h, int w);
 	void setMapDataValue(size_t h, size_t w, MapTile v);
 	std::map<int, std::map<int, Tile*>>& getMapData();
-
-	void createMapImage();
-	static sf::Vector2i getTileTexturePosition(MapTile t);
 protected:
 private:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
 	std::string m_name = "";
 	float m_gravity = GRAVITY;
 
@@ -92,11 +87,6 @@ private:
 
 	std::string m_tileTexturePath;
 	std::string m_tileTextureName;
-	sf::Image m_mapImage;//Img with map tiles
-	sf::Texture m_texture;
-	sf::Sprite m_sprite;
-
-	bool m_mapDrawable = false;
 };
 
 struct Tile : public ph::Body::Callback {

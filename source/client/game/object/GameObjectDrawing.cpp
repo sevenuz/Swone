@@ -4,9 +4,10 @@
 #include "client/game/object/ExtensionDrawing.h"
 #include "client/game/object/extensions/InventoryDrawing.h"
 
-GameObjectDrawing::GameObjectDrawing(const GameObject& obj, StringMapMap& setupMap) :
+GameObjectDrawing::GameObjectDrawing(const GameObject& obj, StringMapMap& setupMap, std::function<GameObjectDrawing*(GameObject*)> goGodMapper) :
 	m_obj(obj)
 {
+	m_goGodMapper = goGodMapper;
 	initSetupMap(setupMap);
 	applySetupMap(setupMap);
 }
@@ -30,6 +31,8 @@ void GameObjectDrawing::applySetupMap(StringMapMap& setupMap)
 {
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
 		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
+		if(global.count(GameObject::S_TEXTURE_PATH))
+			setTexturePath(global[GameObject::S_TEXTURE_PATH]);
 		if(global.count(GameObject::S_SCALE))
 			setScale(Helper::toVector2f(global[GameObject::S_SCALE]));
 	}
@@ -58,16 +61,20 @@ void GameObjectDrawing::applyConfig(GameObject::Config config)
 void GameObjectDrawing::initExtension(std::string extensionName, StringMapMap& setupMap)
 {
 	if(extensionName == GameObject::S_INVENTORY_EXTENSION)
-		m_extensions[GameObject::S_INVENTORY_EXTENSION] = new InventoryDrawing(static_cast<const Inventory&>(m_obj.getExtension(GameObject::S_INVENTORY_EXTENSION)), setupMap);
+		m_extensions[GameObject::S_INVENTORY_EXTENSION] = new InventoryDrawing(
+			static_cast<const Inventory&>(m_obj.getExtension(GameObject::S_INVENTORY_EXTENSION)),
+			setupMap,
+			m_goGodMapper
+		);
 }
 
 void GameObjectDrawing::setAnimationFrames(Animation& animation, StringMap& m)
 {
-	if(m_obj.getTexturePath().empty())
+	if(getTexturePath().empty())
 		throw std::invalid_argument("GameObject Texture is missing.");
 	if(m.count(GameObject::S_ANI_FRAME_TIME))
 		animation.setFrameTime(sf::seconds(Helper::toFloat(m[GameObject::S_ANI_FRAME_TIME])));
-	animation.setSpriteSheet(*GameReader::loadTexture(m_obj.getTexturePath()));
+	animation.setSpriteSheet(*GameReader::loadTexture(getTexturePath()));
 	for(int i = 1; m.count(std::to_string(i)); i++){
 		animation.addFrame(Helper::toIntRect(m[std::to_string(i)]));
 	}
@@ -140,6 +147,14 @@ void GameObjectDrawing::setAnimation(Animation& animation)
 	setOrigin(m_sprite.getLocalBounds().width/2,m_sprite.getLocalBounds().height/2);
 }
 
+sf::Vector2f GameObjectDrawing::getSpriteScaleTo(sf::Vector2f v)
+{
+	return sf::Vector2f(
+		v.x / getAnimatedSprite().getLocalBounds().width,
+		v.y / getAnimatedSprite().getLocalBounds().height
+	);
+}
+
 bool GameObjectDrawing::isMovementAnimationAutomatic()
 {
 	return m_movementAnimationAutomatic;
@@ -151,6 +166,21 @@ void GameObjectDrawing::setMovementAnimationAutomatic(bool s, bool looped)
 	m_sprite.setLooped(looped);
 }
 
+std::string GameObjectDrawing::getTexturePath() const
+{
+	return m_texturePath;
+}
+
+void GameObjectDrawing::setTexturePath(std::string s)
+{
+	m_texturePath = s;
+}
+
+const AnimatedSprite& GameObjectDrawing::getAnimatedSprite() const
+{
+	return m_sprite;
+}
+
 const GameObject& GameObjectDrawing::getGameObject() const
 {
 	return m_obj;
@@ -158,6 +188,10 @@ const GameObject& GameObjectDrawing::getGameObject() const
 
 void GameObjectDrawing::update(sf::Time ellapsed)
 {
+	if(m_obj.m_log) { // TODO update logger on every update?
+		Log::ger().detailsPutValue(m_sprite.getTexture(), "gameObject_texture", m_obj.m_identifier);
+		Log::ger().detailsPutValue(&m_sprite, "animation", m_obj.m_identifier);
+	}
 	setPosition(Map::toMapPixelX(m_obj.getPos().x), Map::toMapPixelY(m_obj.getPos().y));
 	setRotation(m_obj.getBody()->GetOrientAngle());
 	m_sprite.setColor(m_obj.getColor());
@@ -168,7 +202,7 @@ void GameObjectDrawing::update(sf::Time ellapsed)
 
 void GameObjectDrawing::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	if(m_drawable) {
+	if(m_drawable && m_obj.m_visible) { // TODO visible?
 		states.transform *= getTransform();
 		target.draw(m_sprite, states);
 	}

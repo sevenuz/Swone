@@ -4,14 +4,11 @@
 #include <vector>
 #include <functional>
 #include <SFML/System/Time.hpp>
-#include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 
 #include "Updateable.h"
 #include "game/Map.h"
 #include "game/GameReader.h"
-#include "graphics/Animation.h"
-#include "graphics/AnimatedSprite.h"
 #include "util/reader/Reader.h"
 #include "util/Helper.h"
 #include "physics/Body.h"
@@ -28,11 +25,11 @@
 
 // forward declaration to avoid dependency cyclus
 class Extension;
+class GameObjectDrawing;
 
-class GameObject : public sf::Drawable, public sf::Transformable, public Updateable, public ph::Body::Callback {
+class GameObject : public Updateable, public ph::Body::Callback {
+	friend GameObjectDrawing;
 public:
-	enum MovementAnimation : char { Up, Left, Right, Down, Steady };
-
 	struct Event {
 		bool left = false;
 		bool right = false;
@@ -116,7 +113,6 @@ public:
 	void applyConfig(Config config);
 	Config getConfig();
 
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 	virtual void update(sf::Time ellapsed) override;
 	virtual void event(Event e);
 
@@ -132,8 +128,6 @@ public:
 
 	void toggleLogging();
 
-	AnimatedSprite* getAnimatedSprite();
-	sf::Vector2f getSpriteScaleTo(sf::Vector2f v);
 	ph::Body* getBody() const;
 
 	const std::string getIdentifier() const;
@@ -143,9 +137,6 @@ public:
 
 	sf::Color getColor() const;
 	void setColor(sf::Color s);
-
-	std::string getTexturePath() const;
-	void setTexturePath(std::string s);
 
 	const sf::Vector2f getVel() const;
 	void setVel(sf::Vector2f pos);
@@ -163,9 +154,6 @@ public:
 	int getZindex() const;
 	void setZindex(int s);
 
-	bool isMovementAnimationAutomatic();
-	void setMovementAnimationAutomatic(bool s, bool looped = true);
-
 	bool isMoving() const;
 	bool isFalling() const;
 	bool isRising() const;
@@ -174,15 +162,7 @@ public:
 
 	void apply();
 
-	sf::Vector2f getSpritePos();
 	const Extension& getExtension(const std::string& name) const;
-
-	// sets animation depending on obj state
-	void setMovementAnimationAutomatic();
-	void setMovementAnimation(MovementAnimation ani);
-	void setAnimation(Animation& animation);
-	void playAnimationOnce(Animation& animation, std::function<void()> endCb = NULL);
-	void setAnimationFrames(Animation& animation, StringMap& frames);
 
 	// Write all the values that should be updated every tick into this function
 	void updateLog() const;
@@ -195,7 +175,6 @@ private:
 
 	bool m_log = false;
 	bool m_visible = true;
-	bool m_movementAnimationAutomatic = true;
 	const std::string m_type;
 	const std::string m_identifier;
 	std::string m_name;
@@ -203,14 +182,6 @@ private:
 	int m_zindex = 1;
 
 	ph::Body* m_body = NULL;
-
-	std::string m_texturePath;
-	Animation m_ani_up;
-	Animation m_ani_left;
-	Animation m_ani_right;
-	Animation m_ani_down;
-	Animation m_ani_steady;
-	AnimatedSprite m_sprite;
 
 	bool m_isRising = false; // movement to top
 	bool m_isFalling = false; // movement to bottom

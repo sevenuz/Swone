@@ -22,10 +22,6 @@ sf::Vector2f Map::toMapPixel(sf::Vector2f v)
 	return sf::Vector2f(toMapPixelX(v.x), toMapPixelY(v.y));
 }
 
-sf::Sprite& Map::getSprite() {
-	return m_sprite;
-}
-
 void Map::setName(std::string n) {
 	m_name = n;
 }
@@ -110,53 +106,6 @@ std::map<int, std::map<int, Tile*>>& Map::getMapData()
 {
 	return m_mapData;
 }
-
-void Map::createMapImage() {
-	if(m_tileTexturePath.empty())
-		throw std::invalid_argument("Map needs a texture!");
-	const sf::Image tileTexture = *GameReader::loadImage(m_tileTexturePath);
-
-	m_imgWidth = Map::TILE_WIDTH * m_width;
-	m_imgHeight = Map::TILE_HEIGHT * m_height;
-	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Black);
-	for (size_t r = 0; r < m_width; r++)
-		for (size_t c = 0; c < m_height; c++) {
-			sf::Vector2i ttp = Map::getTileTexturePosition(getTile(r, c).type);
-			m_mapImage.copy(tileTexture, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
-				sf::IntRect(ttp.x, ttp.y,
-					Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
-		}
-	if (!m_texture.loadFromImage(m_mapImage)) {
-		throw std::invalid_argument("error: convert img to texture.");
-	} else {
-		m_sprite.setTexture(m_texture);
-		m_sprite.setPosition(sf::Vector2f(TILE_CORRECTION, TILE_CORRECTION));
-
-		m_mapDrawable = true;
-	}
-}
-
-sf::Vector2i Map::getTileTexturePosition(MapTile t)
-{
-	// TODO Map also vertical in textures
-	return sf::Vector2i(t * Map::TILE_WIDTH, 0);
-}
-
-void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	states.texture = NULL;
-	if (m_mapDrawable)
-	{
-		target.draw(m_sprite, states);
-		/*
-		// TODO try Map Vertex Rendering with sf::RenderTexture
-		// Render Map from Vertexes
-		states.texture = &m_mapTiles;
-		for (size_t r = 0; r < m_width; r++)
-			for (size_t c = 0; c < m_height; c++)
-				target.draw(m_mapData.at(c).at(r)->m_vertices, 4, sf::Quads, states);
-		*/
-	}
-};
 
 Tile::Tile(sf::Vector2i pos, MapTile t)
 	 : pos(pos), type(t)

@@ -19,7 +19,7 @@ void MapDrawing::createMapImage() {
 	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Black);
 	for (size_t r = 0; r < m_map.getWidth(); r++)
 		for (size_t c = 0; c < m_map.getHeight(); c++) {
-			sf::Vector2i ttp = Map::getTileTexturePosition(m_map.getTile(r, c).type);
+			sf::Vector2i ttp = getTileTexturePosition(m_map.getTile(r, c).type);
 			m_mapImage.copy(tileTexture, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
 				sf::IntRect(ttp.x, ttp.y,
 					Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
@@ -32,6 +32,12 @@ void MapDrawing::createMapImage() {
 
 		m_mapDrawable = true;
 	}
+}
+
+sf::Vector2i MapDrawing::getTileTexturePosition(MapTile t)
+{
+       // TODO Map also vertical in textures
+       return sf::Vector2i(t * Map::TILE_WIDTH, 0);
 }
 
 void MapDrawing::draw(sf::RenderTarget& target, sf::RenderStates states) const {

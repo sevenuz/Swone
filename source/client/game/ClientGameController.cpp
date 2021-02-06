@@ -1,3 +1,4 @@
+#include "game/object/GameObject.h"
 #include <client/game/ClientGameController.h>
 
 ClientGameController::ClientGameController()
@@ -58,7 +59,11 @@ void ClientGameController::sortGameObjectDrawings()
 GameObject* ClientGameController::spawnGameObject(std::string identifier, std::string key)
 {
 	GameObject* go = GameController::spawnGameObject(identifier, key);
-	GameObjectDrawing* god = new GameObjectDrawing(*go, getScenery().getObjectSetupMaps()[key]);
+	GameObjectDrawing* god = new GameObjectDrawing(
+		*go,
+		getScenery().getObjectSetupMaps()[key],
+		[&](GameObject* go) -> GameObjectDrawing* { return m_goDrawingsMap[go]; }
+	);
 	m_goDrawings.push_back(god);
 	m_goDrawingsMap[go] = god;
 	return go;
@@ -67,7 +72,11 @@ GameObject* ClientGameController::spawnGameObject(std::string identifier, std::s
 GameObject* ClientGameController::spawnPlayer(std::string identifier, std::string key)
 {
 	GameObject* go = GameController::spawnPlayer(identifier, key);
-	GameObjectDrawing* god = new GameObjectDrawing(*go, getScenery().getPlayerSetupMaps()[key]);
+	GameObjectDrawing* god = new GameObjectDrawing(
+		*go,
+		getScenery().getPlayerSetupMaps()[key],
+		[&](GameObject* go) -> GameObjectDrawing* { return m_goDrawingsMap[go]; }
+	);
 	m_goDrawings.push_back(god);
 	m_goDrawingsMap[go] = god;
 	return go;

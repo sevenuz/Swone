@@ -6,7 +6,6 @@
 #include "game/object/extensions/Inventory.h"
 #include "game/object/extensions/OrientCorrection.h"
 
-// TODO generate Id of GO differently
 int GameObject::Identifier_count = 0;
 std::string GameObject::generateIdentifier(std::string name)
 {
@@ -131,10 +130,6 @@ void GameObject::applySetupMap(StringMapMap& setupMap)
 			setName(global[S_NAME]);
 		if(global.count(S_COLOR))
 			setColor(Helper::toColor(global[S_COLOR]));
-		if(global.count(S_TEXTURE_PATH))
-			setTexturePath(global[S_TEXTURE_PATH]);
-		if(global.count(S_SCALE))
-			setScale(Helper::toVector2f(global[S_SCALE]));
 		if(global.count(S_ZINDEX))
 			setZindex(Helper::toInt(global[S_ZINDEX]));
 	}
@@ -168,17 +163,6 @@ void GameObject::applySetupMap(StringMapMap& setupMap)
 
 		m_body->ApplyConfig(config);
 	}
-
-	if(setupMap.count(S_ANI_UP_PARAGRAPH))
-		setAnimationFrames(m_ani_up, setupMap[S_ANI_UP_PARAGRAPH]);
-	if(setupMap.count(S_ANI_LEFT_PARAGRAPH))
-		setAnimationFrames(m_ani_left, setupMap[S_ANI_LEFT_PARAGRAPH]);
-	if(setupMap.count(S_ANI_RIGHT_PARAGRAPH))
-		setAnimationFrames(m_ani_right, setupMap[S_ANI_RIGHT_PARAGRAPH]);
-	if(setupMap.count(S_ANI_DOWN_PARAGRAPH))
-		setAnimationFrames(m_ani_down, setupMap[S_ANI_DOWN_PARAGRAPH]);
-	if(setupMap.count(S_ANI_STEADY_PARAGRAPH))
-		setAnimationFrames(m_ani_steady, setupMap[S_ANI_STEADY_PARAGRAPH]);
 
 	for(auto& e : m_extensions) e.second->applyConfig(setupMap);
 }
@@ -249,84 +233,6 @@ void GameObject::onTileCollision(ph::Manifold* manifold, Tile* t)
 	for(auto& e : m_extensions) e.second->onTileCollision(manifold, t);
 }
 
-void GameObject::setAnimationFrames(Animation& animation, StringMap& m)
-{
-	if(m_texturePath.empty())
-		throw std::invalid_argument("GameObject Texture is missing.");
-	if(m.count(S_ANI_FRAME_TIME))
-		animation.setFrameTime(sf::seconds(Helper::toFloat(m[S_ANI_FRAME_TIME])));
-	animation.setSpriteSheet(*GameReader::loadTexture(m_texturePath));
-	for(int i = 1; m.count(std::to_string(i)); i++){
-		animation.addFrame(Helper::toIntRect(m[std::to_string(i)]));
-	}
-}
-
-void GameObject::setMovementAnimationAutomatic()
-{
-	if(!m_movementAnimationAutomatic)
-		return;
-	if(isMoving() && getVel().x < 0)
-		setMovementAnimation(MovementAnimation::Left);
-	else if(isMoving() && getVel().x > 0)
-		setMovementAnimation(MovementAnimation::Right);
-	else if(isFalling())
-		setMovementAnimation(MovementAnimation::Down);
-	else if(isRising())
-		setMovementAnimation(MovementAnimation::Up);
-	else
-		setMovementAnimation(MovementAnimation::Steady);
-}
-
-void GameObject::setMovementAnimation(MovementAnimation ani) {
-	switch (ani) {
-		case MovementAnimation::Up:
-			setAnimation(m_ani_up);
-			break;
-		case MovementAnimation::Left:
-			setAnimation(m_ani_left);
-			break;
-		case MovementAnimation::Right:
-			setAnimation(m_ani_right);
-			break;
-		case MovementAnimation::Down:
-			setAnimation(m_ani_down);
-			break;
-		case MovementAnimation::Steady:
-			setAnimation(m_ani_steady);
-			break;
-		default:
-			setAnimation(m_ani_steady);
-			break;
-	}
-}
-
-void GameObject::playAnimationOnce(Animation& animation, std::function<void()> endCb)
-{
-	setMovementAnimationAutomatic(false, false);
-	if(endCb == NULL)
-		endCb = [&](){
-			setMovementAnimationAutomatic(true, true);
-		};
-	m_sprite.setEndCallback(endCb);
-	setAnimation(animation);
-}
-
-void GameObject::setAnimation(Animation& animation)
-{
-	// use ani_steady if animation is not defined
-	// else make invisible
-	if(animation.getSpriteSheet() == NULL) {
-		if(m_ani_steady.getSpriteSheet() == NULL) {
-			setVisible(false);
-			return;
-		}
-		animation = m_ani_steady;
-	}
-	// sets animation automaticly if pointer changed
-	m_sprite.play(animation);
-	setOrigin(m_sprite.getLocalBounds().width/2,m_sprite.getLocalBounds().height/2);
-}
-
 void GameObject::updateFlags() {
 	const float tolerance = 0.35;
 	m_isFalling = getVel().y > tolerance;
@@ -335,14 +241,10 @@ void GameObject::updateFlags() {
 }
 
 void GameObject::apply() {
-	setPosition(Map::toMapPixelX(getPos().x), Map::toMapPixelY(getPos().y));
-	setRotation(m_body->GetOrientAngle());
 	updateFlags();
-	setMovementAnimationAutomatic();
 }
 
 void GameObject::update(sf::Time ellapsed) {
-	m_sprite.update(ellapsed);
 	for(auto& e : m_extensions) e.second->update(ellapsed);
 }
 
@@ -350,22 +252,9 @@ void GameObject::event(Event ev) {
 	for(auto& e : m_extensions) e.second->event(ev);
 }
 
-void GameObject::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	if(m_visible) {
-		states.transform *= getTransform();
-		target.draw(m_sprite, states);
-	}
-
-	for(auto& e : m_extensions) e.second->draw(target, states);
-}
-
 void GameObject::toggleLogging()
 {
 	m_log = !m_log;
-	if(m_log) {
-		Log::ger().detailsPutValue(m_sprite.getTexture(), "gameObject_texture", m_identifier);
-		Log::ger().detailsPutValue(&m_sprite, "animation", m_identifier);
-	}
 }
 
 void GameObject::updateLog() const
@@ -414,29 +303,6 @@ sf::Color GameObject::getColor() const
 void GameObject::setColor(sf::Color s)
 {
 	m_color = s;
-	m_sprite.setColor(s);
-}
-
-std::string GameObject::getTexturePath() const
-{
-	return m_texturePath;
-}
-
-void GameObject::setTexturePath(std::string s)
-{
-	m_texturePath = s;
-}
-
-AnimatedSprite* GameObject::getAnimatedSprite() {
-	return &m_sprite;
-}
-
-sf::Vector2f GameObject::getSpriteScaleTo(sf::Vector2f v)
-{
-	return sf::Vector2f(
-		v.x / getAnimatedSprite()->getLocalBounds().width,
-		v.y / getAnimatedSprite()->getLocalBounds().height
-	);
 }
 
 ph::Body* GameObject::getBody() const
@@ -462,17 +328,6 @@ int GameObject::getZindex() const
 void GameObject::setZindex(int s)
 {
 	m_zindex = s;
-}
-
-bool GameObject::isMovementAnimationAutomatic()
-{
-	return m_movementAnimationAutomatic;
-}
-
-void GameObject::setMovementAnimationAutomatic(bool s, bool looped)
-{
-	m_movementAnimationAutomatic = s;
-	m_sprite.setLooped(looped);
 }
 
 bool GameObject::isMoving() const {
@@ -521,10 +376,6 @@ void GameObject::setVelX(float pos)
 void GameObject::setVelY(float pos)
 {
 	m_body->velocity.y = pos;
-}
-
-sf::Vector2f GameObject::getSpritePos() {
-	return m_sprite.getPosition();
 }
 
 const Extension& GameObject::getExtension(const std::string& name) const

@@ -14,7 +14,6 @@ public:
 	virtual ~Extension(){};
 	virtual void applyConfig(StringMapMap& setupMap){};
 	virtual void getConfig(StringMapMap& extensionMap){};
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const{};
 	virtual void event(GameObject::Event e){};
 	virtual void update(sf::Time ellapsed){};
 	virtual void onObjectCollision(ph::Manifold* manifold, GameObject* go){};

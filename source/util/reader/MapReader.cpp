@@ -19,7 +19,6 @@ void MapReader::setMap(Map* mapObj)
 
 void MapReader::endReading() {
 	Reader::endReading();
-	m_map->createMapImage();
 }
 
 void MapReader::setParagraph(std::string p) {
