@@ -16,7 +16,7 @@
 #include "util/Helper.h"
 
 #define MAX_ATTEMPTS 5
-#define TIMEOUT 10 // in seconds
+#define TIMEOUT 10000 // in milliseconds
 
 class Controller;
 

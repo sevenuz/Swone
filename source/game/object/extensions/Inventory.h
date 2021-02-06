@@ -36,8 +36,6 @@ public:
 	void onObjectCollision(ph::Manifold* manifold, GameObject* go) override;
 
 	void addObject(GameObject* g);
-
-	static int Inventory_count;
 private:
 	std::array<bool, INVENTORY_SIZE> m_selection = {};
 	std::array<sf::RectangleShape*, INVENTORY_SIZE> m_rectangles;

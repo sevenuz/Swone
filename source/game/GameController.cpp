@@ -2,7 +2,10 @@
 
 GameController::GameController() {}
 
-GameController::~GameController() {}
+GameController::~GameController()
+{
+	clearAll();
+}
 
 void GameController::loadScenery(std::string resDir, Net::GameFileCheck gfc) {
 	clearAll();

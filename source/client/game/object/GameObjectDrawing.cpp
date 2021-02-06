@@ -12,18 +12,27 @@ GameObjectDrawing::GameObjectDrawing(const GameObject& obj, StringMapMap& setupM
 }
 
 GameObjectDrawing::~GameObjectDrawing()
-{}
+{
+	for(auto& e : m_extensions) delete e.second;
+	m_extensions.clear();
+}
 
 void GameObjectDrawing::initSetupMap(StringMapMap& setupMap)
 {
 	if(setupMap.count(GameObject::S_EXTENSIONS_PARAGRAPH)){
-		if(Helper::toBool(setupMap[GameObject::S_EXTENSIONS_PARAGRAPH][GameObject::S_INVENTORY_EXTENSION]))
+		if(Helper::toBool(setupMap[GameObject::S_EXTENSIONS_PARAGRAPH][GameObject::S_INVENTORY_EXTENSION])) {
 			initExtension(GameObject::S_INVENTORY_EXTENSION, setupMap);
+		}
 	}
 }
 
 void GameObjectDrawing::applySetupMap(StringMapMap& setupMap)
 {
+	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)){
+		auto& global = setupMap[Reader::DEFAULT_PARAGRAPH];
+		if(global.count(GameObject::S_SCALE))
+			setScale(Helper::toVector2f(global[GameObject::S_SCALE]));
+	}
 	if(setupMap.count(GameObject::S_ANI_UP_PARAGRAPH))
 		setAnimationFrames(m_ani_up, setupMap[GameObject::S_ANI_UP_PARAGRAPH]);
 	if(setupMap.count(GameObject::S_ANI_LEFT_PARAGRAPH))
@@ -123,9 +132,9 @@ void GameObjectDrawing::setAnimation(Animation& animation)
 			m_drawable = false;
 			return;
 		}
-		m_drawable = true;
 		animation = m_ani_steady;
 	}
+	m_drawable = true;
 	// sets animation automaticly if pointer changed
 	m_sprite.play(animation);
 	setOrigin(m_sprite.getLocalBounds().width/2,m_sprite.getLocalBounds().height/2);
@@ -142,10 +151,16 @@ void GameObjectDrawing::setMovementAnimationAutomatic(bool s, bool looped)
 	m_sprite.setLooped(looped);
 }
 
+const GameObject& GameObjectDrawing::getGameObject() const
+{
+	return m_obj;
+}
+
 void GameObjectDrawing::update(sf::Time ellapsed)
 {
 	setPosition(Map::toMapPixelX(m_obj.getPos().x), Map::toMapPixelY(m_obj.getPos().y));
 	setRotation(m_obj.getBody()->GetOrientAngle());
+	m_sprite.setColor(m_obj.getColor());
 	setMovementAnimationAutomatic();
 	m_sprite.update(ellapsed);
 	for(auto& e : m_extensions) e.second->update(ellapsed);

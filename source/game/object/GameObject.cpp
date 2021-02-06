@@ -43,7 +43,9 @@ GameObject::GameObject(StringMapMap& setupMap) :
 {}
 
 GameObject::~GameObject() {
-	Log::ger().log("destroy " + getIdentifier());
+	Log::ger().log("destroy " + getIdentifier(), Log::Label::Default, GO_LOG);
+	for(auto& e : m_extensions) delete e.second;
+	m_extensions.clear();
 }
 
 ph::Shape* GameObject::createPolyShape(std::vector<ph::Vec2>& vertices, float density)
@@ -404,7 +406,7 @@ void GameObject::setName(std::string s)
 	m_name = s;
 }
 
-sf::Color GameObject::getColor()
+sf::Color GameObject::getColor() const
 {
 	return m_color;
 }
@@ -452,7 +454,7 @@ void GameObject::setVisible(bool s)
 	m_visible = s;
 }
 
-int GameObject::getZindex()
+int GameObject::getZindex() const
 {
 	return m_zindex;
 }

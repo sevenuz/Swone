@@ -30,6 +30,8 @@ public:
 	bool isMovementAnimationAutomatic();
 	void setMovementAnimationAutomatic(bool s, bool looped = true);
 
+	const GameObject& getGameObject() const;
+
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 	void update(sf::Time elapsed);
 private:

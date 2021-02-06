@@ -25,21 +25,21 @@ public:
 
 	void updateLog() const;
 
-	void update(sf::Time ellapsed);
+	virtual void update(sf::Time ellapsed);
 	void event(GameObject::Event e);
 
 	virtual void clearAll();
 	virtual void removeFromGame(GameObject* go);
 
-	void loadScenery(std::string resDir, Net::GameFileCheck gfc);
+	virtual void loadScenery(std::string resDir, Net::GameFileCheck gfc);
 
 	const ph::Scene& getScene() const;
 	ph::Scene& getScene();
 
-	GameObject* spawnGameObject(std::string identifier, std::string key);
-	GameObject* spawnGameObject(std::string key, bool isStatic = false);
-	GameObject* spawnPlayer(std::string identifier, std::string key);
-	GameObject* spawnPlayer(std::string key);
+	virtual GameObject* spawnGameObject(std::string identifier, std::string key);
+	virtual GameObject* spawnGameObject(std::string key, bool isStatic = false);
+	virtual GameObject* spawnPlayer(std::string identifier, std::string key);
+	virtual GameObject* spawnPlayer(std::string key);
 	GameObject* getGameObejctPointer(std::string identifier);
 	std::string getGameObejctKey(std::string identifier);
 	void reset();

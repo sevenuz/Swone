@@ -19,7 +19,7 @@
 #include "physics/Manifold.h"
 #include "physics/Scene.h"
 
-#define GO_LOG true
+#define GO_LOG false
 
 #define SPEED_FACTOR 0.5
 
@@ -141,7 +141,7 @@ public:
 	std::string getName();
 	void setName(std::string s);
 
-	sf::Color getColor();
+	sf::Color getColor() const;
 	void setColor(sf::Color s);
 
 	std::string getTexturePath() const;
@@ -160,7 +160,7 @@ public:
 	bool isVisible();
 	void setVisible(bool s);
 
-	int getZindex();
+	int getZindex() const;
 	void setZindex(int s);
 
 	bool isMovementAnimationAutomatic();

@@ -2,7 +2,9 @@
 
 MapDrawing::MapDrawing(const Map& map) :
 	m_map(map)
-{}
+{
+	createMapImage();
+}
 
 MapDrawing::~MapDrawing()
 {}

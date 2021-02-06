@@ -24,7 +24,10 @@
 
 class InventoryDrawing : public ExtensionDrawing {
 public:
+	static int Inventory_count;
+
 	InventoryDrawing(const Inventory& inv, StringMapMap& setupMap);
+	virtual ~InventoryDrawing();
 
 	void applyConfig(StringMapMap& setupMap) override;
 

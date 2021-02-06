@@ -6,11 +6,13 @@
  */
 #include "client/game/object/extensions/InventoryDrawing.h"
 
+int InventoryDrawing::Inventory_count = 0;
+
 InventoryDrawing::InventoryDrawing(const Inventory& inv, StringMapMap& setupMap) : m_inventory(inv)
 {
 	sf::Vector2f sizeVct = sf::Vector2f(INVENTORY_WIDTH, INVENTORY_HEIGHT);
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
-		sf::Vector2f posVct = sf::Vector2f(1 + i * INVENTORY_WIDTH, Inventory::Inventory_count * INVENTORY_SIZE * INVENTORY_HEIGHT);
+		sf::Vector2f posVct = sf::Vector2f(1 + i * INVENTORY_WIDTH, InventoryDrawing::Inventory_count * INVENTORY_SIZE * INVENTORY_HEIGHT);
 
 		sf::RectangleShape* r = new sf::RectangleShape(sizeVct); // TODO why allocate new?
 		r->setPosition(posVct);
@@ -27,6 +29,13 @@ InventoryDrawing::InventoryDrawing(const Inventory& inv, StringMapMap& setupMap)
 	}
 
 	applyConfig(setupMap);
+
+	Inventory_count++;
+}
+
+InventoryDrawing::~InventoryDrawing()
+{
+	InventoryDrawing::Inventory_count--;
 }
 
 void InventoryDrawing::applyConfig(StringMapMap& setupMap)

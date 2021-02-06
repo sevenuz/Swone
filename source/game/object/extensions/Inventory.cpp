@@ -6,15 +6,11 @@
  */
 #include "Inventory.h"
 
-int Inventory::Inventory_count = 0;
-
 Inventory::Inventory(GameObject* obj, StringMapMap& setupMap) : Extension(obj)
 {
-	Inventory_count++;
-
 	sf::Vector2f sizeVct = sf::Vector2f(INVENTORY_WIDTH, INVENTORY_HEIGHT);
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
-		sf::Vector2f posVct = sf::Vector2f(1 + i * INVENTORY_WIDTH, Inventory_count * INVENTORY_SIZE * INVENTORY_HEIGHT);
+		sf::Vector2f posVct = sf::Vector2f(1 + i * INVENTORY_WIDTH, INVENTORY_SIZE * INVENTORY_HEIGHT);
 
 		sf::RectangleShape* r = new sf::RectangleShape(sizeVct);
 		r->setPosition(posVct);
