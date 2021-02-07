@@ -1,4 +1,3 @@
-#include "game/object/GameObject.h"
 #include <client/game/ClientGameController.h>
 
 ClientGameController::ClientGameController()
@@ -54,6 +53,46 @@ void ClientGameController::sortGameObjectDrawings()
 	m_goDrawings.sort([](GameObjectDrawing* a, GameObjectDrawing* b) -> bool {
 		return a->getGameObject().getZindex() < b->getGameObject().getZindex();
 	});
+}
+
+void ClientGameController::interpolateGameObjectState(GameObject* go, Net::GameObjectState gos)
+{
+	auto c = go->getConfig();
+	ph::Vec2 posOld(c.body.x, c.body.y);
+	ph::Vec2 posNew(gos.x, gos.y);
+	ph::Vec2 difference = posNew - posOld;
+	if(difference.LenSqr() > LOWER_POSITION_THRESHOLD && difference.LenSqr() < UPPER_POSITION_THRESHOLD) {
+		posNew += difference * POSITION_CORRECTION;
+		gos.x = posNew.x;
+		gos.y = posNew.y;
+	}
+	ph::real oDifference = gos.orient - c.body.orient;
+	if(oDifference > LOWER_ORIENT_THRESHOLD && oDifference < UPPER_ORIENT_THRESHOLD) {
+		gos.orient += oDifference * ORIENT_CORRECTION;
+	}
+	applyGameObjectState(go, gos);
+}
+
+void ClientGameController::interpolateGameState(Net::GameState gs)
+{
+	for(Net::GameObjectState gos : gs.objects) {
+		GameObject* go;
+		try {
+			go = getGameObejctPointer(gos.identifier);
+		} catch(std::out_of_range& e) {
+			go = spawnGameObject(gos.identifier, gos.key);
+		}
+		interpolateGameObjectState(go, gos);
+	}
+	for(Net::GameObjectState gos : gs.players) {
+		GameObject* go;
+		try {
+			go = getGameObejctPointer(gos.identifier);
+		} catch(std::out_of_range& e) {
+			go = spawnPlayer(gos.identifier, gos.key);
+		}
+		interpolateGameObjectState(go, gos);
+	}
 }
 
 GameObject* ClientGameController::spawnGameObject(std::string identifier, std::string key)

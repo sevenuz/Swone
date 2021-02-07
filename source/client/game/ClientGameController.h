@@ -7,6 +7,14 @@
 #include "client/game/object/GameObjectDrawing.h"
 #include "client/game/MapDrawing.h"
 #include "game/GameController.h"
+#include "game/Net.h"
+
+#define LOWER_POSITION_THRESHOLD 0.1 // compared with square difference in map coords
+#define UPPER_POSITION_THRESHOLD 1 // compared with square difference in map coords
+#define POSITION_CORRECTION 0.25
+#define LOWER_ORIENT_THRESHOLD 0.1 // delta in radians
+#define UPPER_ORIENT_THRESHOLD 1 // delta in radians
+#define ORIENT_CORRECTION 0.25
 
 class ClientGameController : public GameController {
 public:
@@ -19,6 +27,9 @@ public:
 	void loadScenery(std::string resDir, Net::GameFileCheck gfc) override;
 	void update(sf::Time ellapsed) override;
 	void sortGameObjectDrawings();
+
+	void interpolateGameObjectState(GameObject* go, Net::GameObjectState gos);
+	void interpolateGameState(Net::GameState gs);
 
 	GameObject* spawnGameObject(std::string identifier, std::string key) override;
 	GameObject* spawnPlayer(std::string identifier, std::string key) override;

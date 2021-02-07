@@ -125,10 +125,42 @@ void NetController::receiveGameState(Net::GamePacket packet)
 {
 	Net::GameState gs;
 	packet >> gs;
-	m_gameStates[packet.getTimestamp()] = gs;
+	auto it = m_gameStates.insert(std::make_pair(packet.getTimestamp(), gs)).first;
+	it = std::prev(m_gameStates.end());
+	Net::Timestamp latency = Helper::now() - packet.getTimestamp();
+	if(latency >= LATENCY_THRESHOLD) {
+		Log::ger().log("GameState exceeds Latency-Threshold", Log::Label::Warning);
+	}
 
 	m_c.gameMutex.lock();
-	m_gc.applyGameState(gs);
+
+	// checks if the iterator is usable
+	if(it != m_gameStates.begin()) {
+		// interpolates from the previous received gamestate
+		m_gc.interpolateGameState(std::prev(it)->second);
+	}
+
+	// apply newest gamestate to local players
+	for(GameObject* go : m_gc.getLocalPlayers()) {
+		for(Net::GameObjectState gos : it->second.players) {
+			if(go->getIdentifier() == gos.identifier) {
+				m_gc.interpolateGameObjectState(go, gos);
+				break;
+			}
+		}
+		Net::Timestamp ts = it->first;
+		// apply all inputs since newest gamestate
+		for(auto it2 = m_playerInputs.lower_bound(it->first); it2 != m_playerInputs.end(); ++it2) {
+			if(it2->second.identifier == go->getIdentifier()) {
+				// newer timestamps are greater then older, so substract older from newer
+				m_gc.update(sf::milliseconds(it2->first - ts));
+				go->event(it2->second.inputs);
+				ts = it2->first;
+			}
+		}
+		//m_gc.update(sf::milliseconds(Helper::now() - ts));
+	}
+
 	m_c.gameMutex.unlock();
 }
 
