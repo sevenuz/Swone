@@ -42,8 +42,6 @@ public:
 	virtual GameObject* spawnPlayer(std::string key);
 	GameObject* getGameObejctPointer(std::string identifier);
 	std::string getGameObejctKey(std::string identifier);
-	void reset();
-	void sortAll();
 
 	void spawnStaticGameObjects();
 	void spawnBeginningGameObjects();

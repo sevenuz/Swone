@@ -15,6 +15,8 @@
 #include "game/GameReader.h"
 #include "game/object/GameObject.h"
 
+#define LATENCY_THRESHOLD 250 // milliseconds
+
 namespace Net
 {
 	typedef sf::Uint16 Port;

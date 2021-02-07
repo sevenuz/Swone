@@ -22,14 +22,6 @@ void GameController::loadScenery(std::string resDir, Net::GameFileCheck gfc) {
 	spawnStaticGameObjects();
 }
 
-void GameController::sortAll()
-{
-	// sort list with z-index
-	m_all.sort([](GameObject* a, GameObject* b) -> bool {
-		return a->getZindex() < b->getZindex();
-	});
-}
-
 void GameController::removeFromGame(GameObject* go)
 {
 	m_players.remove(go);
@@ -217,19 +209,17 @@ void GameController::event(GameObject::Event event)
 
 void GameController::update(sf::Time ellapsed) {
 	m_clock += ellapsed;
-	if(m_clock>=m_sceneDt) {
-		// TODO fps from settings
+	while(m_clock >= m_sceneDt) {
 		// use steady time for determenistic and to increase steadyness
 		m_scene.Step(m_sceneDt.asSeconds(), ph::Vec2(0, getMap()->getGravity()));
+
+		for (GameObject* g : getAll()) {
+			g->apply();
+			g->update(m_sceneDt);
+		}
+
 		m_clock -= m_sceneDt;
 	}
-
-	for (GameObject* g : getAll()) {
-		g->apply();
-		g->update(ellapsed);
-	}
-
-	sortAll();
 }
 
 GameObject* GameController::getGameObejctPointer(std::string identifier)

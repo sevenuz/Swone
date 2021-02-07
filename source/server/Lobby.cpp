@@ -153,7 +153,30 @@ void Lobby::receivePlayerInput(Net::GamePacket packet)
 	Net::PlayerInput pi;
 	packet >> pi;
 	m_playerInputs[packet.getTimestamp()] = pi;
-	m_gc.getGameObejctPointer(pi.identifier)->event(pi.inputs);
+
+	Net::Timestamp latency = Helper::now() - packet.getTimestamp();
+	if(latency >= LATENCY_THRESHOLD) {
+		Log::ger().log(pi.identifier + " exceeds Latency-Threshold", Log::Label::Warning);
+	}
+	// gamestate before input timespamp with accounting latency, if exists which is normally the case
+	auto itState = m_gameStates.upper_bound(packet.getTimestamp() - latency); // TODO latency * 2, round trip?
+	// checks if the iterator is usable
+	if(itState != m_gameStates.begin()) {
+		itState = std::prev(itState);
+		m_gc.applyGameState(itState->second);
+	}
+	// update time from state before to input
+	Net::Timestamp ts = itState->first;
+	// apply all inputs since gamestate, normally is only the received one?
+	for(auto it = m_playerInputs.lower_bound(ts); it != m_playerInputs.end(); ++it) {
+		// newer timestamps are greater then older, so substract older from newer
+		m_gc.update(sf::milliseconds(it->first - ts));
+		m_gc.getGameObejctPointer(it->second.identifier)->event(it->second.inputs);
+		ts = it->first;
+	}
+	// update to now again
+	m_gc.update(sf::milliseconds(Helper::now() - ts));
+
 	m_mtx.unlock();
 }
 
@@ -175,8 +198,9 @@ void Lobby::sendState()
 	Net::GameState gs = m_gc.getGameState();
 	Net::GamePacket packet(Net::U_GAME_STATE, m_code);
 	packet << gs;
+	m_gameStates[packet.getTimestamp()] = gs;
 	if((double)packet.getDataSize() / sf::UdpSocket::MaxDatagramSize >= UDP_DATA_THRESHOLD)
-		Log::ger().log("Packet exceeds Data-Threshold", Log::Label::Warning);
+		Log::ger().log("GameStatePacket exceeds Data-Threshold", Log::Label::Warning);
 	for(Player* p : m_players) {
 		send(packet, p->getConnection());
 	}
