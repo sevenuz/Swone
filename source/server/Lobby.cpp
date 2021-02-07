@@ -170,40 +170,9 @@ void Lobby::stop()
 	m_run = false;
 }
 
-Net::GameObjectState Lobby::getGameObjectState(GameObject* go)
-{
-		auto c = go->getConfig();
-		return Net::GameObjectState{
-			go->getIdentifier(),
-			m_gc.getGameObejctKey(go->getIdentifier()),
-			c.name,
-			c.visible,
-			c.color,
-			c.zindex,
-			c.extensionMap,
-			c.body.collidableSolid,
-			c.body.collidableUnsolid,
-			c.body.rotatable,
-			c.body.solid,
-			c.body.skip,
-			c.body.x,
-			c.body.y,
-			c.body.orient,
-			c.body.vx,
-			c.body.vy,
-			c.body.av
-		};
-}
-
 void Lobby::sendState()
 {
-	Net::GameState gs;
-	for(GameObject* go : m_gc.getGameObjects()) {
-		gs.objects.push_back(getGameObjectState(go));
-	}
-	for(GameObject* go : m_gc.getPlayers()) {
-		gs.players.push_back(getGameObjectState(go));
-	}
+	Net::GameState gs = m_gc.getGameState();
 	Net::GamePacket packet(Net::U_GAME_STATE, m_code);
 	packet << gs;
 	if((double)packet.getDataSize() / sf::UdpSocket::MaxDatagramSize >= UDP_DATA_THRESHOLD)

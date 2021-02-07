@@ -40,8 +40,6 @@ private:
 	void receiveGameState(Net::GamePacket packet);
 	void receiveGameChat(Net::GamePacket packet);
 
-	void applyGameObjectState(GameObject* go, Net::GameObjectState gos);
-
 	Controller& m_c;
 	ClientGameController& m_gc;
 

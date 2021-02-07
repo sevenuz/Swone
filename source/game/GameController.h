@@ -47,6 +47,11 @@ public:
 
 	void spawnStaticGameObjects();
 	void spawnBeginningGameObjects();
+
+	Net::GameObjectState getGameObjectState(GameObject* go);
+	void applyGameObjectState(GameObject* go, Net::GameObjectState gos);
+	Net::GameState getGameState();
+	void applyGameState(Net::GameState gs);
 protected:
 private:
 	Scenery m_scenery;

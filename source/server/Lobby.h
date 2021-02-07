@@ -58,7 +58,6 @@ private:
 	void receivePlayerInput(Net::GamePacket packet);
 
 	Player& registerClient(Player::Connection connection);
-	Net::GameObjectState getGameObjectState(GameObject* go);
 	void sendState();
 	void sendChat();
 

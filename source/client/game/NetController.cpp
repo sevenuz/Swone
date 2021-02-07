@@ -121,52 +121,14 @@ void NetController::receivePlayerConfigAck(Net::GamePacket packet)
 	m_c.gameMutex.unlock();
 }
 
-void NetController::applyGameObjectState(GameObject* go, Net::GameObjectState gos)
-{
-	auto c = go->getConfig();
-	c.name = gos.name;
-	c.visible = gos.visible;
-	c.color = gos.color;
-	c.zindex = gos.zindex;
-	c.extensionMap = gos.extensionMap;
-	c.body.collidableSolid = gos.collidableSolid;
-	c.body.collidableUnsolid = gos.collidableUnsolid;
-	c.body.rotatable = gos.rotatable;
-	c.body.solid = gos.solid;
-	c.body.skip = gos.skip;
-	c.body.x = gos.x;
-	c.body.y = gos.y;
-	c.body.orient = gos.orient;
-	c.body.vx = gos.vx;
-	c.body.vy = gos.vy;
-	c.body.av = gos.av;
-	go->applyConfig(c);
-}
-
 void NetController::receiveGameState(Net::GamePacket packet)
 {
 	Net::GameState gs;
 	packet >> gs;
 	m_gameStates[packet.getTimestamp()] = gs;
+
 	m_c.gameMutex.lock();
-	for(Net::GameObjectState gos : gs.objects) {
-		GameObject* go;
-		try {
-			go = m_gc.getGameObejctPointer(gos.identifier);
-		} catch(std::out_of_range& e) {
-			go = m_gc.spawnGameObject(gos.identifier, gos.key);
-		}
-		applyGameObjectState(go, gos);
-	}
-	for(Net::GameObjectState gos : gs.players) {
-		GameObject* go;
-		try {
-			go = m_gc.getGameObejctPointer(gos.identifier);
-		} catch(std::out_of_range& e) {
-			go = m_gc.spawnPlayer(gos.identifier, gos.key);
-		}
-		applyGameObjectState(go, gos);
-	}
+	m_gc.applyGameState(gs);
 	m_c.gameMutex.unlock();
 }
 

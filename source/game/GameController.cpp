@@ -127,6 +127,87 @@ void GameController::spawnBeginningGameObjects()
 	}
 }
 
+Net::GameObjectState GameController::getGameObjectState(GameObject* go)
+{
+		auto c = go->getConfig();
+		return Net::GameObjectState{
+			go->getIdentifier(),
+			getGameObejctKey(go->getIdentifier()),
+			c.name,
+			c.visible,
+			c.color,
+			c.zindex,
+			c.extensionMap,
+			c.body.collidableSolid,
+			c.body.collidableUnsolid,
+			c.body.rotatable,
+			c.body.solid,
+			c.body.skip,
+			c.body.x,
+			c.body.y,
+			c.body.orient,
+			c.body.vx,
+			c.body.vy,
+			c.body.av
+		};
+}
+
+void GameController::applyGameObjectState(GameObject* go, Net::GameObjectState gos)
+{
+	auto c = go->getConfig();
+	c.name = gos.name;
+	c.visible = gos.visible;
+	c.color = gos.color;
+	c.zindex = gos.zindex;
+	c.extensionMap = gos.extensionMap;
+	c.body.collidableSolid = gos.collidableSolid;
+	c.body.collidableUnsolid = gos.collidableUnsolid;
+	c.body.rotatable = gos.rotatable;
+	c.body.solid = gos.solid;
+	c.body.skip = gos.skip;
+	c.body.x = gos.x;
+	c.body.y = gos.y;
+	c.body.orient = gos.orient;
+	c.body.vx = gos.vx;
+	c.body.vy = gos.vy;
+	c.body.av = gos.av;
+	go->applyConfig(c);
+}
+
+Net::GameState GameController::getGameState()
+{
+	Net::GameState gs;
+	for(GameObject* go : getGameObjects()) {
+		gs.objects.push_back(getGameObjectState(go));
+	}
+	for(GameObject* go : getPlayers()) {
+		gs.players.push_back(getGameObjectState(go));
+	}
+	return gs;
+}
+
+void GameController::applyGameState(Net::GameState gs)
+{
+	for(Net::GameObjectState gos : gs.objects) {
+		GameObject* go;
+		try {
+			go = getGameObejctPointer(gos.identifier);
+		} catch(std::out_of_range& e) {
+			go = spawnGameObject(gos.identifier, gos.key);
+		}
+		applyGameObjectState(go, gos);
+	}
+	for(Net::GameObjectState gos : gs.players) {
+		GameObject* go;
+		try {
+			go = getGameObejctPointer(gos.identifier);
+		} catch(std::out_of_range& e) {
+			go = spawnPlayer(gos.identifier, gos.key);
+		}
+		applyGameObjectState(go, gos);
+	}
+}
+
 void GameController::event(GameObject::Event event)
 {
 	for (GameObject* g : getAll()) {
