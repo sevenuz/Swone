@@ -33,7 +33,7 @@ public:
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
 private:
-	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 	Controller& m_c;
 	ClientGameController& m_gc;
@@ -45,6 +45,7 @@ private:
 	GameState m_gstate = GameState::Play;
 	bool m_showCharacterSelection = true;
 	bool m_showInfoPanel = false;
+	bool m_showHitboxes = false;
 
 	CharacterSelection m_characterSelection;
 	InfoPanel  m_infoPanel;

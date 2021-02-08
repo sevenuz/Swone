@@ -102,6 +102,17 @@ void GameWindow::event(sf::Event& event) {
 		if (event.key.code == sf::Keyboard::Escape) {
 			m_gstate = GameState::Pause;
 		}
+		if (event.key.code == sf::Keyboard::Tab) { // TODO config keys
+			m_showInfoPanel = true;
+			m_showCharacterSelection = !m_showCharacterSelection;
+		}
+		if (event.key.code == sf::Keyboard::H && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+			m_showHitboxes = !m_showHitboxes;
+		}
+	} else if (event.type == sf::Event::KeyReleased) {
+		if (event.key.code == sf::Keyboard::Tab) {
+			m_showInfoPanel = false;
+		}
 	}
 	sf::RenderWindow& w = m_c.getWindow();
 	sf::Vector2i pixelPos = sf::Mouse::getPosition(w);
@@ -196,34 +207,35 @@ void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		target.draw(m_gc.getMapDrawing(), states);
 	m_c.gameMutex.unlock();
 
-	// TODO toggle hitboxes
-	for (ph::Body* g : m_gc.getScene().bodies) {
-		if(g->skip)
-			continue;
-		if(g->shape->GetType() == ph::Shape::Type::ePoly) {
-			ph::PolygonShape* shape = reinterpret_cast<PHY_NS::PolygonShape*>(g->shape);
-			size_t points = shape->m_vertexCount + 1;
-			sf::VertexArray hb(sf::LineStrip, points);
-			for(size_t i = 0; i<points; ++i) {
-				ph::Vec2 v = shape->GetVertexPosition(i%(shape->m_vertexCount));
-				float x = Map::toMapPixelX(v.x);
-				float y = Map::toMapPixelY(v.y);
-				hb[i].position = sf::Vector2f(x,y);
-				hb[i].color = sf::Color::Red;
+	if(m_showHitboxes) {
+		for (ph::Body* g : m_gc.getScene().bodies) {
+			if(g->skip)
+				continue;
+			if(g->shape->GetType() == ph::Shape::Type::ePoly) {
+				ph::PolygonShape* shape = reinterpret_cast<PHY_NS::PolygonShape*>(g->shape);
+				size_t points = shape->m_vertexCount + 1;
+				sf::VertexArray hb(sf::LineStrip, points);
+				for(size_t i = 0; i<points; ++i) {
+					ph::Vec2 v = shape->GetVertexPosition(i%(shape->m_vertexCount));
+					float x = Map::toMapPixelX(v.x);
+					float y = Map::toMapPixelY(v.y);
+					hb[i].position = sf::Vector2f(x,y);
+					hb[i].color = sf::Color::Red;
+				}
+				target.draw(hb, states);
 			}
-			target.draw(hb, states);
-		}
-		else if(g->shape->GetType() == ph::Shape::Type::eCircle) {
-			sf::CircleShape circle;
-			circle.setOutlineColor(sf::Color::Red);
-			circle.setFillColor(sf::Color::Transparent);
-			circle.setOutlineThickness(1);
-			float r = Map::toMapDimension(g->shape->radius);
-			float x = Map::toMapPixelX(g->position.x) - r;
-			float y = Map::toMapPixelY(g->position.y) - r;
-			circle.setRadius(r);
-			circle.setPosition(x, y);
-			target.draw(circle, states);
+			else if(g->shape->GetType() == ph::Shape::Type::eCircle) {
+				sf::CircleShape circle;
+				circle.setOutlineColor(sf::Color::Red);
+				circle.setFillColor(sf::Color::Transparent);
+				circle.setOutlineThickness(1);
+				float r = Map::toMapDimension(g->shape->radius);
+				float x = Map::toMapPixelX(g->position.x) - r;
+				float y = Map::toMapPixelY(g->position.y) - r;
+				circle.setRadius(r);
+				circle.setPosition(x, y);
+				target.draw(circle, states);
+			}
 		}
 	}
 }
