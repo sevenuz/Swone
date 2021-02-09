@@ -16,8 +16,11 @@
 #include "util/Helper.h"
 
 #define MAX_ATTEMPTS 5
-#define TIMEOUT 10000 // in milliseconds
+#define TIMEOUT 10000000 // in microseconds
 
+#define TIMESYNC_START_DT sf::seconds(1.0f/2.0f)
+#define TIMESYNC_SWITCH_THRESHOLD sf::seconds(30.0f)
+#define TIMESYNC_SWITCH_DT sf::seconds(3.0f)
 class Controller;
 
 class NetController {
@@ -40,8 +43,16 @@ private:
 	void receiveGameState(Net::GamePacket packet);
 	void receiveGameChat(Net::GamePacket packet);
 
+	void handleTimeSync();
+
 	Controller& m_c;
 	ClientGameController& m_gc;
+
+	sf::Clock m_timeSyncClock;
+	sf::Time m_timeT; // mesures time since NetController started
+	sf::Time m_timeSyncT = TIMESYNC_START_DT; // start with sync time to directly send first packet
+	sf::Time m_timeSyncDt = TIMESYNC_START_DT;
+	Net::TimeSyncPeer m_timeSyncPeer;
 
 	sf::UdpSocket m_socket;
 	bool m_run = false;

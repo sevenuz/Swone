@@ -21,11 +21,14 @@ const sf::Uint8 Net::Packet::getType()
 	return m_type;
 }
 
-Net::GamePacket::GamePacket(const sf::Uint8 type, const std::string& code) : Net::Packet::Packet(type)
+Net::GamePacket::GamePacket(const sf::Uint8 type, const std::string& code, Net::TimeSyncPeer& tsp) :
+	Net::Packet::Packet(type),
+	m_timeSyncPeer(&tsp)
 {
-	m_stamp = Helper::now();
+	m_stamp = m_timeSyncPeer->getRemoteTimestamp();
+	m_syncStamp = m_timeSyncPeer->getLocalTimeDatagram();
 	m_code = code;
-	*this << m_stamp << m_code;
+	*this << m_stamp << m_syncStamp << m_code;
 }
 Net::GamePacket::GamePacket() : Net::Packet::Packet(T_VOID)
 {}
@@ -36,16 +39,101 @@ const void* Net::GamePacket::GamePacket::onSend(std::size_t& size)
 void Net::GamePacket::onReceive(const void* data, std::size_t size)
 {
 	Net::Packet::onReceive(data, size);
-	*this >> m_stamp >> m_code;
+	*this >> m_stamp >> m_syncStamp >> m_code;
+}
+void Net::GamePacket::setTimeSyncPeer(TimeSyncPeer& tsp)
+{
+	m_timeSyncPeer = &tsp;
+	tsp.incorporateTimestamp(m_syncStamp);
+}
+const Net::TimeSyncPeer& Net::GamePacket::getTimeSyncPeer()
+{
+	return *m_timeSyncPeer;
 }
 const Net::Timestamp Net::GamePacket::getTimestamp() const
 {
-	return m_stamp;
+	assert(m_timeSyncPeer);
+	assert(m_timeSyncPeer->isSynchronized());
+	return m_timeSyncPeer->convertToLocalTimestamp(m_stamp);
 }
 const std::string Net::GamePacket::getCode() const
 {
 	return m_code;
 }
+
+void Net::TimeSyncPeer::updateSmoothedOwd(unsigned owdUsec)
+{
+	// Smooth in OWD using EWMA
+	if (m_smoothedOwdUsec == 0) {
+		m_smoothedOwdUsec = owdUsec;
+	}
+	else {
+		m_smoothedOwdUsec = (m_smoothedOwdUsec * 7 + owdUsec) / 8;
+	}
+}
+bool Net::TimeSyncPeer::isSynchronized()
+{
+	return m_timeSync.IsSynchronized();
+}
+unsigned Net::TimeSyncPeer::getSmoothedOwd()
+{
+	return m_smoothedOwdUsec;
+}
+unsigned Net::TimeSyncPeer::getMinOwd()
+{
+	return m_timeSync.GetMinimumOneWayDelayUsec();
+}
+Counter24 Net::TimeSyncPeer::getMinDelta()
+{
+	return m_timeSync.GetMinDeltaTS24();
+}
+Counter24 Net::TimeSyncPeer::getLocalTimeDatagram()
+{
+	return m_timeSync.LocalTimeToDatagramTS24(Helper::now());
+}
+Counter23 Net::TimeSyncPeer::getRemoteTimestamp()
+{
+	return m_timeSync.ToRemoteTime23(Helper::now());
+}
+Net::Timestamp Net::TimeSyncPeer::convertToLocalTimestamp(Counter23 ts23)
+{
+	return m_timeSync.FromLocalTime23(Helper::now(), ts23);
+}
+Net::Timestamp Net::TimeSyncPeer::now()
+{
+	return convertToLocalTimestamp(getRemoteTimestamp());
+}
+void Net::TimeSyncPeer::incorporateTimestamp(Counter24 timestamp)
+{
+	// Process timestamp
+	const unsigned owdUsec = m_timeSync.OnAuthenticatedDatagramTimestamp(
+		timestamp,
+		Helper::now()
+	);
+
+	updateSmoothedOwd(owdUsec);
+}
+void Net::TimeSyncPeer::incorporateMinDeltaTimestamp(Counter24 timestamp)
+{
+		// Update time synchronization
+        m_timeSync.OnPeerMinDeltaTS24(timestamp);
+}
+
+Net::GamePacket Net::sendTimeSync(std::string lc, Net::TimeSyncPeer& tsp)
+{
+	Net::GamePacket packet(Net::U_TIMESYNC, lc, tsp);
+	packet << tsp.getMinDelta();
+	return packet;
+}
+
+void Net::receiveTimeSync(Net::GamePacket packet, Net::TimeSyncPeer& tsp)
+{
+	Counter24 c;
+	packet >> c;
+	// tsp.incorporateTimestamp is already called when the packat is received
+	tsp.incorporateMinDeltaTimestamp(c);
+}
+
 
 // Type: std::vector<T>
 template<typename T>
@@ -113,6 +201,22 @@ sf::Packet& Net::operator <<(sf::Packet& packet, const sf::Color& sm)
 sf::Packet& Net::operator >>(sf::Packet& packet, sf::Color& sm)
 {
 	return packet >> sm.r >> sm.g >> sm.b >> sm.a;
+}
+
+// Type: Counter<uint32_t, T>
+template<unsigned T>
+sf::Packet& Net::operator <<(sf::Packet& packet, const Counter<uint32_t, T>& sm)
+{
+	sf::Uint32 i = sm.ToUnsigned();
+	return packet << i;
+}
+template<unsigned T>
+sf::Packet& Net::operator >>(sf::Packet& packet, Counter<uint32_t, T>& sm)
+{
+	sf::Uint32 i;
+	packet >> i;
+	sm = Counter<uint32_t, T>(i);
+	return packet;
 }
 
 void Net::handleGameFileCheck(sf::TcpSocket& socket, const GameFileCheck& gfc, const std::string& resDir)

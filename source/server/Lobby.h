@@ -30,13 +30,15 @@ public:
 
 	struct PacketPair {
 		Net::GamePacket packet;
-		Player::Connection connection;
+		Player* player;
 	};
 
 	Lobby(SrvSettings& settings, Net::CreateLobbyReq m_lobbyData);
 	virtual ~Lobby();
 
-	void pushPacketPair(Net::GamePacket packet, Player::Connection connection);
+	Player& registerClient(Player::Connection connection);
+
+	void pushPacketPair(Net::GamePacket packet, Player& player);
 	bool hasPacketPair();
 	PacketPair popPacketPair();
 
@@ -55,15 +57,14 @@ private:
 	void receiveDisconnect(Net::GamePacket packet, Player& c);
 	void receiveChatMessageReq(Net::GamePacket packet, Player& c);
 	void receivePlayerConfigReq(Net::GamePacket packet, Player& c);
-	void receivePlayerInput(Net::GamePacket packet);
+	void receivePlayerInput(Net::GamePacket packet, Player& c);
 
-	Player& registerClient(Player::Connection connection);
 	void sendState();
 	void sendChat();
 
 	std::mutex m_mtx;
 
-	void send(Net::GamePacket packet, Player::Connection connection);
+	void send(Net::GamePacket packet, Player& player);
 	std::queue<PacketPair> m_packetsReceive;
 	std::queue<PacketPair> m_packetsSend;
 
@@ -84,8 +85,9 @@ private:
 
 	std::map<Net::Timestamp, Net::PlayerConfigReq> m_playerConfigs;
 	std::map<Net::Timestamp, Net::PlayerInput> m_playerInputs;
-	std::map<Net::Timestamp, Net::GameState> m_gameStates;
 	std::map<Net::Timestamp, Net::ChatMessageReq> m_gameChat;
+	// save all sent gameStates and save corresponding timestamp in player
+	std::list<Net::GameState> m_gameStates;
 };
 
 #endif

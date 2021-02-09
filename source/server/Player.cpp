@@ -22,6 +22,21 @@ std::string Player::createOrUpdatePlayer(GameController& gc, Net::PlayerConfigRe
 	return go->getIdentifier();
 }
 
+void Player::addGameState(Net::Timestamp ts, Net::GameState* gs)
+{
+	m_gameStates[ts] = gs;
+}
+
+const std::map<Net::Timestamp, Net::GameState*>& Player::getGameStates()
+{
+	return m_gameStates;
+}
+
+Net::TimeSyncPeer& Player::getTimeSyncPeer()
+{
+	return m_timeSyncPeer;
+}
+
 Player::Connection& Player::getConnection()
 {
 	return m_connection;

@@ -30,7 +30,7 @@ namespace Helper
 	std::string getSavePath(const std::string& file = "");
 	// use xdg-open
 	void openLinkOrFile(std::string);
-	// return time since epoch (1970?) in milliseconds
+	// return time since epoch (1970?) in microseconds
 	long now();
 	std::string parseFileName(std::string path);
 

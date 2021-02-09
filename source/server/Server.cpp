@@ -100,11 +100,15 @@ void Server::runUdpSocket()
 		for(auto& p : lobbies) {
 			if(p.second->hasPacketPair()) {
 				auto pp = p.second->popPacketPair();
-				socket.send(pp.packet, pp.connection.address, pp.connection.port);
+				socket.send(pp.packet, pp.player->getConnection().address, pp.player->getConnection().port);
 			}
 		}
 		if(socket.receive(reqPacket, conncetion.address, conncetion.port) == sf::Socket::Done) {
-			lobbies[reqPacket.getCode()]->pushPacketPair(reqPacket, conncetion);
+			Lobby* l = lobbies[reqPacket.getCode()];
+			Player& p = l->registerClient(conncetion);
+			// set timesyncpeer here, to avoid the waiting time of the lobby package queue
+			reqPacket.setTimeSyncPeer(p.getTimeSyncPeer());
+			l->pushPacketPair(reqPacket, p);
 		}
 	}
 	socket.unbind();

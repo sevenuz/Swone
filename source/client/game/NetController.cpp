@@ -21,7 +21,11 @@ void NetController::handleUdpConnection()
 				Log::ger().log("Packet received from unexpected location.", Log::Label::Warning);
 				continue;
 			}
+			reqPacket.setTimeSyncPeer(m_timeSyncPeer);
 			switch(reqPacket.getType()){
+				case Net::U_TIMESYNC:
+					Net::receiveTimeSync(reqPacket, m_timeSyncPeer);
+					break;
 				case Net::U_CHAT_MESSAGE_ACK:
 					receiveChatMessageAck(reqPacket);
 					break;
@@ -36,14 +40,33 @@ void NetController::handleUdpConnection()
 					break;
 			}
 		}
+		handleTimeSync();
 		checkAcknowledgements();
 		//std::this_thread::sleep_for(200ms); // TODO
 	}
 }
 
+void NetController::handleTimeSync()
+{
+	sf::Time ellapsed = m_timeSyncClock.restart();
+	m_timeSyncT += ellapsed;
+	m_timeT += ellapsed;
+	if(m_timeT >= TIMESYNC_SWITCH_THRESHOLD)
+		m_timeSyncDt = TIMESYNC_SWITCH_DT;
+	while(m_timeSyncT >= m_timeSyncDt) {
+		Net::GamePacket packet = Net::sendTimeSync(m_lobbyCode, m_timeSyncPeer);
+		m_socket.send(packet , m_serverIpAddress, m_serverPort);
+		m_timeSyncT -= m_timeSyncDt;
+	}
+}
+
 void NetController::sendPlayerInput(Net::PlayerInput gi)
 {
-	Net::GamePacket packet(Net::U_PLAYER_INPUT, m_lobbyCode);
+	if(!m_timeSyncPeer.isSynchronized()) {
+		Log::ger().log("Not synced -> not sent player input!", Log::Label::Warning);
+		return;
+	}
+	Net::GamePacket packet(Net::U_PLAYER_INPUT, m_lobbyCode, m_timeSyncPeer);
 	packet << gi;
 	m_playerInputs[packet.getTimestamp()] = gi;
 	m_socket.send(packet, m_serverIpAddress, m_serverPort);
@@ -51,7 +74,11 @@ void NetController::sendPlayerInput(Net::PlayerInput gi)
 
 void NetController::sendChatMessageReq(Net::ChatMessageReq cma)
 {
-	Net::GamePacket packet(Net::U_CHAT_MESSAGE_REQ, m_lobbyCode);
+	if(!m_timeSyncPeer.isSynchronized()) {
+		Log::ger().log("Not synced -> not sent chat message!", Log::Label::Warning);
+		return;
+	}
+	Net::GamePacket packet(Net::U_CHAT_MESSAGE_REQ, m_lobbyCode, m_timeSyncPeer);
 	packet << cma;
 	m_chatReqs[packet.getTimestamp()] = cma;
 	m_ackChecks.push_back(AckCheck{packet, packet.getTimestamp(), 1});
@@ -60,7 +87,11 @@ void NetController::sendChatMessageReq(Net::ChatMessageReq cma)
 
 void NetController::sendPlayerConfigReq(Net::PlayerConfigReq pca, std::function<void(GameObject*)> cb)
 {
-	Net::GamePacket packet(Net::U_PLAYER_CONFIG_REQ, m_lobbyCode);
+	if(!m_timeSyncPeer.isSynchronized()) {
+		Log::ger().log("Not synced -> not sent player config!", Log::Label::Warning);
+		return;
+	}
+	Net::GamePacket packet(Net::U_PLAYER_CONFIG_REQ, m_lobbyCode, m_timeSyncPeer);
 	packet << pca;
 	m_playerConfigReqCbs[packet.getTimestamp()] = cb;
 	m_playerConfigReqs[packet.getTimestamp()] = pca;
@@ -80,9 +111,9 @@ void NetController::deleteAcknowledgement(Net::Timestamp t)
 void NetController::checkAcknowledgements()
 {
 	for(AckCheck& a : m_ackChecks) {
-		if((Helper::now()-a.lastSent) >= TIMEOUT) {
+		if((m_timeSyncPeer.now()-a.lastSent) >= TIMEOUT) {
 			a.attempts++;
-			a.lastSent = Helper::now();
+			a.lastSent = m_timeSyncPeer.now();
 			if(a.attempts > MAX_ATTEMPTS) {
 				Log::ger().log("Packet reached MAX_ATTEMPTS: drop", Log::Label::Error);
 				deleteAcknowledgement(a.packet.getTimestamp());
@@ -125,9 +156,14 @@ void NetController::receiveGameState(Net::GamePacket packet)
 {
 	Net::GameState gs;
 	packet >> gs;
+
 	auto it = m_gameStates.insert(std::make_pair(packet.getTimestamp(), gs)).first;
-	it = std::prev(m_gameStates.end());
-	Net::Timestamp latency = Helper::now() - packet.getTimestamp();
+	if(it != std::prev(m_gameStates.end())) {
+		Log::ger().log("GameState received out of order", Log::Label::Warning);
+		it = std::prev(m_gameStates.end());
+	}
+
+	Net::Timestamp latency = m_timeSyncPeer.getSmoothedOwd();
 	if(latency >= LATENCY_THRESHOLD) {
 		Log::ger().log("GameState exceeds Latency-Threshold", Log::Label::Warning);
 	}
@@ -135,6 +171,7 @@ void NetController::receiveGameState(Net::GamePacket packet)
 	m_c.gameMutex.lock();
 
 	// checks if the iterator is usable
+	// so first received GameState will be skipped and applied when the second is reveived
 	if(it != m_gameStates.begin()) {
 		// interpolates from the previous received gamestate
 		m_gc.interpolateGameState(std::prev(it)->second);
@@ -153,12 +190,12 @@ void NetController::receiveGameState(Net::GamePacket packet)
 		for(auto it2 = m_playerInputs.lower_bound(it->first); it2 != m_playerInputs.end(); ++it2) {
 			if(it2->second.identifier == go->getIdentifier()) {
 				// newer timestamps are greater then older, so substract older from newer
-				m_gc.update(sf::milliseconds(it2->first - ts));
+				m_gc.update(sf::microseconds(it2->first - ts));
 				go->event(it2->second.inputs);
 				ts = it2->first;
 			}
 		}
-		//m_gc.update(sf::milliseconds(Helper::now() - ts));
+		m_gc.update(sf::microseconds(m_timeSyncPeer.now() - ts)); // TODO should play to present time?
 	}
 
 	m_c.gameMutex.unlock();
@@ -185,7 +222,6 @@ void NetController::start(std::string lobbyCode, sf::IpAddress srvIp, Net::Port 
 		Log::ger().log("Client: failed to bind Port", Log::Label::Error);
 	}
 	m_socket.setBlocking(false);
-	sendChatMessageReq(Net::ChatMessageReq{"Client Register Req Message"});
 	m_clientPort = m_socket.getLocalPort();
 	Log::ger().log("Client is listening: " + m_serverIpAddress.toString() + ":" + std::to_string(m_serverPort));
 	handleUdpConnection();
@@ -193,7 +229,7 @@ void NetController::start(std::string lobbyCode, sf::IpAddress srvIp, Net::Port 
 
 void NetController::disconnect()
 {
-	Net::GamePacket packet(Net::U_DISCONNECT, m_lobbyCode);
+	Net::GamePacket packet(Net::U_DISCONNECT, m_lobbyCode, m_timeSyncPeer);
 	m_socket.send(packet, m_serverIpAddress, m_serverPort);
 	stop();
 }

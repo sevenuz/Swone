@@ -9,13 +9,15 @@
 #include <vector>
 
 #include "imgui.h"
+#include "TimeSync/TimeSync.h"
+
 #include "util/reader/Reader.h"
 #include "util/Log.h"
 #include "util/Helper.h"
 #include "game/GameReader.h"
 #include "game/object/GameObject.h"
 
-#define LATENCY_THRESHOLD 250 // milliseconds
+#define LATENCY_THRESHOLD 250000 // microseconds
 
 namespace Net
 {
@@ -40,6 +42,7 @@ namespace Net
 	static const unsigned char U_GAME_STATE = 13;
 	static const unsigned char U_GAME_CHAT = 14;
 	static const unsigned char U_DISCONNECT = 15;
+	static const unsigned char U_TIMESYNC = 16;
 
 	// Status Codes
 	static const unsigned char C_CONNECTION = 1;
@@ -61,19 +64,48 @@ namespace Net
 			const sf::Uint8 getType();
 	};
 
+	// inspired by https://github.com/catid/TimeSync/blob/master/tests/tests.cpp#L144
+	class TimeSyncPeer {
+		private:
+			TimeSynchronizer m_timeSync;
+			unsigned m_smoothedOwdUsec = 0;
+			void updateSmoothedOwd(unsigned owdUsec);
+		public:
+			bool isSynchronized();
+			unsigned getSmoothedOwd();
+			unsigned getMinOwd();
+			Counter24 getMinDelta();
+			Counter24 getLocalTimeDatagram();
+			Counter23 getRemoteTimestamp();
+			Net::Timestamp convertToLocalTimestamp(Counter23 ts23);
+			Net::Timestamp now();
+			void incorporateTimestamp(Counter24 timestamp);
+			void incorporateMinDeltaTimestamp(Counter24 timestamp);
+	};
+
 	class GamePacket : public Net::Packet {
 		private:
-			Net::Timestamp m_stamp;
+			Counter23 m_stamp; // can be transformed to useable timestamp
+			Counter24 m_syncStamp; // is used to sync clocks
 			std::string m_code;
+			TimeSyncPeer* m_timeSyncPeer = nullptr;
 		public:
-			GamePacket(const sf::Uint8 type, const std::string& code);
+			GamePacket(const sf::Uint8 type, const std::string& code, TimeSyncPeer& tsp);
 			GamePacket();
 			virtual const void* onSend(std::size_t& size);
 			virtual void onReceive(const void* data, std::size_t size);
 
+			// should only be used after receiving a packet
+			// it is directly updating the TimeSyncPeer with the timestamp of this packet
+			void setTimeSyncPeer(TimeSyncPeer& tsp);
+			const TimeSyncPeer& getTimeSyncPeer();
+			// asserts that the TimeSyncPeer is already syncronized
 			const Net::Timestamp getTimestamp() const;
 			const std::string getCode() const;
 	};
+
+	Net::GamePacket sendTimeSync(std::string lc, Net::TimeSyncPeer& tsp);
+	void receiveTimeSync(Net::GamePacket packet, Net::TimeSyncPeer& tsp);
 
 	// Type: std::vector<T>
 	template<typename T>
@@ -96,6 +128,12 @@ namespace Net
 	// Type: sf::Color
 	sf::Packet& operator <<(sf::Packet& packet, const sf::Color& sm);
 	sf::Packet& operator >>(sf::Packet& packet, sf::Color& sm);
+
+	// Type: Counter<uint32_t, T>
+	template<unsigned T>
+	sf::Packet& operator <<(sf::Packet& packet, const Counter<uint32_t, T>& sm);
+	template<unsigned T>
+	sf::Packet& operator >>(sf::Packet& packet, Counter<uint32_t, T>& sm);
 
 	struct Status {
 		sf::Uint16 code;

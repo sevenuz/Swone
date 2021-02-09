@@ -42,7 +42,7 @@ void Helper::openLinkOrFile(std::string s) // TODO for windows and ios
 long Helper::now()
 {
 	auto now = std::chrono::system_clock::now().time_since_epoch();
-	long time = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+	long time = std::chrono::duration_cast<std::chrono::microseconds>(now).count();
 	return time;
 }
 

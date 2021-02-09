@@ -46,8 +46,12 @@ void Lobby::handlePackets()
 		if(!m_packetsReceive.empty())
 		{
 			auto pp = m_packetsReceive.front();
-			Player& p = registerClient(pp.connection);
+			Player& p = *pp.player;
 			switch(pp.packet.getType()) {
+				case Net::U_TIMESYNC:
+					Net::receiveTimeSync(pp.packet, p.getTimeSyncPeer());
+					send(Net::sendTimeSync(m_code, p.getTimeSyncPeer()), p);
+					break;
 				case Net::U_DISCONNECT:
 					receiveDisconnect(pp.packet, p);
 					break;
@@ -58,7 +62,7 @@ void Lobby::handlePackets()
 					receivePlayerConfigReq(pp.packet, p);
 					break;
 				case Net::U_PLAYER_INPUT:
-					receivePlayerInput(pp.packet);
+					receivePlayerInput(pp.packet, p);
 					break;
 			}
 			m_packetsReceive.pop();
@@ -66,14 +70,14 @@ void Lobby::handlePackets()
 	}
 }
 
-void Lobby::send(Net::GamePacket packet, Player::Connection connection)
+void Lobby::send(Net::GamePacket packet, Player& player)
 {
-	m_packetsSend.push(PacketPair{packet, connection});
+	m_packetsSend.push(PacketPair{packet, &player});
 }
 
-void Lobby::pushPacketPair(Net::GamePacket packet, Player::Connection connection)
+void Lobby::pushPacketPair(Net::GamePacket packet, Player& player)
 {
-	m_packetsReceive.push(PacketPair{packet, connection});
+	m_packetsReceive.push(PacketPair{packet, &player});
 }
 
 bool Lobby::hasPacketPair()
@@ -88,14 +92,14 @@ Lobby::PacketPair Lobby::popPacketPair()
 	return pp;
 }
 
-Player& Lobby::registerClient(Player::Connection connection)
+Player& Lobby::registerClient(Player::Connection connection) // TODO prevent random connecting
 {
 	// TODO improve player registration
 	for(Player* c : m_players) {
 		if(c->getConnection().address == connection.address && c->getConnection().port == connection.port)
 			return *c;
 	}
-	Player* player = new Player(sf::seconds(Helper::now()), connection);
+	Player* player = new Player(sf::microseconds(Helper::now()), connection);
 
 	m_mtx.lock();
 	m_players.push_back(player);
@@ -122,11 +126,11 @@ void Lobby::receiveChatMessageReq(Net::GamePacket packet, Player& c)
 	packet >> cmr;
 	Log::ger().log("Lobby: got msg: " + cmr.message );
 	m_gameChat[packet.getTimestamp()] = cmr;
-	Net::GamePacket resPacket(Net::U_CHAT_MESSAGE_ACK, m_code);
+	Net::GamePacket resPacket(Net::U_CHAT_MESSAGE_ACK, m_code, c.getTimeSyncPeer());
 	resPacket << Net::ChatMessageAck{
 		packet.getTimestamp()
 	};
-	send(resPacket, c.getConnection());
+	send(resPacket, c);
 }
 
 void Lobby::receivePlayerConfigReq(Net::GamePacket packet, Player& c)
@@ -134,7 +138,7 @@ void Lobby::receivePlayerConfigReq(Net::GamePacket packet, Player& c)
 	Net::PlayerConfigReq pcr;
 	packet >> pcr;
 	m_playerConfigs[packet.getTimestamp()] = pcr;
-	Net::GamePacket resPacket(Net::U_PLAYER_CONFIG_ACK, m_code);
+	Net::GamePacket resPacket(Net::U_PLAYER_CONFIG_ACK, m_code, c.getTimeSyncPeer());
 
 	m_mtx.lock();
 	resPacket << Net::PlayerConfigAck{
@@ -144,38 +148,38 @@ void Lobby::receivePlayerConfigReq(Net::GamePacket packet, Player& c)
 	};
 	m_mtx.unlock();
 
-	send(resPacket, c.getConnection());
+	send(resPacket, c);
 }
 
-void Lobby::receivePlayerInput(Net::GamePacket packet)
+void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 {
 	m_mtx.lock();
 	Net::PlayerInput pi;
 	packet >> pi;
 	m_playerInputs[packet.getTimestamp()] = pi;
 
-	Net::Timestamp latency = Helper::now() - packet.getTimestamp();
+	Net::Timestamp latency = c.getTimeSyncPeer().getSmoothedOwd();
 	if(latency >= LATENCY_THRESHOLD) {
 		Log::ger().log(pi.identifier + " exceeds Latency-Threshold", Log::Label::Warning);
 	}
 	// gamestate before input timespamp with accounting latency, if exists which is normally the case
-	auto itState = m_gameStates.upper_bound(packet.getTimestamp() - latency); // TODO latency * 2, round trip?
+	auto itState = c.getGameStates().upper_bound(packet.getTimestamp() - latency); // TODO latency * 2, round trip?
 	// checks if the iterator is usable
-	if(itState != m_gameStates.begin()) {
+	if(itState != c.getGameStates().begin()) {
 		itState = std::prev(itState);
-		m_gc.applyGameState(itState->second);
+		m_gc.applyGameState(*itState->second);
 	}
 	// update time from state before to input
 	Net::Timestamp ts = itState->first;
 	// apply all inputs since gamestate, normally is only the received one?
 	for(auto it = m_playerInputs.lower_bound(ts); it != m_playerInputs.end(); ++it) {
 		// newer timestamps are greater then older, so substract older from newer
-		m_gc.update(sf::milliseconds(it->first - ts));
+		m_gc.update(sf::microseconds(it->first - ts));
 		m_gc.getGameObejctPointer(it->second.identifier)->event(it->second.inputs);
 		ts = it->first;
 	}
 	// update to now again
-	m_gc.update(sf::milliseconds(Helper::now() - ts));
+	m_gc.update(sf::microseconds(c.getTimeSyncPeer().now() - ts));
 
 	m_mtx.unlock();
 }
@@ -196,13 +200,16 @@ void Lobby::stop()
 void Lobby::sendState()
 {
 	Net::GameState gs = m_gc.getGameState();
-	Net::GamePacket packet(Net::U_GAME_STATE, m_code);
-	packet << gs;
-	m_gameStates[packet.getTimestamp()] = gs;
-	if((double)packet.getDataSize() / sf::UdpSocket::MaxDatagramSize >= UDP_DATA_THRESHOLD)
+	m_gameStates.push_back(gs);
+	if((double)sizeof(gs) / sf::UdpSocket::MaxDatagramSize >= UDP_DATA_THRESHOLD)
 		Log::ger().log("GameStatePacket exceeds Data-Threshold", Log::Label::Warning);
 	for(Player* p : m_players) {
-		send(packet, p->getConnection());
+		if(!p->getTimeSyncPeer().isSynchronized())
+			continue;
+		Net::GamePacket packet(Net::U_GAME_STATE, m_code, p->getTimeSyncPeer());
+		packet << gs;
+		p->addGameState(packet.getTimestamp(), &m_gameStates.back());
+		send(packet, *p);
 	}
 }
 
@@ -214,10 +221,12 @@ void Lobby::sendChat()
 		gc.messages.insert(std::prev(std::prev(std::prev(std::prev(std::prev(m_gameChat.end()))))), m_gameChat.end()); // TODO
 	else
 		gc.messages.insert(m_gameChat.begin(), m_gameChat.end());
-	Net::GamePacket packet(Net::U_GAME_CHAT, m_code);
-	packet << gc;
 	for(Player* p : m_players) {
-		send(packet, p->getConnection());
+		if(!p->getTimeSyncPeer().isSynchronized())
+			continue;
+		Net::GamePacket packet(Net::U_GAME_CHAT, m_code, p->getTimeSyncPeer());
+		packet << gc;
+		send(packet, *p);
 	}
 }
 

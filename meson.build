@@ -16,10 +16,12 @@ iInclude = include_directories('./source')
 iImgui = include_directories('./bib/imgui')
 iTinydir = include_directories('./bib/tinydir')
 iMd5 = include_directories('./bib/md5')
+iTimeSync = include_directories('./bib/TimeSync/inc')
 
 src = [
-	'bib/imgui/imgui-SFML.cpp',
 	'bib/md5/md5.cpp',
+	'bib/TimeSync/src/TimeSync.cpp',
+	'bib/imgui/imgui-SFML.cpp',
 	'bib/imgui/imgui.cpp',
 	'bib/imgui/imgui_draw.cpp',
 	'bib/imgui/imgui_demo.cpp',
@@ -77,7 +79,8 @@ executable(
 		iImgui,
 		iTinydir,
 		incdir,
-		iMd5
+		iMd5,
+		iTimeSync
 	],
 	dependencies : [
 		GL,
