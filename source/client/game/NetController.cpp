@@ -40,20 +40,56 @@ void NetController::handleUdpConnection()
 					break;
 			}
 		}
+		sf::Time ellapsed = restartClock();
+		updateGameController(ellapsed);
 		handleTimeSync();
 		checkAcknowledgements();
 		//std::this_thread::sleep_for(200ms); // TODO
 	}
 }
 
-void NetController::handleTimeSync()
+sf::Time NetController::restartClock()
 {
-	sf::Time ellapsed = m_timeSyncClock.restart();
+	sf::Time ellapsed = m_clock.restart();
 	m_timeSyncT += ellapsed;
 	m_timeT += ellapsed;
+	return ellapsed;
+}
+
+void NetController::updateGameController(sf::Time ellapsed)
+{
+	std::lock_guard<std::mutex> lock(m_c.gameMutex);
+
+	// first received GameState will be skipped and applied when the second is received
+	if(m_gameStates.size() >= 2) {
+		Net::Timestamp targetT = m_timeSyncPeer.now() - INTERPOLATION_TIME;
+
+		auto it = m_gameStates.upper_bound(targetT);
+		auto bit = it;
+		if(bit != m_gameStates.begin())
+			bit = std::prev(bit);
+		if(targetT > bit->first && targetT < it->first) {
+			sf::Time diffT = sf::microseconds(targetT) + ellapsed - sf::microseconds(it->first);
+			if(diffT >= sf::Time::Zero) {
+				// sets the interpolated game state
+				m_gc.update(diffT);
+				m_gc.interpolateGameState(it->second);
+				// we reached next game state and can delete older ones
+				m_gameStates.erase(m_gameStates.begin(), bit);
+				m_gc.update(ellapsed - diffT);
+			} else {
+				m_gc.update(ellapsed);
+			}
+		}
+	}
+}
+
+void NetController::handleTimeSync()
+{
 	if(m_timeT >= TIMESYNC_SWITCH_THRESHOLD)
 		m_timeSyncDt = TIMESYNC_SWITCH_DT;
 	while(m_timeSyncT >= m_timeSyncDt) {
+		Log::ger().log("latency: " + std::to_string(m_timeSyncPeer.getLatency()));
 		Net::GamePacket packet = Net::sendTimeSync(m_lobbyCode, m_timeSyncPeer);
 		m_socket.send(packet , m_serverIpAddress, m_serverPort);
 		m_timeSyncT -= m_timeSyncDt;
@@ -157,46 +193,53 @@ void NetController::receiveGameState(Net::GamePacket packet)
 	Net::GameState gs;
 	packet >> gs;
 
-	auto it = m_gameStates.insert(std::make_pair(packet.getTimestamp(), gs)).first;
-	if(it != std::prev(m_gameStates.end())) {
-		Log::ger().log("GameState received out of order", Log::Label::Warning);
-		it = std::prev(m_gameStates.end());
-	}
-
-	Net::Timestamp latency = m_timeSyncPeer.getSmoothedOwd();
+	Net::Timestamp owd = m_timeSyncPeer.getSmoothedOwd();
+	Net::Timestamp ts = packet.getTimestamp();
+	Net::Timestamp latency = m_timeSyncPeer.getLatency();
 	if(latency >= LATENCY_THRESHOLD) {
 		Log::ger().log("GameState exceeds Latency-Threshold", Log::Label::Warning);
 	}
 
-	m_c.gameMutex.lock();
-
-	// checks if the iterator is usable
-	// so first received GameState will be skipped and applied when the second is reveived
-	if(it != m_gameStates.begin()) {
-		// interpolates from the previous received gamestate
-		m_gc.interpolateGameState(std::prev(it)->second);
+	// add interpolation game state in client time
+	auto itt = m_gameStates.insert(std::make_pair(ts + owd, gs)).first;
+	if(itt != std::prev(m_gameStates.end())) {
+		Log::ger().log("GameState received out of order", Log::Label::Warning);
 	}
 
-	// apply newest gamestate to local players
-	for(GameObject* go : m_gc.getLocalPlayers()) {
-		for(Net::GameObjectState gos : it->second.players) {
-			if(go->getIdentifier() == gos.identifier) {
-				m_gc.interpolateGameObjectState(go, gos);
+	// delete already applied player inputs
+	auto it = m_playerInputs.lower_bound(ts - owd);
+	if(it != m_playerInputs.begin())
+		m_playerInputs.erase(m_playerInputs.begin(), std::prev(it));
+
+	m_c.gameMutex.lock();
+
+	Net::GameState interpolateGs = m_gc.getGameState();
+	// apply newest game state to simulate local players
+	for(Net::GameObjectState& gos : gs.players) {
+		for(GameObject* p : m_gc.getLocalPlayers()) {
+			if(gos.identifier == p->getIdentifier()) {
+				m_gc.applyGameObjectState(p, gos);
 				break;
 			}
 		}
-		Net::Timestamp ts = it->first;
-		// apply all inputs since newest gamestate
-		for(auto it2 = m_playerInputs.lower_bound(it->first); it2 != m_playerInputs.end(); ++it2) {
+	}
+	// apply all inputs since newest gamestate
+	for(auto it2 = m_playerInputs.begin(); it2 != m_playerInputs.end(); ++it2) {
+		// apply newest gamestate to local players
+		for(GameObject* go : m_gc.getLocalPlayers()) {
 			if(it2->second.identifier == go->getIdentifier()) {
 				// newer timestamps are greater then older, so substract older from newer
-				m_gc.update(sf::microseconds(it2->first - ts));
+				m_gc.update(sf::microseconds(it2->first - ts - owd));
 				go->event(it2->second.inputs);
 				ts = it2->first;
+				break;
 			}
 		}
-		m_gc.update(sf::microseconds(m_timeSyncPeer.now() - ts)); // TODO should play to present time?
 	}
+	m_gc.update(sf::microseconds(m_timeSyncPeer.now() - ts));
+	// applies interpolation state before player simulation
+	m_gc.interpolateGameState(interpolateGs); // does not apply to local players
+	restartClock();
 
 	m_c.gameMutex.unlock();
 }

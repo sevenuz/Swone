@@ -21,12 +21,9 @@ Lobby::~Lobby() {
 void Lobby::startMainLoop()
 {
 	while(m_run) {
-		sf::Time ellapsed = clock.restart();
-		m_tickT += ellapsed;
-		m_chatT += ellapsed;
 
 		m_mtx.lock();
-		m_gc.update(ellapsed);
+		m_gc.update(restartClock()); // sets also tickT and chatT
 
 		if(m_tickT >= m_tickDt) {
 			m_tickT -= m_tickDt;
@@ -38,6 +35,14 @@ void Lobby::startMainLoop()
 		}
 		m_mtx.unlock();
 	}
+}
+
+sf::Time Lobby::restartClock()
+{
+	sf::Time ellapsed = clock.restart();
+	m_tickT += ellapsed;
+	m_chatT += ellapsed;
+	return ellapsed;
 }
 
 void Lobby::handlePackets()
@@ -153,25 +158,55 @@ void Lobby::receivePlayerConfigReq(Net::GamePacket packet, Player& c)
 
 void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 {
-	m_mtx.lock();
 	Net::PlayerInput pi;
 	packet >> pi;
-	m_playerInputs[packet.getTimestamp()] = pi;
+	// TODO handles input from same player for different local player wrongly
 
-	Net::Timestamp latency = c.getTimeSyncPeer().getSmoothedOwd();
+	Net::Timestamp owd = c.getTimeSyncPeer().getSmoothedOwd();
+	Net::Timestamp ts = packet.getTimestamp() - owd;
+	Net::Timestamp targetT = ts - INTERPOLATION_TIME;
+	Net::Timestamp latency = c.getTimeSyncPeer().getLatency();
 	if(latency >= LATENCY_THRESHOLD) {
 		Log::ger().log(pi.identifier + " exceeds Latency-Threshold", Log::Label::Warning);
 	}
-	// gamestate before input timespamp with accounting latency, if exists which is normally the case
-	auto itState = c.getGameStates().upper_bound(packet.getTimestamp() - latency); // TODO latency * 2, round trip?
-	// checks if the iterator is usable
-	if(itState != c.getGameStates().begin()) {
+	m_playerInputs[ts] = pi;
+
+	m_mtx.lock();
+
+	//m_gc.getGameObejctPointer(pi.identifier)->event(pi.inputs);
+
+	// newest gamestate on client before input was sent
+	// client timestamp - one way delay = server time stamp
+	auto itState = c.getGameStates().upper_bound(ts);
+	if(itState != c.getGameStates().begin()) // TODO else?
 		itState = std::prev(itState);
-		m_gc.applyGameState(*itState->second);
+	// gamestate from which client is interpolating
+	auto bitState = c.getGameStates().upper_bound(targetT);
+	if(bitState != c.getGameStates().begin()) // TODO else?
+		bitState = std::prev(bitState);
+
+	// synchronize jitter of gamestates on client side
+	// but we only have server side clock inaccuracy...
+	// if(targetT - bitState->first > ts - itState->first) { } else { }
+
+	// set clients interpolation state to world
+	m_gc.applyGameState(*bitState->second);
+
+	// set clients newest gamestate to his local players
+	for(Net::GameObjectState& gos : itState->second->players) {
+		for(GameObject* p : c.getPlayers()) {
+			if(gos.identifier == p->getIdentifier()) {
+				m_gc.applyGameObjectState(p, gos);
+				break;
+			}
+		}
 	}
-	// update time from state before to input
-	Net::Timestamp ts = itState->first;
-	// apply all inputs since gamestate, normally is only the received one?
+
+	// update difference between clients latest state and he was sending the input
+	m_gc.update(sf::microseconds(ts - itState->first));
+
+	// apply all inputs since clients input time, also noting out of order inputs
+	// first it should always be received input
 	for(auto it = m_playerInputs.lower_bound(ts); it != m_playerInputs.end(); ++it) {
 		// newer timestamps are greater then older, so substract older from newer
 		m_gc.update(sf::microseconds(it->first - ts));
@@ -180,6 +215,21 @@ void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 	}
 	// update to now again
 	m_gc.update(sf::microseconds(c.getTimeSyncPeer().now() - ts));
+	// save clients local players states
+	std::vector<std::pair<GameObject*, Net::GameObjectState>> localPlayerStates;
+	for(GameObject* p : c.getPlayers()) {
+		localPlayerStates.push_back(std::make_pair(p, m_gc.getGameObjectState(p)));
+	}
+	// bring objects from clients target time into present
+	m_gc.update(sf::microseconds(INTERPOLATION_TIME));
+	// apply clients local player states
+	// now all objects are at the same time again
+	for(auto p : localPlayerStates) {
+		m_gc.applyGameObjectState(p.first, p.second);
+	}
+	// restart clock which updates also sendState timer
+	// to synchronize with update loop
+	restartClock();
 
 	m_mtx.unlock();
 }

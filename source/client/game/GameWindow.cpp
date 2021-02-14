@@ -89,11 +89,7 @@ void GameWindow::drawPause()
 }
 
 void GameWindow::update(sf::Time ellapsed) {
-	m_c.gameMutex.lock();
-	m_gc.update(ellapsed);
-	m_c.gameMutex.unlock();
-
-	setViewCenter(getPlayerCenter());
+	// TODO setViewCenter(getPlayerCenter());
 	// TODO set View Zoom if player are far away from each other
 }
 
@@ -128,31 +124,34 @@ void GameWindow::event(sf::Event& event) {
 		m_viewDelta.x = delta.x * 0.1f;
 		m_viewDelta.y = delta.y * 0.1f;
 	}
+
 	// TODO remove shape spawn
-	if (event.type == sf::Event::MouseButtonPressed)
-	{
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if(m_showHitboxes) {
+		if (event.type == sf::Event::MouseButtonPressed)
 		{
-			ph::PolygonShape poly;
-			ph::uint32 count = (ph::uint32)ph::Random( 3, MaxPolyVertexCount );
-			ph::Vec2 *vertices = new ph::Vec2[count];
-			ph::real e = ph::Random( 5*0.05, 10*0.05 );
-			for(ph::uint32 i = 0; i < count; ++i)
-				vertices[i].Set( ph::Random( -e, e ), ph::Random( -e, e ) );
-			poly.Set( vertices, count );
-			ph::Body *b = new ph::Body( ph::Body::Config{.x =  worldPos.x/64, .y =  worldPos.y/64}, &poly );
-			b->SetOrient( ph::Random( -ph::PI, ph::PI ) );
-			b->restitution = 0.2f;
-			b->dynamicFriction = 0.2f;
-			b->staticFriction = 0.4f;
-			m_gc.getScene().Add(b);
-			delete [] vertices;
-		}
-		else if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-		{
-			ph::Circle c( ph::Random( 0.1f, 1.0f ) );
-			ph::Body *b2 = new ph::Body( ph::Body::Config{.x =  worldPos.x/64, .y =  worldPos.y/64}, &c );
-			m_gc.getScene().Add(b2);
+			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				ph::PolygonShape poly;
+				ph::uint32 count = (ph::uint32)ph::Random( 3, MaxPolyVertexCount );
+				ph::Vec2 *vertices = new ph::Vec2[count];
+				ph::real e = ph::Random( 5*0.05, 10*0.05 );
+				for(ph::uint32 i = 0; i < count; ++i)
+					vertices[i].Set( ph::Random( -e, e ), ph::Random( -e, e ) );
+				poly.Set( vertices, count );
+				ph::Body *b = new ph::Body( ph::Body::Config{.x =  worldPos.x/64, .y =  worldPos.y/64}, &poly );
+				b->SetOrient( ph::Random( -ph::PI, ph::PI ) );
+				b->restitution = 0.2f;
+				b->dynamicFriction = 0.2f;
+				b->staticFriction = 0.4f;
+				m_gc.getScene().Add(b);
+				delete [] vertices;
+			}
+			else if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+			{
+				ph::Circle c( ph::Random( 0.1f, 1.0f ) );
+				ph::Body *b2 = new ph::Body( ph::Body::Config{.x =  worldPos.x/64, .y =  worldPos.y/64}, &c );
+				m_gc.getScene().Add(b2);
+			}
 		}
 	}
 
@@ -180,6 +179,7 @@ void GameWindow::event(sf::Event& event) {
 					sf::Keyboard::isKeyPressed(k.action4)
 				};
 				go->event(event);
+				Log::ger().log("event an " + go->getIdentifier());
 				m_nc.sendPlayerInput(Net::PlayerInput{
 						go->getIdentifier(),
 						event

@@ -35,6 +35,7 @@ public:
 	void sendChatMessageReq(Net::ChatMessageReq cma);
 	void sendPlayerConfigReq(Net::PlayerConfigReq pca, std::function<void(GameObject*)>);
 private:
+	sf::Time restartClock();
 	void handleUdpConnection();
 	void deleteAcknowledgement(Net::Timestamp t);
 	void checkAcknowledgements();
@@ -43,12 +44,13 @@ private:
 	void receiveGameState(Net::GamePacket packet);
 	void receiveGameChat(Net::GamePacket packet);
 
+	void updateGameController(sf::Time ellapsed);
 	void handleTimeSync();
 
 	Controller& m_c;
 	ClientGameController& m_gc;
 
-	sf::Clock m_timeSyncClock;
+	sf::Clock m_clock;
 	sf::Time m_timeT; // mesures time since NetController started
 	sf::Time m_timeSyncT = TIMESYNC_START_DT; // start with sync time to directly send first packet
 	sf::Time m_timeSyncDt = TIMESYNC_START_DT;

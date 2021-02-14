@@ -73,7 +73,14 @@ void ClientGameController::interpolateGameObjectState(GameObject* go, Net::GameO
 	applyGameObjectState(go, gos);
 }
 
-void ClientGameController::interpolateGameState(Net::GameState gs)
+bool ClientGameController::isLocalPlayer(const std::string& id) {
+	for(GameObject* p : getLocalPlayers())
+		if(id == p->getIdentifier())
+			return true;
+	return false;
+}
+
+void ClientGameController::interpolateGameState(const Net::GameState& gs)
 {
 	for(Net::GameObjectState gos : gs.objects) {
 		GameObject* go;
@@ -85,6 +92,8 @@ void ClientGameController::interpolateGameState(Net::GameState gs)
 		interpolateGameObjectState(go, gos);
 	}
 	for(Net::GameObjectState gos : gs.players) {
+		if(isLocalPlayer(gos.identifier))
+			continue;
 		GameObject* go;
 		try {
 			go = getGameObejctPointer(gos.identifier);

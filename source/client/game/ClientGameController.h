@@ -29,7 +29,9 @@ public:
 	void sortGameObjectDrawings();
 
 	void interpolateGameObjectState(GameObject* go, Net::GameObjectState gos);
-	void interpolateGameState(Net::GameState gs);
+	void interpolateGameState(const Net::GameState& gs);
+
+	bool isLocalPlayer(const std::string& identifier);
 
 	GameObject* spawnGameObject(std::string identifier, std::string key) override;
 	GameObject* spawnPlayer(std::string identifier, std::string key) override;

@@ -52,6 +52,7 @@ public:
 	Net::JoinLobbyAck getJoinLobbyAck();
 	Net::LobbyStatus getLobbyStatus();
 private:
+	sf::Time restartClock();
 	void startMainLoop();
 	void handlePackets();
 	void receiveDisconnect(Net::GamePacket packet, Player& c);

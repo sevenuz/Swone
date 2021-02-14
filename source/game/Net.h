@@ -18,6 +18,7 @@
 #include "game/object/GameObject.h"
 
 #define LATENCY_THRESHOLD 250000 // microseconds
+#define INTERPOLATION_TIME 100000 // microseconds
 
 namespace Net
 {
@@ -73,6 +74,7 @@ namespace Net
 		public:
 			bool isSynchronized();
 			unsigned getSmoothedOwd();
+			unsigned getLatency();
 			unsigned getMinOwd();
 			Counter24 getMinDelta();
 			Counter24 getLocalTimeDatagram();

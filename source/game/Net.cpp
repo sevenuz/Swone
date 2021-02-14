@@ -79,6 +79,10 @@ unsigned Net::TimeSyncPeer::getSmoothedOwd()
 {
 	return m_smoothedOwdUsec;
 }
+unsigned Net::TimeSyncPeer::getLatency()
+{
+	return 2 * m_smoothedOwdUsec;
+}
 unsigned Net::TimeSyncPeer::getMinOwd()
 {
 	return m_timeSync.GetMinimumOneWayDelayUsec();

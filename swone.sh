@@ -30,18 +30,14 @@ build(){
 run(){
 	if [ -z "$FAILED" ]
 	then
-		cd $BUILDDIR
-		./swone
-		cd ..
+		./$BUILDDIR/swone
 	fi
 }
 
 debug(){
 	if [ -z "$FAILED" ]
 	then
-		cd $BUILDDIR
-		gdb -ex=r --args ./swone
-		cd ..
+		gdb -ex=r --args ./$BUILDDIR/swone
 	fi
 }
 

@@ -67,7 +67,7 @@ void CharacterSelection::drawImgui()
 		const char* keybindingProfileNames[m_c.getSettings().getKeybindings().size()];
 		size_t keybindingProfileCount = 0;
 		for(auto c : m_c.getSettings().getKeybindings()){
-			keybindingProfileNames[keybindingProfileCount] = c.first.c_str();
+			keybindingProfileNames[keybindingProfileCount] = c.first.c_str(); // TODO shows only one entry multiple times
 			keybindingProfileCount++;
 		}
 		ImGui::Combo("Controls", &m_selectedKeybindingProfile, keybindingProfileNames, keybindingProfileCount);
