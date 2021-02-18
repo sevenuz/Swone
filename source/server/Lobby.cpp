@@ -202,12 +202,12 @@ void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 		}
 	}
 
-	// update difference between clients latest state and he was sending the input
-	m_gc.update(sf::microseconds(ts - itState->first));
+	// update difference between clients latest state and the inputs since then
+	ts = itState->first;
 
 	// apply all inputs since clients input time, also noting out of order inputs
 	// first it should always be received input
-	for(auto it = m_playerInputs.lower_bound(ts); it != m_playerInputs.end(); ++it) {
+	for(auto it = m_playerInputs.lower_bound(itState->first); it != m_playerInputs.end(); ++it) {
 		// newer timestamps are greater then older, so substract older from newer
 		m_gc.update(sf::microseconds(it->first - ts));
 		m_gc.getGameObejctPointer(it->second.identifier)->event(it->second.inputs);
@@ -224,7 +224,7 @@ void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 	m_gc.update(sf::microseconds(INTERPOLATION_TIME));
 	// apply clients local player states
 	// now all objects are at the same time again
-	for(auto p : localPlayerStates) {
+	for(auto& p : localPlayerStates) {
 		m_gc.applyGameObjectState(p.first, p.second);
 	}
 	// restart clock which updates also sendState timer

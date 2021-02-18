@@ -16,7 +16,7 @@ void MapDrawing::createMapImage() {
 
 	m_imgWidth = Map::TILE_WIDTH * m_map.getWidth();
 	m_imgHeight = Map::TILE_HEIGHT * m_map.getHeight();
-	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Black);
+	m_mapImage.create(m_imgWidth, m_imgHeight, sf::Color::Transparent);
 	for (size_t r = 0; r < m_map.getWidth(); r++)
 		for (size_t c = 0; c < m_map.getHeight(); c++) {
 			sf::Vector2i ttp = getTileTexturePosition(m_map.getTile(r, c).type);
