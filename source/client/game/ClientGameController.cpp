@@ -35,8 +35,19 @@ void ClientGameController::clearAll()
 void ClientGameController::loadScenery(std::string resDir, Net::GameFileCheck gfc)
 {
 	GameController::loadScenery(resDir, gfc);
+
 	delete m_mapDrawing;
 	m_mapDrawing = new MapDrawing(*getScenery().getMap());
+
+	for(GameObject* go : getStaticGameObjects()) {
+		GameObjectDrawing* god = new GameObjectDrawing(
+			*go,
+			getScenery().getObjectSetupMaps()[getGameObejctKey(go->getIdentifier())],
+			[&](GameObject* go) -> GameObjectDrawing* { return m_goDrawingsMap[go]; }
+		);
+		m_goDrawings.push_back(god);
+		m_goDrawingsMap[go] = god;
+	}
 }
 
 void ClientGameController::update(sf::Time ellapsed)
