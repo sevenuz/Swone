@@ -24,7 +24,7 @@ public:
 
 	void setViewZoom();
 	void setViewCenter(sf::Vector2f pos);
-	sf::Vector2f getPlayerCenter();
+	sf::Vector2f getPlayerCenter() const;
 	sf::View getView();
 
 	void drawImgui();

@@ -31,7 +31,7 @@ void GameWindow::setViewCenter(sf::Vector2f pos) {
 	);
 }
 
-sf::Vector2f GameWindow::getPlayerCenter()
+sf::Vector2f GameWindow::getPlayerCenter() const
 {
 	sf::Vector2f ppos = sf::Vector2f(0,0);
 	size_t pcount = 0;
@@ -88,10 +88,7 @@ void GameWindow::drawPause()
 	}
 }
 
-void GameWindow::update(sf::Time ellapsed) {
-	// TODO setViewCenter(getPlayerCenter());
-	// TODO set View Zoom if player are far away from each other
-}
+void GameWindow::update(sf::Time ellapsed) {}
 
 void GameWindow::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
@@ -192,9 +189,18 @@ void GameWindow::event(sf::Event& event) {
 
 void GameWindow::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	states.transform *= getTransform();
-	target.setView(m_view);
 
 	m_c.gameMutex.lock();
+
+	// TODO set View Zoom if player are far away from each other
+	sf::Vector2f pos = getPlayerCenter();
+	sf::View view = m_view;
+	view.setCenter(
+		Map::toMapPixelX(pos.x) + m_viewDelta.x,
+		Map::toMapPixelY(pos.y) + m_viewDelta.y
+	);
+	target.setView(view);
+
 	bool drawMap = true;
 	for (GameObjectDrawing* g : m_gc.getGameObjectDrawings()) {
 		if(g->getGameObject().getZindex() >= 0 && drawMap) {
