@@ -11,7 +11,5 @@ swone.layout
 !/build/swone@exe.vcxproj
 !/build/swone.sln
 winbuild.txt
-res/settings.ini
-res/srvsettings.ini
-res/download/
+res/
 .cache
