@@ -18,19 +18,8 @@ void Client::handleAllEvents(sf::Event& event)
 		settings.setWidth(event.size.width);
 		settings.setHeight(event.size.height);
 	} else if(event.type == sf::Event::KeyPressed) {
-		if(event.key.code == sf::Keyboard::LControl) {
-			key_strg_pressed = true;
-		} else if(event.key.code == sf::Keyboard::L) {
-			key_l_pressed = true;
-		}
-		if(key_strg_pressed && key_l_pressed) {
+		if(event.key.code == sf::Keyboard::F3) {
 			Log::ger().toggleLogWindow();
-		}
-	} else if(event.type == sf::Event::KeyReleased) {
-		if(event.key.code == sf::Keyboard::LControl) {
-			key_strg_pressed = false;
-		} else if(event.key.code == sf::Keyboard::L) {
-			key_l_pressed = false;
 		}
 	}
 }
@@ -38,7 +27,8 @@ void Client::handleAllEvents(sf::Event& event)
 void Client::drawLog()
 {
 	if(Log::ger().isLogClosed()) {
-		ImGui::Begin("Log", &Log::ger().isLogClosed());
+		int window_flags = ImGuiWindowFlags_NoSavedSettings;
+		ImGui::Begin("Log", &Log::ger().isLogClosed(), window_flags);
 
 		ImGui::BeginChild("ScrollingRegion", ImVec2(0, -ImGui::GetItemsLineHeightWithSpacing()), false, ImGuiWindowFlags_HorizontalScrollbar);
 
@@ -60,7 +50,7 @@ void Client::drawLog()
 				break;
 			}
 
-			ImGui::Text(s.message.c_str());
+			ImGui::Text("%s", s.message.c_str());
 			ImGui::PopStyleColor();
 		}
 
@@ -93,7 +83,7 @@ void Client::renderObjectSelector()
 			int id = 0;
 			for(GameObject* g : gameObjects) {
 				ImGui::PushID(id);
-				ImGui::Text(g->getIdentifier().c_str());
+				ImGui::Text("%s", g->getIdentifier().c_str());
 				ImGui::SameLine();
 				if(ImGui::SmallButton("Inspect Object")) {
 					g->toggleLogging();
@@ -288,7 +278,7 @@ void Client::startMainLoop()
 void Client::initLogger()
 {
 	std::function<void(std::string, float)> imguiDisplayString = [](std::string s, float scale) {
-		ImGui::Text(s.c_str());
+		ImGui::Text("%s", s.c_str());
 	};
 
 	std::function<void(const sf::Texture*, float)> imguiDisplayTexture = [](const sf::Texture* t, float scale) {

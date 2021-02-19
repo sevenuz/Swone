@@ -158,6 +158,8 @@ void GameWindow::event(sf::Event& event) {
 		}
 	}
 
+	if(m_gstate == GameState::Pause || m_showCharacterSelection)
+		return;
 	if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
 		m_c.gameMutex.lock();
 		for(GameObject* go : m_gc.getLocalPlayers()) {

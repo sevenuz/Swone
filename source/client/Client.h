@@ -48,8 +48,6 @@ private:
 
 	sf::Clock game_clock;
 
-	bool key_strg_pressed = false;
-	bool key_l_pressed = false;
 	bool object_viewer_activated = false;
 	bool demo_window_activated = false;
 };
