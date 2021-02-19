@@ -35,9 +35,6 @@ void Reader::read()
 	std::string line;
 	while (std::getline(infile, line))
 	{
-		// ignore comment lines and empty lines:
-		if (line.substr(0, 2) == "//" || Helper::trim(line).empty())
-			continue;
 		parseLine(m_paragraph, line);
 		m_lineCounter++;
 	}
@@ -116,6 +113,9 @@ void Reader::addParagraphValue(std::string paragraph, StringPair p) {
 
 void Reader::parseLine(std::string paragraph, std::string line)
 {
+	// ignore comment lines and empty lines:
+	if (line.substr(0, 2) == "//" || Helper::trim(line).empty())
+		return;
 	try {
 		addParagraphValue(paragraph, parseValue(line));
 	}

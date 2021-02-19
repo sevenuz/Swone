@@ -112,10 +112,10 @@ Tile::Tile(sf::Vector2i pos, MapTile t)
 	{
 		if(type == MapTile::UNDERSCORE) {
 			shape.SetBox(TILE_SIZE/2, TILE_SIZE/4);
-			body = new ph::Body(ph::Body::Config{x : ((float)pos.x), y : ((float)pos.y+TILE_CORRECTION/2)}, &shape, this);
+			body = new ph::Body(ph::Body::Config{.x = ((float)pos.x), .y = ((float)pos.y+TILE_CORRECTION/2)}, &shape, this);
 		} else {
 			shape.SetBox(TILE_SIZE/2, TILE_SIZE/2);
-			body = new ph::Body(ph::Body::Config{x : ((float)pos.x), y : ((float)pos.y)}, &shape, this);
+			body = new ph::Body(ph::Body::Config{.x = ((float)pos.x), .y = ((float)pos.y)}, &shape, this);
 		}
 		body->SetSolid();
 		/*
@@ -142,7 +142,7 @@ Tile* Tile::castBodyCallback(ph::Body::Callback* c)
 	if(c->getCallbackType() == MAP_TILE_TYPE)
 		return static_cast<Tile*>(c);
 	else
-		return NULL;
+		return nullptr;
 }
 
 bool Tile::isPassable() const {

@@ -93,13 +93,19 @@ void GameWindow::update(sf::Time ellapsed) {}
 void GameWindow::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
 		if (event.key.code == sf::Keyboard::Escape) {
-			m_gstate = GameState::Pause;
+			if(m_gstate == GameState::Pause) {
+				m_gstate = GameState::Play;
+			} else {
+				m_gstate = GameState::Pause;
+			}
 		}
-		if (event.key.code == sf::Keyboard::Tab) { // TODO config keys
+		if (event.key.code == sf::Keyboard::Tab) {
 			m_showInfoPanel = true;
+		}
+		if (event.key.code == sf::Keyboard::F1) { // TODO config key
 			m_showCharacterSelection = !m_showCharacterSelection;
 		}
-		if (event.key.code == sf::Keyboard::H && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+		if (event.key.code == sf::Keyboard::F3) {
 			m_showHitboxes = !m_showHitboxes;
 		}
 	} else if (event.type == sf::Event::KeyReleased) {
