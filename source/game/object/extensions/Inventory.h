@@ -19,6 +19,8 @@ class InventoryDrawing;
 class Inventory : public Extension {
 	friend InventoryDrawing;
 public:
+	static constexpr const char* S_INVENTORY_ITEMS = "items";
+
 	Inventory(GameObject* obj, StringMapMap& setupMap);
 
 	void applyConfig(StringMapMap& setupMap) override;

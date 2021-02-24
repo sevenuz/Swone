@@ -28,6 +28,7 @@ class Extension;
 class GameObjectDrawing;
 
 class GameObject : public Updateable, public ph::Body::Callback {
+	friend Extension;
 	friend GameObjectDrawing;
 public:
 	struct Event {
@@ -101,11 +102,8 @@ public:
 		StringMapMap extensionMap; // TODO improve data exchange with extensions
 	};
 
-	GameObject(std::string type, Config config, ph::Shape* shape);
-	GameObject(std::string type, Config config, std::vector<ph::Vec2>& vertices, float density);
-	GameObject(std::string type, Config config, float radius, float density);
-	GameObject(StringMapMap& setupMap);
-	GameObject(std::string identifier, StringMapMap& setupMap);
+	GameObject(StringMapMap& setupMap, std::function<GameObject*(const std::string& identifier)> idGoMapper);
+	GameObject(std::string identifier, StringMapMap& setupMap, std::function<GameObject*(const std::string& identifier)> idGoMapper);
 	virtual ~GameObject();
 
 	void applySetupMap(StringMapMap& setupMap);
@@ -187,6 +185,7 @@ private:
 	bool m_isFalling = false; // movement to bottom
 	bool m_isMoving = false;  // movement on x
 
+	std::function<GameObject*(const std::string& identifier)> m_idGoMapper;
 	std::map<std::string, Extension*> m_extensions;
 };
 

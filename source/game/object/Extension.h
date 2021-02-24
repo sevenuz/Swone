@@ -22,6 +22,9 @@ public:
 	virtual void updateLog(){};
 protected:
 	GameObject* m_obj;
+	GameObject* getGameObjectByIdentifier(const std::string& identifier) { // TODO implementierung hier legit??
+		return m_obj->m_idGoMapper(identifier);
+	};
 };
 
 #endif

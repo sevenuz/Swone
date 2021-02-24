@@ -64,8 +64,10 @@ void CharacterSelection::drawImguiCharacterMenu(size_t index)
 
 	ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always);
 	ImGui::SetNextWindowSize(window_size, ImGuiCond_Always);
-	std::string menuName = "Character Menu: ";
-	menuName += (c.player) ? c.player->getName() : std::to_string(index + 1);
+	std::string menuName = "Character Menu (";
+	menuName += std::to_string(index + 1) + ") : ";
+	if(c.player)
+		menuName += c.player->getName();
 	ImGui::Begin(menuName.c_str(), w_open, window_flags);
 		ImGui::BeginGroup();
 		ImGui::Text("Select a Character");

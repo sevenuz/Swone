@@ -53,7 +53,13 @@ void GameController::clearAll()
 // is only called if object comes from server and so it is never static
 GameObject* GameController::spawnGameObject(std::string identifier, std::string key)
 {
-	GameObject* go = new GameObject(identifier, m_scenery.getObjectSetupMaps()[key]);
+	GameObject* go = new GameObject(
+		identifier,
+		m_scenery.getObjectSetupMaps()[key],
+		[&](const std::string& id) -> GameObject* {
+			return getGameObejctPointer(id);
+		}
+	);
 	m_goPointers[go->getIdentifier()] = go;
 	m_goKeys[go->getIdentifier()] = key;
 	m_gameObjects.push_back(go);
@@ -64,7 +70,12 @@ GameObject* GameController::spawnGameObject(std::string identifier, std::string 
 
 GameObject* GameController::spawnGameObject(std::string key, bool isStatic)
 {
-	GameObject* go = new GameObject(m_scenery.getObjectSetupMaps()[key]);
+	GameObject* go = new GameObject(
+		m_scenery.getObjectSetupMaps()[key],
+		[&](const std::string& id) -> GameObject* {
+			return getGameObejctPointer(id);
+		}
+	);
 	m_goPointers[go->getIdentifier()] = go;
 	m_goKeys[go->getIdentifier()] = key;
 	if(isStatic)
@@ -78,7 +89,13 @@ GameObject* GameController::spawnGameObject(std::string key, bool isStatic)
 
 GameObject* GameController::spawnPlayer(std::string identifier, std::string key)
 {
-	GameObject* go = new GameObject(identifier, m_scenery.getPlayerSetupMaps()[key]);
+	GameObject* go = new GameObject(
+		identifier,
+		m_scenery.getPlayerSetupMaps()[key],
+		[&](const std::string& id) -> GameObject* {
+			return getGameObejctPointer(id);
+		}
+	);
 	m_goPointers[go->getIdentifier()] = go;
 	m_goKeys[go->getIdentifier()] = key;
 	m_players.push_back(go);
@@ -90,7 +107,12 @@ GameObject* GameController::spawnPlayer(std::string identifier, std::string key)
 // is only called from lobby and so always a remotePlayer
 GameObject* GameController::spawnPlayer(std::string key)
 {
-	GameObject* go = new GameObject(m_scenery.getPlayerSetupMaps()[key]);
+	GameObject* go = new GameObject(
+		m_scenery.getPlayerSetupMaps()[key],
+		[&](const std::string& id) -> GameObject* {
+			return getGameObejctPointer(id);
+		}
+	);
 	m_goPointers[go->getIdentifier()] = go;
 	m_goKeys[go->getIdentifier()] = key;
 	m_players.push_back(go);
@@ -273,16 +295,6 @@ const ph::Scene& GameController::getScene() const
 ph::Scene& GameController::getScene()
 {
 	return m_scene;
-}
-
-GameObject* GameController::getGameObjectById(const std::string & id) const
-{
-	for (GameObject* g : getAll())
-	{
-		if (g->getIdentifier() == id)
-			return g;
-	}
-	return nullptr;
 }
 
 void GameController::updateLog() const

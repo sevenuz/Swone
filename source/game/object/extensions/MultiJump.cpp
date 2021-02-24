@@ -15,9 +15,26 @@ MultiJump::MultiJump(GameObject* obj, StringMapMap& setupMap) : Extension(obj)
 
 void MultiJump::applyConfig(StringMapMap& setupMap)
 {
-	if(setupMap.count(Reader::DEFAULT_PARAGRAPH))
+	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)) {
+		// setup
+		if(setupMap[Reader::DEFAULT_PARAGRAPH].count(S_JUMPS_POSSIBLE))
+			m_jumpsPossible = Helper::toInt(setupMap[Reader::DEFAULT_PARAGRAPH][S_JUMPS_POSSIBLE]);
 		if(setupMap[Reader::DEFAULT_PARAGRAPH].count(Extension::S_VELOCITY))
 			m_posVelY = Helper::toVector2f(setupMap[Reader::DEFAULT_PARAGRAPH][Extension::S_VELOCITY]).y;
+		// state
+		if(setupMap[Reader::DEFAULT_PARAGRAPH].count(S_JUMPS))
+			m_jumps = Helper::toInt(setupMap[Reader::DEFAULT_PARAGRAPH][S_JUMPS]);
+	}
+}
+
+void MultiJump::getConfig(StringMapMap& extensionMap)
+{
+	extensionMap[Reader::DEFAULT_PARAGRAPH][S_JUMPS] = std::to_string(m_jumps);
+}
+
+void MultiJump::onTileCollision(ph::Manifold* manifold, Tile* t)
+{
+	resetJump();
 }
 
 void MultiJump::jump() {
@@ -34,21 +51,6 @@ void MultiJump::event(GameObject::Event event) {
 	}
 }
 
-void MultiJump::update(sf::Time ellapsed) {
-	refreshJump(ellapsed);
-}
-
-void MultiJump::refreshJump(sf::Time ellapsed) {
-	m_jumpCooldown += ellapsed;
-	if (m_jumpCooldown >= m_jumpCooldownTime) {
-		if (m_jumps < m_jumpsPossible) {
-			m_jumps++;
-		}
-		m_jumpCooldown = sf::seconds(0);
-	}
-}
-
 void MultiJump::resetJump() {
-	m_jumpCooldown = sf::seconds(0);
 	m_jumps = m_jumpsPossible;
 }

@@ -13,12 +13,20 @@ Inventory::Inventory(GameObject* obj, StringMapMap& setupMap) : Extension(obj)
 
 void Inventory::applyConfig(StringMapMap& setupMap)
 {
-	// TODO read inventory from extensionMap?
+	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
+		if(setupMap[S_INVENTORY_ITEMS].count(std::to_string(i))) {
+			m_items[i] = getGameObjectByIdentifier(setupMap[S_INVENTORY_ITEMS][std::to_string(i)]);
+		}
+	}
 }
 
 void Inventory::getConfig(StringMapMap& extensionMap)
 {
-	// TODO write inventory to extensionMap?
+	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
+		if(m_items[i]) {
+			extensionMap[S_INVENTORY_ITEMS][std::to_string(i)] = m_items[i]->getIdentifier();
+		}
+	}
 }
 
 void Inventory::event(GameObject::Event e)
@@ -48,8 +56,16 @@ void Inventory::event(GameObject::Event e)
 
 bool Inventory::addObject(GameObject* g)
 {
+	// TODO why required?? because physics call collision callback multiple times?
+	for(size_t i = 0; i < INVENTORY_SIZE; ++i)
+		if(m_items[i])
+			if(m_items[i]->getIdentifier() == g->getIdentifier()) {
+				Log::ger().log("already in Inventory");
+				return false;
+			}
+
 	for(size_t i = 0; i < INVENTORY_SIZE; ++i) {
-		if(m_items[i] == NULL) {
+		if(!m_items[i]) {
 			m_items[i] = g;
 			return true;
 		}

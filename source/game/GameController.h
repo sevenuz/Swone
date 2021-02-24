@@ -21,7 +21,6 @@ public:
 	std::list<GameObject*>& getStaticGameObjects();
 	std::list<GameObject*>& getGameObjects();
 	std::list<GameObject*>& getPlayers();
-	GameObject* getGameObjectById(const std::string& id) const;
 
 	void updateLog() const;
 
