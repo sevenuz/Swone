@@ -37,9 +37,9 @@ void SrvSettings::read(const std::string& s)
 		if(k==SRVSETTINGS_DOMAIN)
 			setDomain(v);
 		else if(k==SRVSETTINGS_PORT)
-			setPort((ushort)Helper::toLong(v));
+			setPort((unsigned short)Helper::toLong(v));
 		else if(k==SRVSETTINGS_TICK_RATE)
-			setTickRate((ushort)Helper::toLong(v));
+			setTickRate((unsigned short)Helper::toLong(v));
 		else if(k==SRVSETTINGS_RESOURCE_DIRECTORY)
 			setResourceDirectory(v);
 		else if(k==SRVSETTINGS_LOBBY_MAXIMUM)
