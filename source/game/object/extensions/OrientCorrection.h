@@ -15,6 +15,7 @@ public:
 	OrientCorrection(GameObject* obj);
 	void update(sf::Time ellapsed) override;
 	void onTileCollision(ph::Manifold* manifold, Tile* t) override;
+	void onObjectCollision(ph::Manifold* manifold, GameObject* t) override;
 private:
 	bool checkOrient();
 

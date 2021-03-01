@@ -57,6 +57,7 @@ src = [
 	'source/game/object/GameObject.cpp',
 	'source/game/object/extensions/MovementX.cpp',
 	'source/game/object/extensions/MultiJump.cpp',
+	'source/game/object/extensions/KickUp.cpp',
 	'source/game/object/extensions/Inventory.cpp',
 	'source/game/object/extensions/OrientCorrection.cpp',
 	'source/util/reader/Reader.cpp',

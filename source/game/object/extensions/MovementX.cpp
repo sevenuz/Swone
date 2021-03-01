@@ -19,15 +19,25 @@ void MovementX::applyConfig(StringMapMap& setupMap)
 			m_posVelX = Helper::toVector2f(setupMap[Reader::DEFAULT_PARAGRAPH][Extension::S_VELOCITY]).x;
 }
 
-void MovementX::event(GameObject::Event event) {
-	if (event.left) {
-		m_obj->setVelX(-m_posVelX);
+void MovementX::update(sf::Time ellapsed)
+{
+	if(m_accelerationX == 0)
+		return;
+	float v = std::abs(m_obj->getVel().x) + ellapsed.asSeconds() * m_accelerationX;
+	if(v <= m_posVelX) {
+		m_obj->setVelX(v * m_direction);
 	} else {
-		//m_obj->setVelX(0);
+		m_obj->setVelX(m_posVelX * m_direction);
 	}
-	if (event.right) {
-		m_obj->setVelX(m_posVelX);
+}
+
+void MovementX::event(GameObject::Event event) {
+	m_accelerationX = ACCELERATION;
+	if (event.left) {
+		m_direction = -1;
+	} else if (event.right) {
+		m_direction = 1;
 	} else {
-		//m_obj->setVelX(0);
+		m_accelerationX = 0;
 	}
 }

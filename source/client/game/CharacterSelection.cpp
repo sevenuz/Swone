@@ -5,12 +5,18 @@ CharacterSelection::CharacterSelection(Controller& c) :
 	m_gc(c.getGameController()),
 	m_nc(c.getNetController())
 {
-	// add one default Charactermenu
-	m_characters.push_back(Character{});
+	reset(); // init
 }
 
 CharacterSelection::~CharacterSelection()
 {}
+
+void CharacterSelection::reset()
+{
+	m_characters.clear();
+	// add one default Charactermenu
+	m_characters.push_back(Character{});
+}
 
 void CharacterSelection::drawImgui()
 {

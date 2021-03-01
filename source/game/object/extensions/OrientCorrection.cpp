@@ -39,3 +39,8 @@ void OrientCorrection::onTileCollision(ph::Manifold* manifold, Tile* t)
 {
 	checkOrient();
 }
+
+void OrientCorrection::onObjectCollision(ph::Manifold* manifold, GameObject* t)
+{
+	checkOrient();
+}

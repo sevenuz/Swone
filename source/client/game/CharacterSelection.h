@@ -19,6 +19,7 @@ public:
 	virtual ~CharacterSelection();
 
 	void drawImgui();
+	void reset();
 private:
 	Controller& m_c;
 	ClientGameController& m_gc;

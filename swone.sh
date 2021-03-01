@@ -64,7 +64,8 @@ fi
 
 for var in "$@"
 do
-    $var 2>/dev/null || echo "$var is not a command. Try help to see all."
+	# 2>/dev/null || echo "$var is not a command. Try help to see all."
+    $var
 	echo ''
 done
 

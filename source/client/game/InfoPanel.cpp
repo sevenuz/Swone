@@ -8,6 +8,9 @@ InfoPanel::InfoPanel(Controller& c) :
 InfoPanel::~InfoPanel()
 {}
 
+void InfoPanel::reset()
+{}
+
 void InfoPanel::drawImgui()
 {
 	// imgui.h:595 or imgui_demo.cpp:187

@@ -155,12 +155,24 @@ std::list<GameObject*>& ClientGameController::getLocalPlayers()
 
 void ClientGameController::setLocalPlayerKeybinding(GameObject* go, Settings::Keybinding k)
 {
+	// set empty event to compare with, the first time an event is polled for this player
+	m_playerLastEvent[go] = GameObject::Event{};
 	m_playerKeybindings[go] = k;
 }
 
 const Settings::Keybinding& ClientGameController::getLocalPlayerKeybinding(GameObject* go)
 {
 	return m_playerKeybindings.at(go);
+}
+
+void ClientGameController::setLocalPlayerLastEvent(GameObject* go, GameObject::Event e)
+{
+	m_playerLastEvent[go] = e;
+}
+
+const GameObject::Event& ClientGameController::getLocalPlayerLastEvent(GameObject* go)
+{
+	return m_playerLastEvent.at(go);
 }
 
 const std::list<GameObjectDrawing*> ClientGameController::getGameObjectDrawings() const

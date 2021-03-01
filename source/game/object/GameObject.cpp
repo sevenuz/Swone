@@ -3,6 +3,7 @@
 // necessary because of forward declaration in GameObject.h
 #include "game/object/extensions/MovementX.h"
 #include "game/object/extensions/MultiJump.h"
+#include "game/object/extensions/KickUp.h"
 #include "game/object/extensions/Inventory.h"
 #include "game/object/extensions/OrientCorrection.h"
 
@@ -88,6 +89,8 @@ void GameObject::initSetupMap(StringMapMap& setupMap)
 			initExtension(S_MOVEMENTX_EXTENSION, setupMap);
 		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_MULTIJUMP_EXTENSION]))
 			initExtension(S_MULTIJUMP_EXTENSION, setupMap);
+		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_KICKUP_EXTENSION]))
+			initExtension(S_KICKUP_EXTENSION, setupMap);
 		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_INVENTORY_EXTENSION]))
 			initExtension(S_INVENTORY_EXTENSION, setupMap);
 		if(Helper::toBool(setupMap[S_EXTENSIONS_PARAGRAPH][S_ORIENT_CORRECTION_EXTENSION]))
@@ -101,6 +104,8 @@ void GameObject::initExtension(std::string extensionName, StringMapMap& setupMap
 		m_extensions[S_MOVEMENTX_EXTENSION] = new MovementX(this, setupMap);
 	if(extensionName == S_MULTIJUMP_EXTENSION)
 		m_extensions[S_MULTIJUMP_EXTENSION] = new MultiJump(this, setupMap);
+	if(extensionName == S_KICKUP_EXTENSION)
+		m_extensions[S_KICKUP_EXTENSION] = new KickUp(this);
 	if(extensionName == S_INVENTORY_EXTENSION)
 		m_extensions[S_INVENTORY_EXTENSION] = new Inventory(this, setupMap);
 	if(extensionName == S_ORIENT_CORRECTION_EXTENSION)

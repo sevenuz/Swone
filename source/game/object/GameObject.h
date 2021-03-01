@@ -85,6 +85,7 @@ public:
 	static constexpr const char* S_GRAVITY_EXTENSION = "gravity";
 	static constexpr const char* S_MOVEMENTX_EXTENSION = "movementx";
 	static constexpr const char* S_MULTIJUMP_EXTENSION = "multijump";
+	static constexpr const char* S_KICKUP_EXTENSION = "kickup";
 	static constexpr const char* S_INVENTORY_EXTENSION = "inventory";
 	static constexpr const char* S_ORIENT_CORRECTION_EXTENSION = "orientCorrection";
 

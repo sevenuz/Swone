@@ -272,9 +272,11 @@ void NetController::start(std::string lobbyCode, sf::IpAddress srvIp, Net::Port 
 
 void NetController::disconnect()
 {
+	m_c.gameMutex.lock();
 	Net::GamePacket packet(Net::U_DISCONNECT, m_lobbyCode, m_timeSyncPeer);
 	m_socket.send(packet, m_serverIpAddress, m_serverPort);
 	stop();
+	m_c.gameMutex.unlock();
 }
 
 void NetController::stop()

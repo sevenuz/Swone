@@ -11,6 +11,7 @@ public:
 	InfoPanel(Controller& c);
 	virtual ~InfoPanel();
 
+	void reset();
 	void drawImgui();
 private:
 	Controller& m_controller;

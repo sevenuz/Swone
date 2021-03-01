@@ -72,6 +72,8 @@ void GameWindow::drawPause()
 		}
 		if(ImGui::Button("Disconnect", ImVec2(120,0))) {
 			m_c.getNetController().disconnect();
+			m_characterSelection.reset();
+			m_infoPanel.reset();
 			m_gstate = GameState::Play;
 			m_c.popState();
 			ImGui::CloseCurrentPopup();
@@ -89,6 +91,18 @@ void GameWindow::drawPause()
 }
 
 void GameWindow::update(sf::Time ellapsed) {}
+
+bool GameWindow::isEqualEvent(const GameObject::Event& event1, const GameObject::Event& event2)
+{
+	return event1.left == event2.left &&
+		event1.right == event2.right &&
+		event1.up == event2.up &&
+		event1.down == event2.down &&
+		event1.action1 == event2.action1 &&
+		event1.action2 == event2.action2 &&
+		event1.action3 == event2.action3 &&
+		event1.action4 == event2.action4;
+}
 
 void GameWindow::event(sf::Event& event) {
 	if (event.type == sf::Event::KeyPressed) {
@@ -183,12 +197,14 @@ void GameWindow::event(sf::Event& event) {
 					sf::Keyboard::isKeyPressed(k.action3),
 					sf::Keyboard::isKeyPressed(k.action4)
 				};
-				go->event(event);
-				Log::ger().log("event an " + go->getIdentifier());
-				m_nc.sendPlayerInput(Net::PlayerInput{
-						go->getIdentifier(),
-						event
-				});
+				if(!isEqualEvent(m_gc.getLocalPlayerLastEvent(go), event)) {
+					m_gc.setLocalPlayerLastEvent(go, event);
+					go->event(event);
+					m_nc.sendPlayerInput(Net::PlayerInput{
+							go->getIdentifier(),
+							event
+					});
+				}
 			}
 		}
 		m_c.gameMutex.unlock();

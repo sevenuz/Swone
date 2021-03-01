@@ -20,7 +20,7 @@ void MapDrawing::createMapImage() {
 	for (size_t r = 0; r < m_map.getWidth(); r++)
 		for (size_t c = 0; c < m_map.getHeight(); c++) {
 			sf::Vector2i ttp = getTileTexturePosition(m_map.getTile(r, c).type);
-			m_mapImage.copy(tileTexture, c * Map::TILE_WIDTH, r * Map::TILE_HEIGHT,
+			m_mapImage.copy(tileTexture, r * Map::TILE_WIDTH, c * Map::TILE_HEIGHT,
 				sf::IntRect(ttp.x, ttp.y,
 					Map::TILE_WIDTH, Map::TILE_HEIGHT), true);
 		}

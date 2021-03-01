@@ -33,6 +33,7 @@ public:
 	void update(sf::Time ellapsed);
 	void event(sf::Event& e);
 private:
+	bool isEqualEvent(const GameObject::Event& event1, const GameObject::Event& event2);
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 	Controller& m_c;

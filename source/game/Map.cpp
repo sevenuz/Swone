@@ -86,11 +86,11 @@ MapTile Map::getBorder() {
 	return m_border;
 }
 
-const Tile& Map::getTile(int h, int w) const {
+const Tile& Map::getTile(int w, int h) const {
 	return *m_mapData.at(h).at(w);
 }
 
-const Tile& Map::getTile(int h, int w) {
+const Tile& Map::getTile(int w, int h) {
 	if (!m_mapData[h].count(w)) {
 		// add border tile to map if coordinate not exists
 		setMapDataValue(h, w, m_border);

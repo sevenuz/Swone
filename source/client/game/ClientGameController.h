@@ -40,6 +40,8 @@ public:
 
 	void setLocalPlayerKeybinding(GameObject* go, Settings::Keybinding);
 	const Settings::Keybinding& getLocalPlayerKeybinding(GameObject* go);
+	void setLocalPlayerLastEvent(GameObject* go, GameObject::Event event);
+	const GameObject::Event& getLocalPlayerLastEvent(GameObject* go);
 
 	const std::list<GameObjectDrawing*> getGameObjectDrawings() const;
 	const MapDrawing& getMapDrawing() const;
@@ -51,6 +53,7 @@ private:
 	std::list<GameObjectDrawing*> m_goDrawings;
 	std::map<GameObject*, GameObjectDrawing*> m_goDrawingsMap;
 	std::map<GameObject*, Settings::Keybinding> m_playerKeybindings;
+	std::map<GameObject*, GameObject::Event> m_playerLastEvent;
 
 	MapDrawing* m_mapDrawing = nullptr;
 };
