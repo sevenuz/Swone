@@ -56,32 +56,29 @@ std::string Helper::parseFileName(std::string path)
 
 void Helper::readDirectory(tinydir_dir& dir, std::function<void(tinydir_file& file)>fn, bool recursive)
 {
-	if (!dir.has_next) {
+	if (!dir.n_files) {
 		throw std::invalid_argument("no files or no dir available");
 	}
 
-	while (dir.has_next)
+	for (std::size_t i = 0; i < dir.n_files; i++)
 	{
 		tinydir_file file;
-		tinydir_readfile(&dir, &file);
+		tinydir_readfile_n(&dir, &file, i);
 
 		if (recursive && file.is_dir) {
 			if (strcmp(file.name, ".") != 0 && strcmp(file.name, "..") != 0) {
-				tinydir_open(&dir, file.path);
-				readDirectory(dir, fn, recursive);
+				readDirectory(std::string(file.path), fn, recursive);
 			}
 		} else {
 			fn(file);
 		}
-
-		tinydir_next(&dir);
 	}
 }
 
 void Helper::readDirectory(std::string path, std::function<void(tinydir_file& file)>fn, bool recursive)
 {
 	tinydir_dir dir;
-	tinydir_open(&dir, path.c_str());
+	tinydir_open_sorted(&dir, path.c_str());
 	readDirectory(dir, fn, recursive);
 	tinydir_close(&dir);
 }
