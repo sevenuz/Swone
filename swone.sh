@@ -17,7 +17,7 @@ build(){
 	else
 		###  Control will jump here if $DIR does NOT exists ###
 		echo "run meson build..."
-		meson $BUILDDIR
+		meson -Dbuildtype=custom -Ddebug=true -Doptimization=g $BUILDDIR
 		cd $BUILDDIR
 	fi
 	echo "run ninja..."
