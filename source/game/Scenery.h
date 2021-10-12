@@ -4,8 +4,6 @@
 #include <list>
 #include <map>
 
-#include <md5.h>
-
 #include "game/GameReader.h"
 #include "game/Map.h"
 #include "game/Net.h"

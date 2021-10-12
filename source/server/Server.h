@@ -6,8 +6,6 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/System/Time.hpp>
 
-#include <md5.h>
-
 #include "server/SrvSettings.h"
 #include "server/Player.h"
 #include "server/Lobby.h"

@@ -102,6 +102,17 @@ void Helper::writeFileBytes(std::string file, size_t length, const char* data)
 	std::ofstream(file, std::ios::binary).write(data, length);
 }
 
+std::string Helper::md5(const std::string& filename)
+{
+	if(std::FILE* file = fopen(filename.c_str(), "rb")) {
+		std::string res = md5file(file);
+		fclose(file);
+		return res;
+	} else {
+		throw std::invalid_argument("file not exist or cannot be opened: " + filename);
+	}
+}
+
 std::string Helper::replaceIllegalCharacters(std::string s, std::string ic, char r)
 {
 	for(auto it = s.begin(); it < s.end(); ++it){

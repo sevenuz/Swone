@@ -103,7 +103,7 @@ void GameReader::hashResDir(std::string resDir)
 
 std::string GameReader::getHash(std::string file)
 {
-	std::string hash = md5file(file.c_str());
+	std::string hash = Helper::md5(file.c_str());
 	// TODO is hash collision a problem?
 	if(getFileHashes().count(hash) && getFileHashes()[hash] != file) {
 		Log::ger().log("Collision: " + hash, Log::Label::Error);

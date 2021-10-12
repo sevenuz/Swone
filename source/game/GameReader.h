@@ -4,8 +4,6 @@
 #include <functional>
 #include <map>
 
-#include <md5.h>
-
 #include "util/Log.h"
 #include "util/reader/Reader.h"
 

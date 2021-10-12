@@ -17,7 +17,7 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 	} else {
 		m_fileCheck.sceneryFile = std::make_pair(
 				fileName,
-				md5file(GameReader::getSceneryPath(resDir, fileName).c_str())
+				Helper::md5(GameReader::getSceneryPath(resDir, fileName).c_str())
 		);
 	}
 	if(setupMap.count(Reader::DEFAULT_PARAGRAPH)) {
@@ -33,7 +33,7 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 			} else {
 				std::string mapName = global[S_MAP];
 				mapPath = GameReader::getMapPath(resDir, mapName);
-				m_fileCheck.mapFile = std::make_pair(mapName, md5file(mapPath.c_str()));
+				m_fileCheck.mapFile = std::make_pair(mapName, Helper::md5(mapPath.c_str()));
 			}
 
 			m_map = GameReader::getMap(mapPath, [&](std::string textureName) -> std::string {
@@ -47,7 +47,7 @@ Scenery::Scenery(std::string resDir, std::string fileName, StringMapMap setupMap
 			if(!gfcInjection) {
 				std::string textureName = m_map->getTileTextureName();
 				std::string texturePath = m_map->getTileTexturePath();
-				m_fileCheck.textureFileMap[textureName] = md5file(texturePath.c_str());
+				m_fileCheck.textureFileMap[textureName] = Helper::md5(texturePath.c_str());
 			}
 		} else {
 			throw std::invalid_argument("Map-Filename missing.");
@@ -99,7 +99,7 @@ StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goN
 		goPath = GameReader::getFile(m_fileCheck.objectFileMap[goName]);
 	} else {
 		goPath = GameReader::getGameObjectPath(resDir, goName);
-		m_fileCheck.objectFileMap[goName] = md5file(goPath.c_str());
+		m_fileCheck.objectFileMap[goName] = Helper::md5(goPath.c_str());
 	}
 
 	StringMapMap& goSetupMap = GameReader::getGameObjectMap(goPath);
@@ -115,7 +115,7 @@ StringMapMap& Scenery::getGameObjectSetupMap(std::string resDir, std::string goN
 	// set texture path in setupMap
 	goSetupMap[Reader::DEFAULT_PARAGRAPH][GameObject::S_TEXTURE_PATH] = texturePath;
 	if(!gfcInjection)
-		m_fileCheck.textureFileMap[textureName] = md5file(texturePath.c_str());
+		m_fileCheck.textureFileMap[textureName] = Helper::md5(texturePath.c_str());
 
 	return goSetupMap;
 }

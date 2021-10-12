@@ -14,6 +14,7 @@
 #include <filesystem>
 
 #include <tinydir.h>
+#include <md5.h>
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -39,6 +40,8 @@ namespace Helper
 
 	void readFileBytes(std::string file, std::function<void(size_t length, char* data)> fn);
 	void writeFileBytes(std::string file, size_t length, const char* data);
+
+	std::string md5(const std::string& filename);
 
 	std::string replaceIllegalCharacters(std::string s, std::string illegalCharacters, char replace);
 	void replaceAll(std::string& s, std::string toReplace, std::string replacement);
