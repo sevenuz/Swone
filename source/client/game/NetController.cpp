@@ -58,29 +58,40 @@ sf::Time NetController::restartClock()
 
 void NetController::updateGameController(sf::Time ellapsed)
 {
+	if(m_gameStates.size() < 2)
+		return;
 	std::lock_guard<std::mutex> lock(m_c.gameMutex);
 
-	// first received GameState will be skipped and applied when the second is received
-	if(m_gameStates.size() >= 2) {
-		Net::Timestamp targetT = m_timeSyncPeer.now() - INTERPOLATION_TIME;
+	Net::Timestamp targetT = m_timeSyncPeer.now() - INTERPOLATION_TIME + ellapsed.asMicroseconds();
+	Net::Timestamp finishT = targetT + ellapsed.asMicroseconds();
 
-		auto it = m_gameStates.upper_bound(targetT);
-		auto bit = it;
-		if(bit != m_gameStates.begin())
-			bit = std::prev(bit);
-		if(targetT > bit->first && targetT < it->first) {
-			sf::Time diffT = sf::microseconds(targetT) + ellapsed - sf::microseconds(it->first);
-			if(diffT >= sf::Time::Zero) {
-				// sets the interpolated game state
-				m_gc.update(diffT);
-				m_gc.interpolateGameState(it->second);
-				// we reached next game state and can delete older ones
-				m_gameStates.erase(m_gameStates.begin(), bit);
-				m_gc.update(ellapsed - diffT);
-			} else {
-				m_gc.update(ellapsed);
-			}
+	auto it = m_gameStates.upper_bound(targetT);
+	auto bit = it;
+
+	// first received GameState will be skipped and applied when the second is received
+	if(bit != m_gameStates.begin() && bit != m_gameStates.end())
+		bit = std::prev(bit);
+	else
+		return;
+
+	if(finishT > it->first) {
+		// we reached next game state and can delete older ones
+		m_gameStates.erase(m_gameStates.begin(), bit);
+
+		m_gc.update(sf::microseconds(it->first - targetT));
+		m_gc.applyGameState(it->second);
+		m_gc.update(sf::microseconds(finishT - it->first));
+
+		if(std::next(it) != m_gameStates.end()) {
+			auto nit = std::next(it);
+			double p = (double)(finishT - it->first) / (double)(nit->first - it->first);
+			m_gc.interpolateGameState(nit->second, p);
 		}
+	} else {
+		double p = (double)(targetT - bit->first) / (double)(it->first - bit->first);
+		m_gc.applyGameState(bit->second);
+		m_gc.interpolateGameState(it->second, p);
+		m_gc.update(ellapsed);
 	}
 }
 
@@ -89,7 +100,7 @@ void NetController::handleTimeSync()
 	if(m_timeT >= TIMESYNC_SWITCH_THRESHOLD)
 		m_timeSyncDt = TIMESYNC_SWITCH_DT;
 	while(m_timeSyncT >= m_timeSyncDt) {
-		Log::ger().log("latency: " + std::to_string(m_timeSyncPeer.getLatency()));
+		Log::ger().log("latency: " + std::to_string(m_timeSyncPeer.getLatency()) + "us");
 		Net::GamePacket packet = Net::sendTimeSync(m_lobbyCode, m_timeSyncPeer);
 		m_socket.send(packet , m_serverIpAddress, m_serverPort);
 		m_timeSyncT -= m_timeSyncDt;
@@ -209,7 +220,7 @@ void NetController::receiveGameState(Net::GamePacket packet)
 	// delete already applied player inputs
 	auto it = m_playerInputs.lower_bound(ts - owd);
 	if(it != m_playerInputs.begin())
-		m_playerInputs.erase(m_playerInputs.begin(), std::prev(it));
+		m_playerInputs.erase(m_playerInputs.begin(), it);
 
 	m_c.gameMutex.lock();
 
@@ -224,21 +235,22 @@ void NetController::receiveGameState(Net::GamePacket packet)
 		}
 	}
 	// apply all inputs since newest gamestate
+	auto t = ts + owd; // clienttime of the new gamestate
 	for(auto it2 = m_playerInputs.begin(); it2 != m_playerInputs.end(); ++it2) {
 		// apply newest gamestate to local players
 		for(GameObject* go : m_gc.getLocalPlayers()) {
 			if(it2->second.identifier == go->getIdentifier()) {
 				// newer timestamps are greater then older, so substract older from newer
-				m_gc.update(sf::microseconds(it2->first - ts - owd));
+				m_gc.update(sf::microseconds(it2->first - t));
 				go->event(it2->second.inputs);
-				ts = it2->first;
+				t = it2->first;
 				break;
 			}
 		}
 	}
-	m_gc.update(sf::microseconds(m_timeSyncPeer.now() - ts));
+	m_gc.update(sf::microseconds(m_timeSyncPeer.now() - t));
 	// applies interpolation state before player simulation
-	m_gc.interpolateGameState(interpolateGs); // does not apply to local players
+	m_gc.applyGameState(interpolateGs); // does not apply to local players
 	restartClock();
 
 	m_c.gameMutex.unlock();

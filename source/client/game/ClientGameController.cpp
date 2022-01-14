@@ -66,21 +66,31 @@ void ClientGameController::sortGameObjectDrawings()
 	});
 }
 
-void ClientGameController::interpolateGameObjectState(GameObject* go, Net::GameObjectState gos)
+ph::real interpolateVal(ph::real a, ph::real b, double percentage)
+{
+	ph::real c = a + ((b - a) * percentage);
+	ph::real difference = c - a;
+	ph::real sqr_difference = difference * difference;
+	if(sqr_difference > LOWER_POSITION_THRESHOLD && sqr_difference < UPPER_POSITION_THRESHOLD) {
+		a += difference * POSITION_CORRECTION;
+	}
+	return c;
+}
+
+void ClientGameController::interpolateGameObjectState(GameObject* go, Net::GameObjectState gos, const double percentage)
 {
 	auto c = go->getConfig();
-	ph::Vec2 posOld(c.body.x, c.body.y);
-	ph::Vec2 posNew(gos.x, gos.y);
-	ph::Vec2 difference = posNew - posOld;
-	if(difference.LenSqr() > LOWER_POSITION_THRESHOLD && difference.LenSqr() < UPPER_POSITION_THRESHOLD) {
-		posNew += difference * POSITION_CORRECTION;
-		gos.x = posNew.x;
-		gos.y = posNew.y;
+
+	// only on state apply, else interpolation by physics
+	if (percentage == 1.0) {
+		gos.x = interpolateVal(c.body.x, gos.x, percentage);
+		gos.y = interpolateVal(c.body.y, gos.y, percentage);
+		gos.orient = interpolateVal(c.body.orient, gos.orient, percentage);
 	}
-	ph::real oDifference = gos.orient - c.body.orient;
-	if(oDifference > LOWER_ORIENT_THRESHOLD && oDifference < UPPER_ORIENT_THRESHOLD) {
-		gos.orient += oDifference * ORIENT_CORRECTION;
-	}
+	gos.vx = interpolateVal(c.body.vx, gos.vx, percentage);
+	gos.vy = interpolateVal(c.body.vy, gos.vy, percentage);
+	gos.av = interpolateVal(c.body.av, gos.av, percentage);
+
 	applyGameObjectState(go, gos);
 }
 
@@ -91,7 +101,7 @@ bool ClientGameController::isLocalPlayer(const std::string& id) {
 	return false;
 }
 
-void ClientGameController::interpolateGameState(const Net::GameState& gs)
+void ClientGameController::interpolateGameState(const Net::GameState& gs, const double percentage)
 {
 	for(Net::GameObjectState gos : gs.objects) {
 		GameObject* go;
@@ -100,7 +110,7 @@ void ClientGameController::interpolateGameState(const Net::GameState& gs)
 		} catch(std::out_of_range& e) {
 			go = spawnGameObject(gos.identifier, gos.key);
 		}
-		interpolateGameObjectState(go, gos);
+		interpolateGameObjectState(go, gos, percentage);
 	}
 	for(Net::GameObjectState gos : gs.players) {
 		if(isLocalPlayer(gos.identifier))
@@ -111,8 +121,13 @@ void ClientGameController::interpolateGameState(const Net::GameState& gs)
 		} catch(std::out_of_range& e) {
 			go = spawnPlayer(gos.identifier, gos.key);
 		}
-		interpolateGameObjectState(go, gos);
+		interpolateGameObjectState(go, gos, percentage);
 	}
+}
+
+void ClientGameController::applyGameState(const Net::GameState& gs)
+{
+	interpolateGameState(gs, 1.0);
 }
 
 GameObject* ClientGameController::spawnGameObject(std::string identifier, std::string key)

@@ -9,12 +9,9 @@
 #include "game/GameController.h"
 #include "game/Net.h"
 
-#define LOWER_POSITION_THRESHOLD 0.1 // compared with square difference in map coords
-#define UPPER_POSITION_THRESHOLD 1 // compared with square difference in map coords
-#define POSITION_CORRECTION 0.25
-#define LOWER_ORIENT_THRESHOLD 0.1 // delta in radians
-#define UPPER_ORIENT_THRESHOLD 1 // delta in radians
-#define ORIENT_CORRECTION 0.25
+#define LOWER_POSITION_THRESHOLD 0.25 // compared with square difference in map coords
+#define UPPER_POSITION_THRESHOLD 0.75 // compared with square difference in map coords
+#define POSITION_CORRECTION 0.25 // in percent of the difference
 
 class ClientGameController : public GameController {
 public:
@@ -28,8 +25,9 @@ public:
 	void update(sf::Time ellapsed) override;
 	void sortGameObjectDrawings();
 
-	void interpolateGameObjectState(GameObject* go, Net::GameObjectState gos);
-	void interpolateGameState(const Net::GameState& gs);
+	void interpolateGameObjectState(GameObject* go, Net::GameObjectState gos, const double percentage);
+	void interpolateGameState(const Net::GameState& gs, const double percentage);
+	void applyGameState(const Net::GameState& gs);
 
 	bool isLocalPlayer(const std::string& identifier);
 
