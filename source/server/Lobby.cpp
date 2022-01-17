@@ -163,13 +163,13 @@ void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 	// TODO handles input from same player for different local player wrongly
 
 	Net::Timestamp owd = c.getTimeSyncPeer().getSmoothedOwd();
-	Net::Timestamp ts = packet.getTimestamp() - owd;
-	Net::Timestamp targetT = ts - INTERPOLATION_TIME;
+	Net::Timestamp ts = packet.getTimestamp();
+	Net::Timestamp targetT = ts - owd - INTERPOLATION_TIME;
 	Net::Timestamp latency = c.getTimeSyncPeer().getLatency();
 	if(latency >= LATENCY_THRESHOLD) {
 		Log::ger().log(pi.identifier + " exceeds Latency-Threshold", Log::Label::Warning);
 	}
-	m_playerInputs[ts] = pi;
+	m_playerInputs[ts - owd] = pi;
 
 	m_mtx.lock();
 
@@ -177,13 +177,11 @@ void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 
 	// newest gamestate on client before input was sent
 	// client timestamp - one way delay = server time stamp
-	auto itState = c.getGameStates().upper_bound(ts);
-	if(itState != c.getGameStates().begin()) // TODO else?
-		itState = std::prev(itState);
+	auto itState = c.getGameStates().lower_bound(ts - owd);
 	// gamestate from which client is interpolating
-	auto bitState = c.getGameStates().upper_bound(targetT);
-	if(bitState != c.getGameStates().begin()) // TODO else?
-		bitState = std::prev(bitState);
+	auto bitState = c.getGameStates().lower_bound(targetT);
+	if(bitState == c.getGameStates().end() || itState == c.getGameStates().end()) // TODO error?
+		return;
 
 	// synchronize jitter of gamestates on client side
 	// but we only have server side clock inaccuracy...
@@ -201,17 +199,19 @@ void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 			}
 		}
 	}
+	// (targetT - bit->first) == (ts - owd - it->first) when TODO: INTERPOLATION_TIME = n * SRV_UPDATE_FREQUENCY
+	// now we are at the view of the current player
+	m_gc.update(sf::microseconds(targetT - bit->first));
 
 	// update difference between clients latest state and the inputs since then
-	ts = itState->first;
-
+	auto t = targetT;
 	// apply all inputs since clients input time, also noting out of order inputs
-	// first it should always be received input
-	for(auto it = m_playerInputs.lower_bound(itState->first); it != m_playerInputs.end(); ++it) {
+	// last should be received input
+	for(auto it = m_playerInputs.upper_bound(targetT); it != m_playerInputs.end(); ++it) {
 		// newer timestamps are greater then older, so substract older from newer
-		m_gc.update(sf::microseconds(it->first - ts));
+		m_gc.update(sf::microseconds(it->first - t));
 		m_gc.getGameObejctPointer(it->second.identifier)->event(it->second.inputs);
-		ts = it->first;
+		t = it->first;
 	}
 	// update to now again
 	m_gc.update(sf::microseconds(c.getTimeSyncPeer().now() - ts));
