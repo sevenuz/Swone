@@ -13,3 +13,4 @@ swone.layout
 winbuild.txt
 res/
 .cache
+.ccls-cache
