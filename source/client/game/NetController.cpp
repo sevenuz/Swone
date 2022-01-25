@@ -40,11 +40,12 @@ void NetController::handleUdpConnection()
 					break;
 			}
 		}
+		m_lastGameTick = Helper::now();
 		sf::Time ellapsed = restartClock();
 		updateGameController(ellapsed);
 		handleTimeSync();
 		checkAcknowledgements();
-		//std::this_thread::sleep_for(200ms); // TODO
+		std::this_thread::sleep_for(std::chrono::microseconds(NET_MAIN_SLEEP));
 	}
 }
 
@@ -115,6 +116,7 @@ void NetController::sendPlayerInput(Net::PlayerInput gi)
 	}
 	Net::GamePacket packet(Net::U_PLAYER_INPUT, m_lobbyCode, m_timeSyncPeer);
 	packet << gi;
+	// TODO shoulnt we use local timestampt? -> makes it laggy
 	m_playerInputs[packet.getTimestamp()] = gi;
 	m_socket.send(packet, m_serverIpAddress, m_serverPort);
 }
@@ -211,6 +213,8 @@ void NetController::receiveGameState(Net::GamePacket packet)
 		Log::ger().log("GameState exceeds Latency-Threshold", Log::Label::Warning);
 	}
 
+	m_c.gameMutex.lock();
+
 	// add interpolation game state in client time
 	auto itt = m_gameStates.insert(std::make_pair(ts + owd, gs)).first;
 	if(itt != std::prev(m_gameStates.end())) {
@@ -218,13 +222,10 @@ void NetController::receiveGameState(Net::GamePacket packet)
 	}
 
 	// delete already applied player inputs
-	auto it = m_playerInputs.lower_bound(ts - owd);
+	auto it = m_playerInputs.upper_bound(ts - owd);
 	if(it != m_playerInputs.begin())
-		m_playerInputs.erase(m_playerInputs.begin(), it);
+		m_playerInputs.erase(m_playerInputs.begin(), std::prev(it));
 
-	m_c.gameMutex.lock();
-
-	Net::GameState interpolateGs = m_gc.getGameState();
 	// apply newest game state to simulate local players
 	for(Net::GameObjectState& gos : gs.players) {
 		for(GameObject* p : m_gc.getLocalPlayers()) {
@@ -248,10 +249,13 @@ void NetController::receiveGameState(Net::GamePacket packet)
 			}
 		}
 	}
-	m_gc.update(sf::microseconds(m_timeSyncPeer.now() - t));
-	// applies interpolation state before player simulation
-	m_gc.applyGameState(interpolateGs); // does not apply to local players
-	restartClock();
+
+	if (t > m_lastGameTick) {
+		m_gc.update(sf::microseconds(Helper::now() - t));
+		restartClock();
+	} else {
+		m_gc.update(sf::microseconds(m_lastGameTick - t));
+	}
 
 	m_c.gameMutex.unlock();
 }

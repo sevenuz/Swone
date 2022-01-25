@@ -9,9 +9,9 @@
 #include "game/GameController.h"
 #include "game/Net.h"
 
-#define LOWER_POSITION_THRESHOLD 0.25 // compared with square difference in map coords
-#define UPPER_POSITION_THRESHOLD 0.75 // compared with square difference in map coords
-#define POSITION_CORRECTION 0.25 // in percent of the difference
+#define LOWER_POSITION_THRESHOLD 0.05 // compared with square difference in map coords
+#define UPPER_POSITION_THRESHOLD 3.75 // compared with square difference in map coords
+#define POSITION_CORRECTION 0.75 // in percent of the difference
 
 class ClientGameController : public GameController {
 public:

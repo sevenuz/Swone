@@ -23,6 +23,7 @@ void Lobby::startMainLoop()
 	while(m_run) {
 
 		m_mtx.lock();
+		m_lastGameTick = Helper::now();
 		m_gc.update(restartClock()); // sets also tickT and chatT
 
 		if(m_tickT >= m_tickDt) {
@@ -34,6 +35,8 @@ void Lobby::startMainLoop()
 			sendChat();
 		}
 		m_mtx.unlock();
+
+		std::this_thread::sleep_for(std::chrono::microseconds(MAIN_SLEEP));
 	}
 }
 
@@ -72,6 +75,7 @@ void Lobby::handlePackets()
 			}
 			m_packetsReceive.pop();
 		}
+		std::this_thread::sleep_for(std::chrono::microseconds(PACKETS_SLEEP));
 	}
 }
 
@@ -164,16 +168,14 @@ void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 
 	Net::Timestamp owd = c.getTimeSyncPeer().getSmoothedOwd();
 	Net::Timestamp ts = packet.getTimestamp() - owd;
-	Net::Timestamp targetT = ts - INTERPOLATION_TIME;
 	Net::Timestamp latency = c.getTimeSyncPeer().getLatency();
+	Net::Timestamp targetT = ts - INTERPOLATION_TIME - latency;
 	if(latency >= LATENCY_THRESHOLD) {
 		Log::ger().log(pi.identifier + " exceeds Latency-Threshold", Log::Label::Warning);
 	}
 	m_playerInputs[ts] = pi;
 
 	m_mtx.lock();
-
-	//m_gc.getGameObejctPointer(pi.identifier)->event(pi.inputs);
 
 	// newest gamestate on client before input was sent
 	// client timestamp - one way delay = server time stamp
@@ -203,33 +205,37 @@ void Lobby::receivePlayerInput(Net::GamePacket packet, Player& c)
 	}
 
 	// update difference between clients latest state and the inputs since then
-	ts = itState->first;
+	auto t = itState->first;
 
 	// apply all inputs since clients input time, also noting out of order inputs
 	// first it should always be received input
 	for(auto it = m_playerInputs.lower_bound(itState->first); it != m_playerInputs.end(); ++it) {
 		// newer timestamps are greater then older, so substract older from newer
-		m_gc.update(sf::microseconds(it->first - ts));
+		m_gc.update(sf::microseconds(it->first - t));
 		m_gc.getGameObejctPointer(it->second.identifier)->event(it->second.inputs);
-		ts = it->first;
+		t = it->first;
 	}
 	// update to now again
-	m_gc.update(sf::microseconds(c.getTimeSyncPeer().now() - ts));
+	if (t > m_lastGameTick) {
+		m_gc.update(sf::microseconds(Helper::now() - t));
+		// restart clock which updates also sendState timer
+		// to synchronize with update loop
+		restartClock();
+	} else {
+		m_gc.update(sf::microseconds(m_lastGameTick - t));
+	}
 	// save clients local players states
 	std::vector<std::pair<GameObject*, Net::GameObjectState>> localPlayerStates;
 	for(GameObject* p : c.getPlayers()) {
 		localPlayerStates.push_back(std::make_pair(p, m_gc.getGameObjectState(p)));
 	}
 	// bring objects from clients target time into present
+	// now all objects are at the same time again
 	m_gc.update(sf::microseconds(INTERPOLATION_TIME));
 	// apply clients local player states
-	// now all objects are at the same time again
 	for(auto& p : localPlayerStates) {
 		m_gc.applyGameObjectState(p.first, p.second);
 	}
-	// restart clock which updates also sendState timer
-	// to synchronize with update loop
-	restartClock();
 
 	m_mtx.unlock();
 }
@@ -258,7 +264,14 @@ void Lobby::sendState()
 			continue;
 		Net::GamePacket packet(Net::U_GAME_STATE, m_code, p->getTimeSyncPeer());
 		packet << gs;
-		p->addGameState(packet.getTimestamp(), &m_gameStates.back());
+		/*
+		if	(packet.getTimestamp() < packet.getLocalTimestamp())
+			Log::ger().log("local remote timestamp delta: " + std::to_string(packet.getLocalTimestamp() - packet.getTimestamp()));
+		else
+			Log::ger().log("local remote timestamp delta: -" + std::to_string(packet.getTimestamp() - packet.getLocalTimestamp()));
+		*/
+		// TODO should we use local timestamp?
+		p->addGameState(packet.getLocalTimestamp(), &m_gameStates.back());
 		send(packet, *p);
 	}
 }

@@ -24,6 +24,10 @@
 #define UDP_DATA_THRESHOLD 0.8
 #define MAX_PLAYER_COUNT 10
 
+// sleep in microseconds
+#define MAIN_SLEEP 1000
+#define PACKETS_SLEEP 1000
+
 class Lobby {
 public:
 	static std::string generateCode(std::string name);
@@ -69,6 +73,7 @@ private:
 	std::queue<PacketPair> m_packetsReceive;
 	std::queue<PacketPair> m_packetsSend;
 
+	Net::Timestamp m_lastGameTick;
 	sf::Clock clock;
 	sf::Time m_tickT;
 	sf::Time m_tickDt = sf::seconds(1.0f/20.0f);

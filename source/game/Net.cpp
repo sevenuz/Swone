@@ -25,10 +25,11 @@ Net::GamePacket::GamePacket(const sf::Uint8 type, const std::string& code, Net::
 	Net::Packet::Packet(type),
 	m_timeSyncPeer(&tsp)
 {
-	m_stamp = m_timeSyncPeer->getRemoteTimestamp();
+	m_localStamp = Helper::now();
+	m_remoteStamp = m_timeSyncPeer->getRemoteTimestamp(m_localStamp);
 	m_syncStamp = m_timeSyncPeer->getLocalTimeDatagram();
 	m_code = code;
-	*this << m_stamp << m_syncStamp << m_code;
+	*this << m_remoteStamp << m_syncStamp << m_code;
 }
 Net::GamePacket::GamePacket() : Net::Packet::Packet(T_VOID)
 {}
@@ -39,7 +40,7 @@ const void* Net::GamePacket::GamePacket::onSend(std::size_t& size)
 void Net::GamePacket::onReceive(const void* data, std::size_t size)
 {
 	Net::Packet::onReceive(data, size);
-	*this >> m_stamp >> m_syncStamp >> m_code;
+	*this >> m_remoteStamp >> m_syncStamp >> m_code;
 }
 void Net::GamePacket::setTimeSyncPeer(TimeSyncPeer& tsp)
 {
@@ -50,11 +51,16 @@ const Net::TimeSyncPeer& Net::GamePacket::getTimeSyncPeer()
 {
 	return *m_timeSyncPeer;
 }
+const Net::Timestamp Net::GamePacket::getLocalTimestamp() const
+{
+	assert(m_localStamp);
+	return m_localStamp;
+}
 const Net::Timestamp Net::GamePacket::getTimestamp() const
 {
 	assert(m_timeSyncPeer);
 	assert(m_timeSyncPeer->isSynchronized());
-	return m_timeSyncPeer->convertToLocalTimestamp(m_stamp);
+	return m_timeSyncPeer->convertToLocalTimestamp(m_remoteStamp);
 }
 const std::string Net::GamePacket::getCode() const
 {
@@ -95,9 +101,9 @@ Counter24 Net::TimeSyncPeer::getLocalTimeDatagram()
 {
 	return m_timeSync.LocalTimeToDatagramTS24(Helper::now());
 }
-Counter23 Net::TimeSyncPeer::getRemoteTimestamp()
+Counter23 Net::TimeSyncPeer::getRemoteTimestamp(const Net::Timestamp localUsec)
 {
-	return m_timeSync.ToRemoteTime23(Helper::now());
+	return m_timeSync.ToRemoteTime23(localUsec);
 }
 Net::Timestamp Net::TimeSyncPeer::convertToLocalTimestamp(Counter23 ts23)
 {
@@ -105,7 +111,7 @@ Net::Timestamp Net::TimeSyncPeer::convertToLocalTimestamp(Counter23 ts23)
 }
 Net::Timestamp Net::TimeSyncPeer::now()
 {
-	return convertToLocalTimestamp(getRemoteTimestamp());
+	return convertToLocalTimestamp(getRemoteTimestamp(Helper::now()));
 }
 void Net::TimeSyncPeer::incorporateTimestamp(Counter24 timestamp)
 {

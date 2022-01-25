@@ -78,7 +78,7 @@ namespace Net
 			unsigned getMinOwd();
 			Counter24 getMinDelta();
 			Counter24 getLocalTimeDatagram();
-			Counter23 getRemoteTimestamp();
+			Counter23 getRemoteTimestamp(const Net::Timestamp localUsec);
 			Net::Timestamp convertToLocalTimestamp(Counter23 ts23);
 			Net::Timestamp now();
 			void incorporateTimestamp(Counter24 timestamp);
@@ -87,7 +87,8 @@ namespace Net
 
 	class GamePacket : public Net::Packet {
 		private:
-			Counter23 m_stamp; // can be transformed to useable timestamp
+			Net::Timestamp m_localStamp; // local timestamp, used to create remote timestamp
+			Counter23 m_remoteStamp; // can be transformed to useable timestamp
 			Counter24 m_syncStamp; // is used to sync clocks
 			std::string m_code;
 			TimeSyncPeer* m_timeSyncPeer = nullptr;
@@ -102,6 +103,7 @@ namespace Net
 			void setTimeSyncPeer(TimeSyncPeer& tsp);
 			const TimeSyncPeer& getTimeSyncPeer();
 			// asserts that the TimeSyncPeer is already syncronized
+			const Net::Timestamp getLocalTimestamp() const;
 			const Net::Timestamp getTimestamp() const;
 			const std::string getCode() const;
 	};

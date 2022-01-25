@@ -81,12 +81,9 @@ void ClientGameController::interpolateGameObjectState(GameObject* go, Net::GameO
 {
 	auto c = go->getConfig();
 
-	// only on state apply, else interpolation by physics
-	if (percentage == 1.0) {
-		gos.x = interpolateVal(c.body.x, gos.x, percentage);
-		gos.y = interpolateVal(c.body.y, gos.y, percentage);
-		gos.orient = interpolateVal(c.body.orient, gos.orient, percentage);
-	}
+	gos.x = interpolateVal(c.body.x, gos.x, percentage);
+	gos.y = interpolateVal(c.body.y, gos.y, percentage);
+	gos.orient = interpolateVal(c.body.orient, gos.orient, percentage);
 	gos.vx = interpolateVal(c.body.vx, gos.vx, percentage);
 	gos.vy = interpolateVal(c.body.vy, gos.vy, percentage);
 	gos.av = interpolateVal(c.body.av, gos.av, percentage);
